@@ -1,22 +1,20 @@
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
-import { MENSAGENS } from '@/lib/auth/acesso'
+import { mensagemDeErro } from '@/lib/auth/acesso'
 
 export const metadata = { title: 'Entrar' }
 
-type Props = { searchParams: Promise<{ erro?: string; de?: string }> }
+type Props = { searchParams: Promise<{ erro?: string; error?: string; de?: string }> }
 
 export default async function Entrar({ searchParams }: Props) {
-  const { erro, de } = await searchParams
+  const params = await searchParams
+  const { de } = params
+  // o Auth.js devolve ?error=, os nossos redirecionamentos usam ?erro=
+  const erro = params.erro ?? params.error
   const sessao = await auth()
   if (sessao?.user && !erro) redirect(de ?? '/admin')
 
-  const mensagem =
-    erro === 'nao-convidado' || erro === 'desativado'
-      ? MENSAGENS[erro]
-      : erro
-        ? 'Não foi possível entrar. Tente de novo.'
-        : null
+  const problema = mensagemDeErro(erro)
 
   return (
     <main
@@ -49,8 +47,8 @@ export default async function Entrar({ searchParams }: Props) {
           Entre com a conta Google que o grupo cadastrou para você.
         </p>
 
-        {mensagem && (
-          <p
+        {problema && (
+          <div
             role="alert"
             style={{
               marginTop: 18,
@@ -61,8 +59,20 @@ export default async function Entrar({ searchParams }: Props) {
               borderLeft: '4px solid var(--laranja)',
             }}
           >
-            {mensagem}
-          </p>
+            <p>{problema.texto}</p>
+            {problema.tecnico && (
+              // detalhe para quem está montando o site; quem só quer
+              // entrar não precisa ver isso aberto
+              <details style={{ marginTop: 8 }}>
+                <summary style={{ cursor: 'pointer', font: '700 11px var(--condensada)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--amarelo)' }}>
+                  Detalhes técnicos
+                </summary>
+                <p style={{ marginTop: 6, font: '400 12.5px/1.5 var(--corpo)', color: 'rgba(249,249,249,0.75)' }}>
+                  {problema.tecnico}
+                </p>
+              </details>
+            )}
+          </div>
         )}
 
         <form

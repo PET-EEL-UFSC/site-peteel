@@ -31,10 +31,59 @@ export function avaliarAcesso(convidado: Convidado | null): ResultadoAcesso {
   return { permitido: true, userId: convidado.id, papel: convidado.papel }
 }
 
-export const MENSAGENS: Record<'nao-convidado' | 'desativado', string> = {
-  'nao-convidado':
-    'Esta conta não tem acesso ao painel do PET EEL. Peça a um administrador do grupo para te adicionar.',
-  desativado: 'Este acesso foi desativado. Fale com um administrador do grupo.',
+/**
+ * Mensagens da tela de login. Cobre tanto os motivos nossos quanto os
+ * códigos que o Auth.js devolve — sem isso qualquer falha de
+ * configuração vira "tente de novo", que não diz nada a quem está
+ * montando o site nem a quem só quer entrar.
+ */
+export const MENSAGENS: Record<string, { texto: string; tecnico?: string }> = {
+  // nossos
+  'nao-convidado': {
+    texto: 'Esta conta não tem acesso ao painel do PET EEL. Peça a um administrador do grupo para te adicionar.',
+  },
+  desativado: {
+    texto: 'Este acesso foi desativado. Fale com um administrador do grupo.',
+  },
+
+  // do Auth.js
+  Configuration: {
+    texto: 'O login com Google ainda não está configurado neste site.',
+    tecnico:
+      'Faltam AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET, ou foram adicionadas sem reimplantar. Variável nova só vale no próximo build.',
+  },
+  AccessDenied: {
+    texto: 'Acesso negado. Esta conta não está na lista de quem pode entrar.',
+  },
+  Verification: {
+    texto: 'Este link de acesso expirou. Tente entrar de novo.',
+  },
+  OAuthAccountNotLinked: {
+    texto: 'Já existe um acesso com este e-mail, criado por outro método.',
+    tecnico: 'Auth.js recusou vincular a conta Google a um usuário existente.',
+  },
+  OAuthSignin: {
+    texto: 'Não foi possível iniciar o login com o Google.',
+    tecnico: 'Confira o AUTH_GOOGLE_ID e se o cliente OAuth existe no projeto do Google Cloud.',
+  },
+  OAuthCallback: {
+    texto: 'O Google recusou a volta para o site.',
+    tecnico:
+      'O endereço de redirecionamento tem que ser exatamente <NEXTAUTH_URL>/api/auth/callback/google no Google Cloud.',
+  },
+  Callback: {
+    texto: 'Algo deu errado ao concluir o login.',
+  },
+}
+
+export function mensagemDeErro(codigo: string | undefined): { texto: string; tecnico?: string } | null {
+  if (!codigo) return null
+  return (
+    MENSAGENS[codigo] ?? {
+      texto: 'Não foi possível entrar.',
+      tecnico: `Código devolvido: ${codigo}`,
+    }
+  )
 }
 
 /**
