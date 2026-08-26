@@ -14,8 +14,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     ['/admin/midia', 'Imagens'],
     ['/admin/pessoas', 'Pessoas'],
   ]
-  if (pode(u.papel, 'gerenciarPessoas')) itens.push(['/admin/acessos', 'Acessos'])
-  if (pode(u.papel, 'publicar')) itens.push(['/admin/config', 'Configuração'])
+  if (pode(u.papel, 'gerenciarAcessos')) itens.push(['/admin/acessos', 'Acessos'])
+  if (pode(u.papel, 'configurarSite')) itens.push(['/admin/config', 'Configuração'])
 
   return (
     <div className="painel">

@@ -3,7 +3,7 @@ import { exigirPermissao } from '@/lib/auth/sessao'
 import { Pessoas } from '../_componentes/Pessoas'
 
 export default async function PessoasPage() {
-  await exigirPermissao('gerenciarPessoas')
+  await exigirPermissao('gerenciarPetianos')
 
   const [petianos, midias] = await Promise.all([
     db.petiano.findMany({ orderBy: [{ saiuEm: 'asc' }, { tutor: 'desc' }, { ordem: 'asc' }] }),

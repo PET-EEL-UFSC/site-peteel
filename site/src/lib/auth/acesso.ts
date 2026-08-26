@@ -37,14 +37,32 @@ export const MENSAGENS: Record<'nao-convidado' | 'desativado', string> = {
   desativado: 'Este acesso foi desativado. Fale com um administrador do grupo.',
 }
 
-/** Só ADMIN publica e mexe em pessoas; EDITOR salva rascunho. */
+/**
+ * A divisão é entre trabalho do dia a dia e governança, não entre
+ * "confiável" e "não confiável".
+ *
+ * EDITOR faz tudo que é conteúdo, publicar inclusive. Prender a
+ * publicação no ADMIN só faria o grupo compartilhar a senha da conta
+ * institucional — e uma senha circulando entre doze pessoas é pior do
+ * que cada uma ter seu próprio acesso. O histórico de revisões cobre o
+ * risco: nada some, e o ADMIN restaura.
+ *
+ * ADMIN guarda o que é irreversível ou estrutural: apagar página,
+ * gerenciar quem entra, configurar o site.
+ */
 export const PERMISSOES = {
   editarRascunho: ['ADMIN', 'EDITOR'],
-  publicar: ['ADMIN'],
-  gerenciarPessoas: ['ADMIN'],
-  criarPagina: ['ADMIN'],
-  apagarPagina: ['ADMIN'],
+  publicar: ['ADMIN', 'EDITOR'],
   subirMidia: ['ADMIN', 'EDITOR'],
+  criarPagina: ['ADMIN', 'EDITOR'],
+
+  // a lista de petianos é conteúdo do site: quem entra no grupo em março
+  // precisa aparecer na página sem depender do admin
+  gerenciarPetianos: ['ADMIN', 'EDITOR'],
+
+  apagarPagina: ['ADMIN'],
+  gerenciarAcessos: ['ADMIN'],
+  configurarSite: ['ADMIN'],
 } as const satisfies Record<string, readonly Papel[]>
 
 export type Acao = keyof typeof PERMISSOES

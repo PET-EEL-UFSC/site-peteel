@@ -148,7 +148,7 @@ export async function apagarPagina(paginaId: string): Promise<Resultado> {
 // ─────────────────────────── pessoas ───────────────────────────
 
 export async function salvarPetiano(formData: FormData): Promise<void> {
-  await exigirPermissaoAction('gerenciarPessoas')
+  await exigirPermissaoAction('gerenciarPetianos')
 
   const id = String(formData.get('id') ?? '')
   const dados = {
@@ -172,7 +172,7 @@ export async function salvarPetiano(formData: FormData): Promise<void> {
 
 export async function apagarPetiano(id: string): Promise<Resultado> {
   try {
-    await exigirPermissaoAction('gerenciarPessoas')
+    await exigirPermissaoAction('gerenciarPetianos')
   } catch (e) {
     return { ok: false, erro: (e as Error).message }
   }
@@ -185,7 +185,7 @@ export async function apagarPetiano(id: string): Promise<Resultado> {
 // ─────────────────────────── acessos ───────────────────────────
 
 export async function convidar(formData: FormData): Promise<void> {
-  const eu = await exigirPermissaoAction('gerenciarPessoas')
+  const eu = await exigirPermissaoAction('gerenciarAcessos')
 
   const parsed = emailSchema.safeParse(String(formData.get('email') ?? ''))
   if (!parsed.success) throw new Error('e-mail inválido')
@@ -204,7 +204,7 @@ export async function convidar(formData: FormData): Promise<void> {
 export async function alternarAcesso(userId: string, ativo: boolean): Promise<Resultado> {
   let eu
   try {
-    eu = await exigirPermissaoAction('gerenciarPessoas')
+    eu = await exigirPermissaoAction('gerenciarAcessos')
   } catch (e) {
     return { ok: false, erro: (e as Error).message }
   }
@@ -230,7 +230,7 @@ export async function alternarAcesso(userId: string, ativo: boolean): Promise<Re
 export async function mudarPapel(userId: string, papel: 'ADMIN' | 'EDITOR'): Promise<Resultado> {
   let eu
   try {
-    eu = await exigirPermissaoAction('gerenciarPessoas')
+    eu = await exigirPermissaoAction('gerenciarAcessos')
   } catch (e) {
     return { ok: false, erro: (e as Error).message }
   }
@@ -248,7 +248,7 @@ export async function mudarPapel(userId: string, papel: 'ADMIN' | 'EDITOR'): Pro
 // ─────────────────────────── configuração ───────────────────────────
 
 export async function salvarConfig(formData: FormData): Promise<void> {
-  await exigirPermissaoAction('publicar')
+  await exigirPermissaoAction('configurarSite')
 
   const t = (k: string) => String(formData.get(k) ?? '').trim() || null
   await db.config.upsert({

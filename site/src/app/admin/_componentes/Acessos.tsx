@@ -42,8 +42,8 @@ export function Acessos({ usuarios, meuId }: { usuarios: U[]; meuId: string }) {
         <label className="campo">
           <span>Pode fazer o quê</span>
           <select name="papel" defaultValue="EDITOR">
-            <option value="EDITOR">Editor — escreve e salva rascunho</option>
-            <option value="ADMIN">Administrador — também publica e gerencia acessos</option>
+            <option value="EDITOR">Editor — escreve, publica e sobe imagens</option>
+            <option value="ADMIN">Administrador — também apaga páginas e gerencia acessos</option>
           </select>
         </label>
 
@@ -93,7 +93,8 @@ export function Acessos({ usuarios, meuId }: { usuarios: U[]; meuId: string }) {
         </tbody>
       </table>
       <p className="dica" style={{ marginTop: 8 }}>
-        Desativar tem efeito imediato: o painel confere o acesso no banco a cada carregamento, mesmo com a sessão aberta.
+        Editor dá conta do dia a dia: escrever, publicar e subir foto. Administrador é para governança —
+        apagar página, mexer nesta lista e configurar o site. Desativar tem efeito imediato, mesmo com a sessão aberta.
       </p>
     </>
   )

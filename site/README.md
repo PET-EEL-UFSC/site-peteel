@@ -34,13 +34,18 @@ disso a variável pode sair do ambiente — admin convida admin pela interface.
 
 Papéis:
 
-| | Editor | Administrador |
-|---|---|---|
-| Editar e salvar rascunho | sim | sim |
-| Subir imagem | sim | sim |
-| Publicar | não | sim |
-| Criar/apagar página | não | sim |
-| Gerenciar pessoas e acessos | não | sim |
+**Dia a dia** — Editor e Administrador podem:
+editar e salvar rascunho · publicar · subir imagem · criar página ·
+manter a lista de petianos.
+
+**Governança** — só Administrador:
+apagar página · gerenciar quem tem acesso · configurar o site.
+
+A divisão é entre dia a dia e governança, não entre confiável e não
+confiável. Prender a publicação no administrador só faria o grupo
+compartilhar a senha da conta institucional, e uma senha circulando entre
+doze pessoas é pior do que cada uma ter o próprio acesso. O histórico de
+revisões cobre o risco: nada some, e o administrador restaura.
 
 Desativar alguém tem efeito imediato, mesmo com a sessão aberta: o painel
 confere o acesso no banco a cada carregamento.

@@ -119,7 +119,7 @@ export function EditorBlocos({ paginaId, slug, titulo, inicial, temRascunho, pod
           </button>
         )}
         {sujo && <span style={{ font: '400 13px var(--corpo)', color: '#a11' }}>alterações não salvas</span>}
-        {!podePublicar && <span className="dica">Você pode salvar rascunho; publicar é só para administradores.</span>}
+        {!podePublicar && <span className="dica">Seu acesso salva rascunho, mas não publica.</span>}
       </div>
 
       {msg && <p className={msg.ok ? 'aviso-ok' : 'aviso-erro'}>{msg.texto}</p>}

@@ -3,7 +3,7 @@ import { exigirPermissao } from '@/lib/auth/sessao'
 import { Acessos } from '../_componentes/Acessos'
 
 export default async function AcessosPage() {
-  const eu = await exigirPermissao('gerenciarPessoas')
+  const eu = await exigirPermissao('gerenciarAcessos')
 
   const usuarios = await db.user.findMany({
     select: { id: true, email: true, nome: true, papel: true, ativo: true, gestao: true, primeiroAcesso: true, criadoEm: true },

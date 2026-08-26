@@ -3,3 +3,6 @@ node_modules
 .env
 public/uploads
 *.tsbuildinfo
+
+.env.producao-ref
+.env.local-backup

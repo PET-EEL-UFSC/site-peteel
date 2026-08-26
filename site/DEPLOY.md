@@ -174,6 +174,10 @@ do grupo, é só repassar a senha. Se estiverem em conta pessoal, cada um
 precisa ser transferido individualmente — por isso a recomendação de já
 começar institucional.
 
-Dentro do site, promover a próxima gestão é em **Acessos**: adicionar as
-pessoas como Administrador antes de desativar as antigas. O sistema não
-deixa remover o último administrador ativo.
+Dentro do site, cada petiano entra como **Editor** — escreve, publica e
+sobe foto, sem precisar da senha da conta institucional. O
+**Administrador** (`peteel@gmail.com`) fica para o que é irreversível ou
+estrutural: apagar página, mexer na lista de acessos e configurar o site.
+
+Na virada de gestão, adicione as pessoas novas antes de desativar as
+antigas. O sistema não deixa remover o último administrador ativo.

@@ -3,7 +3,7 @@ import { exigirPermissao } from '@/lib/auth/sessao'
 import { salvarConfig } from '../acoes'
 
 export default async function ConfigPage() {
-  await exigirPermissao('publicar')
+  await exigirPermissao('configurarSite')
   const c = await db.config.findUnique({ where: { id: 1 } })
 
   const campo = (nome: string, rotulo: string, valor: string | null | undefined, dica?: string, tipo = 'text') => (
