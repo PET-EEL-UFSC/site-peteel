@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NavPainel } from './_componentes/NavPainel'
 import { exigirUsuario } from '@/lib/auth/sessao'
 import { pode } from '@/lib/auth/acesso'
 import { signOut } from '@/auth'
@@ -27,11 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </span>
         </div>
 
-        {itens.map(([href, label]) => (
-          <Link key={href} href={href}>
-            {label}
-          </Link>
-        ))}
+        <NavPainel itens={itens} />
 
         <div style={{ marginTop: 'auto', padding: '18px 22px 0' }}>
           <p style={{ font: '400 12px/1.4 var(--corpo)', color: 'rgba(249,249,249,0.55)' }}>

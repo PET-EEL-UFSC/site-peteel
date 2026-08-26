@@ -184,21 +184,88 @@ export async function apagarPetiano(id: string): Promise<Resultado> {
 
 // ─────────────────────────── acessos ───────────────────────────
 
-export async function convidar(formData: FormData): Promise<void> {
-  const eu = await exigirPermissaoAction('gerenciarAcessos')
+export async function convidar(formData: FormData): Promise<Resultado> {
+  let eu
+  try {
+    eu = await exigirPermissaoAction('gerenciarAcessos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
 
   const parsed = emailSchema.safeParse(String(formData.get('email') ?? ''))
-  if (!parsed.success) throw new Error('e-mail inválido')
+  if (!parsed.success) return { ok: false, erro: 'e-mail inválido' }
 
   const papel = String(formData.get('papel') ?? 'EDITOR') === 'ADMIN' ? 'ADMIN' : 'EDITOR'
+  const nome = String(formData.get('nome') ?? '').trim() || null
+  const gestao = String(formData.get('gestao') ?? '').trim() || null
+
+  const jaExiste = await db.user.findUnique({ where: { email: parsed.data }, select: { id: true } })
 
   await db.user.upsert({
     where: { email: parsed.data },
-    update: { papel, ativo: true },
-    create: { email: parsed.data, papel, ativo: true, convidadoPorId: eu.id, gestao: String(formData.get('gestao') ?? '') || null },
+    // não sobrescreve o nome com vazio se a pessoa já existe
+    update: { papel, ativo: true, ...(nome ? { nome } : {}), ...(gestao ? { gestao } : {}) },
+    create: { email: parsed.data, nome, gestao, papel, ativo: true, convidadoPorId: eu.id },
   })
 
   revalidatePath('/admin/acessos')
+  return {
+    ok: true,
+    mensagem: jaExiste
+      ? `${parsed.data} já tinha acesso — dados atualizados.`
+      : `${parsed.data} agora pode entrar com o Google.`,
+  }
+}
+
+/** Nome e gestão são digitados aqui; o Google só preenche o nome se vier vazio. */
+export async function atualizarAcesso(
+  userId: string,
+  dados: { nome: string; gestao: string }
+): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarAcessos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  await db.user.update({
+    where: { id: userId },
+    data: { nome: dados.nome.trim() || null, gestao: dados.gestao.trim() || null },
+  })
+
+  revalidatePath('/admin/acessos')
+  return { ok: true, mensagem: 'Dados atualizados.' }
+}
+
+/**
+ * Apaga o acesso de vez, em vez de só desativar.
+ *
+ * É seguro porque o histórico não depende da linha: revisão e mídia
+ * guardam o autor com onDelete SetNull, então o que a pessoa publicou
+ * continua lá, só perde a assinatura. Sessões e vínculo com o Google
+ * caem junto (Cascade), então a pessoa é deslogada na hora.
+ */
+export async function apagarAcesso(userId: string): Promise<Resultado> {
+  let eu
+  try {
+    eu = await exigirPermissaoAction('gerenciarAcessos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  if (userId === eu.id) return { ok: false, erro: 'você não pode apagar o próprio acesso' }
+
+  const alvo = await db.user.findUnique({ where: { id: userId }, select: { papel: true, ativo: true, email: true } })
+  if (!alvo) return { ok: false, erro: 'acesso não encontrado' }
+
+  if (alvo.papel === 'ADMIN' && alvo.ativo) {
+    const admins = await db.user.count({ where: { papel: 'ADMIN', ativo: true } })
+    if (admins <= 1) return { ok: false, erro: 'este é o único admin ativo; promova outra pessoa antes' }
+  }
+
+  await db.user.delete({ where: { id: userId } })
+  revalidatePath('/admin/acessos')
+  return { ok: true, mensagem: `Acesso de ${alvo.email} apagado.` }
 }
 
 export async function alternarAcesso(userId: string, ativo: boolean): Promise<Resultado> {
