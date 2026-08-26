@@ -85,9 +85,7 @@ Dev grava em `public/uploads`; produção usa Vercel Blob (`STORAGE=blob`).
 
 ## Produção
 
-Vercel + Postgres gerenciado (Neon). Variáveis: `DATABASE_URL`, `AUTH_SECRET`,
-`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXTAUTH_URL`, `STORAGE=blob`,
-`BLOB_READ_WRITE_TOKEN`.
+Passo a passo completo em **[DEPLOY.md](DEPLOY.md)** — Vercel + Neon.
 
 As páginas públicas são pré-renderizadas no build e revalidadas ao publicar.
 
