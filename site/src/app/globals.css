@@ -1,0 +1,86 @@
+@import './fontes.css';
+
+:root {
+  --amarelo: #fdea00;
+  --escuro: #2c2b22;
+  --offwhite: #f9f9f9;
+  --azul: #0000f6;
+  --laranja: #fda000;
+
+  --condensada: 'Roboto Condensed', Roboto, Arial, sans-serif;
+  --corpo: Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--offwhite);
+  color: var(--escuro);
+  font-family: var(--corpo);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--condensada);
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+p { margin: 0; }
+a { color: var(--azul); text-decoration: none; }
+a:hover { color: var(--escuro); }
+
+/* ── navegação ── */
+.navitem { position: relative; display: flex; align-items: center; }
+.navmenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: -14px;
+  min-width: 220px;
+  background: var(--escuro);
+  border-top: 3px solid var(--amarelo);
+  flex-direction: column;
+  padding: 8px 0;
+  z-index: 70;
+}
+.navitem:hover .navmenu { display: flex; }
+.navmenu a { padding: 9px 18px; font: 400 13.5px var(--corpo); color: rgba(249, 249, 249, 0.8); }
+.navmenu a:hover { color: var(--escuro); background: var(--amarelo); }
+
+@keyframes boltshift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-3%); }
+}
+
+/* ── hero ── */
+.hero-media { grid-template-rows: 1.5fr 1fr; height: min(70svh, 560px); }
+
+@media (min-width: 901px) and (max-width: 1120px) {
+  .hero { grid-template-columns: 1fr 0.8fr; gap: 30px; }
+  .hero h1 { font-size: clamp(36px, 4.4vw, 58px); }
+}
+/* telas baixas: o hero encolhe em vez de estourar a viewport */
+@media (min-width: 901px) and (max-height: 760px) {
+  .hero h1 { font-size: clamp(34px, 3.6vw, 54px); }
+  .hero { padding-top: 84px; padding-bottom: 36px; }
+}
+
+@media (max-width: 900px) {
+  /* !important porque os estilos inline dos blocos vencem a cascata */
+  #main-nav, #nav-cta { display: none !important; }
+  #nav-menu { display: grid !important; }
+  .hero { grid-template-columns: 1fr !important; padding: 92px 22px 48px !important; gap: 28px !important; }
+  .hero h1 { font-size: clamp(34px, 9vw, 52px) !important; max-width: none !important; }
+  .hero-secao { min-height: 0 !important; }
+  .hero-media { grid-template-columns: 1fr 1fr !important; height: min(46svh, 320px) !important; }
+  .faixa-grid { grid-template-columns: 1fr !important; gap: 28px !important; padding-left: 22px !important; padding-right: 22px !important; }
+  .grid-cards, .grid-galeria { grid-template-columns: 1fr 1fr !important; }
+  .tutor-card { grid-template-columns: 1fr !important; }
+  .linha-com-foto { grid-template-columns: 96px 1fr !important; }
+  .linha-com-foto .linha-foto { grid-row: span 2; }
+  .secao { padding-left: 22px !important; padding-right: 22px !important; }
+  .cabecalho { padding-left: 22px !important; padding-right: 22px !important; }
+}

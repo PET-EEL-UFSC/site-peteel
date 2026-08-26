@@ -1,0 +1,55 @@
+.painel { min-height: 100svh; display: grid; grid-template-columns: 232px 1fr; background: #f4f3ee; }
+.painel-nav { background: var(--escuro); padding: 22px 0; display: flex; flex-direction: column; }
+.painel-nav a { display: block; padding: 11px 22px; font: 700 13px var(--condensada); letter-spacing: 0.09em; text-transform: uppercase; color: rgba(249,249,249,0.72); }
+.painel-nav a:hover { background: rgba(249,249,249,0.08); color: var(--offwhite); }
+.painel-nav a[data-ativo='1'] { color: var(--escuro); background: var(--amarelo); }
+.painel-corpo { padding: 30px 34px 70px; min-width: 0; }
+
+.cartao { background: #fff; border: 2px solid var(--escuro); }
+.btn { border: 2px solid var(--escuro); background: var(--escuro); color: var(--amarelo); padding: 11px 18px; font: 900 12px var(--condensada); letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+.btn-claro { background: #fff; color: var(--escuro); }
+.btn-claro:hover { background: var(--amarelo); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-perigo { background: #fff; color: #a11; border-color: #a11; }
+.btn-perigo:hover { background: #a11; color: #fff; }
+
+.campo { display: block; margin-bottom: 14px; }
+.campo > span { display: block; font: 700 11px var(--condensada); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(44,43,34,0.65); margin-bottom: 5px; }
+.campo input[type='text'], .campo input[type='url'], .campo input[type='number'], .campo input[type='date'], .campo textarea, .campo select {
+  width: 100%; border: 2px solid var(--escuro); background: #fff; padding: 9px 11px; font: 400 14px var(--corpo); color: var(--escuro);
+}
+.campo textarea { min-height: 84px; resize: vertical; }
+.dica { font: 400 12px/1.45 var(--corpo); color: rgba(44,43,34,0.55); margin-top: 4px; }
+
+.editor { display: grid; grid-template-columns: 240px minmax(330px, 0.85fr) minmax(0, 1.5fr); gap: 18px; align-items: start; }
+/* o iframe da prévia tem 1280px de largura intrínseca; sem min-width:0 a
+   trilha do grid cresce até caber ele e estoura o painel inteiro */
+.editor > * { min-width: 0; }
+/* grudada só no modo três colunas; embaixo, grudar não ajuda em nada */
+.previa-caixa { position: sticky; top: 16px; }
+@media (max-width: 1620px) { .previa-caixa { position: static; } }
+/* apertado demais para três colunas: a prévia vira uma faixa embaixo,
+   em vez de sumir — é ela que dá sentido ao formulário */
+@media (max-width: 1620px) {
+  .editor { grid-template-columns: 230px minmax(0, 1fr); }
+  .editor > :last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 1000px) { .editor { grid-template-columns: minmax(0, 1fr); } }
+.bloco-item { display: flex; align-items: center; gap: 8px; width: 100%; border: 2px solid var(--escuro); background: #fff; padding: 9px 10px; margin-bottom: 7px; text-align: left; cursor: pointer; }
+.bloco-item[data-sel='1'] { background: var(--amarelo); }
+.bloco-item .rotulo { font: 900 12.5px var(--condensada); letter-spacing: 0.06em; text-transform: uppercase; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini { border: 1px solid var(--escuro); background: #fff; width: 24px; height: 24px; font: 900 12px var(--corpo); cursor: pointer; line-height: 1; }
+.mini:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.aviso-erro { background: #2C2B22; color: #ff9a8a; border-left: 4px solid #a11; padding: 11px 14px; font: 400 13.5px/1.5 var(--corpo); margin-bottom: 14px; }
+.aviso-ok { background: var(--amarelo); border-left: 4px solid var(--escuro); padding: 11px 14px; font: 400 13.5px/1.5 var(--corpo); margin-bottom: 14px; }
+
+.tabela { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid var(--escuro); }
+.tabela th { text-align: left; font: 700 11px var(--condensada); letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 14px; border-bottom: 2px solid var(--escuro); }
+.tabela td { padding: 11px 14px; border-bottom: 1px solid rgba(44,43,34,0.15); font: 400 14px var(--corpo); vertical-align: middle; }
+.tag { display: inline-block; padding: 3px 8px; font: 900 10px var(--condensada); letter-spacing: 0.1em; text-transform: uppercase; }
+
+@media (max-width: 860px) {
+  .painel { grid-template-columns: 1fr; }
+  .painel-nav { flex-direction: row; overflow-x: auto; padding: 0; }
+}
