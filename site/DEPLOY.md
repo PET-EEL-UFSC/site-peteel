@@ -17,13 +17,24 @@ deploy — por isso ele vem depois.
 Monte assim (acrescente o que está em negrito ao que a Neon te deu):
 
 ```
-DATABASE_URL="postgresql://…-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true&connection_limit=1"
+DATABASE_URL="postgresql://…-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true&connection_limit=5&pool_timeout=20"
 DIRECT_URL="postgresql://…sa-east-1.aws.neon.tech/neondb?sslmode=require"
 ```
 
-São duas porque o pooler não executa migração (DDL). A aplicação usa a
-pooled, o `prisma migrate` usa a direta. `connection_limit=1` é para
-ambiente serverless: cada função abre sua própria conexão.
+São duas porque o pooler não executa migração (DDL): a aplicação usa a
+pooled, o `prisma migrate` usa a direta.
+
+Dois detalhes que quebram o deploy se faltarem:
+
+- **Tire o `channel_binding=require`** que a Neon põe na URL. O driver do
+  Prisma não lida com esse parâmetro. O `sslmode=require` continua, então
+  a conexão segue criptografada.
+- **`connection_limit=5&pool_timeout=20`**, não `connection_limit=1`. A
+  receita de "1 conexão por função" é para o runtime serverless, mas o
+  `next build` pré-renderiza as 25 páginas em paralelo e estoura uma
+  conexão só — o build morre com `P2024: Timed out fetching a new
+  connection`. Cinco conexões dão conta do build e continuam de bom
+  tamanho no runtime, já que quem faz o pooling de verdade é a Neon.
 
 ## 2. Segredo de sessão
 
