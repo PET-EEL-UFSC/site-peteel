@@ -37,7 +37,6 @@ export default async function ConfigPage() {
         {campo('instagram', 'Instagram', c?.instagram, undefined, 'url')}
         {campo('linkedin', 'LinkedIn', c?.linkedin, undefined, 'url')}
         {campo('facebook', 'Facebook', c?.facebook, undefined, 'url')}
-        {campo('spotify', 'Spotify (POWERCast)', c?.spotify, undefined, 'url')}
 
         <h2 style={{ fontSize: 18, textTransform: 'uppercase', margin: '22px 0 12px' }}>Faixa de aviso</h2>
         <label className="campo" style={{ display: 'flex', gap: 9, alignItems: 'center' }}>

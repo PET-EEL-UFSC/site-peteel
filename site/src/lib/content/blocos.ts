@@ -6,7 +6,7 @@ import { elementoSchema } from './elementos'
  * Uma página é uma lista ordenada de blocos.
  *
  * O bloco de trabalho é a FAIXA: fundo + decoração + N quadrantes.
- * As bandas do Florescer e do Processo seletivo são a mesma Faixa com
+ * As bandas do Connect e do Processo seletivo são a mesma Faixa com
  * parâmetros diferentes — foi essa constatação que definiu o modelo.
  */
 

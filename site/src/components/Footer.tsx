@@ -20,7 +20,6 @@ export function Footer({ config, arvore }: { config: ConfigSite; arvore: NoArvor
     ['Instagram', config.instagram],
     ['LinkedIn', config.linkedin],
     ['Facebook', config.facebook],
-    ['POWERCast', config.spotify],
   ].filter(([, v]) => !!v) as [string, string][]
 
   return (

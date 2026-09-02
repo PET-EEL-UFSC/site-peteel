@@ -56,7 +56,7 @@ Cada página é uma **lista ordenada de blocos**, guardada em JSONB e validada
 por Zod (`src/lib/content/`). Reordenar é reordenar o array.
 
 O bloco de trabalho é a **Faixa**: fundo + decoração (raio) + N quadrantes.
-As bandas do Florescer e do Processo seletivo são a mesma Faixa com
+As bandas do Connect e do Processo seletivo são a mesma Faixa com
 parâmetros diferentes.
 
 Três regras ficam no código, não na mão de quem edita — se fossem parâmetro

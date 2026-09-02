@@ -111,7 +111,7 @@ export const linhasSchema = z.object({
   comFoto: z.boolean().default(true),
 })
 
-/** Vídeo do YouTube ou player do Spotify (POWERCast). */
+/** Vídeo do YouTube ou player do Spotify. */
 export const embedSchema = z.object({
   tipo: z.literal('embed'),
   provedor: z.enum(['youtube', 'spotify']),

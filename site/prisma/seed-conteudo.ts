@@ -124,7 +124,7 @@ export const PAGINAS: Def[] = [
             itens: [
               { titulo: 'Pesquisa', texto: 'Projetos internos, projetos externos em laboratórios e empresas, e estágios de férias.', href: '/pesquisa', corTag: 'amarelo' },
               { titulo: 'Ensino', texto: 'Cursos com certificado da UFSC, seminários semanais e a série Conheça seu Professor.', href: '/ensino', corTag: 'azul' },
-              { titulo: 'Extensão', texto: 'VMC, SAEEL, Tech Week, POWERCast e Conheça o Laboratório.', href: '/extensao', corTag: 'laranja' },
+              { titulo: 'Extensão', texto: 'VMC, SAEEL, Tech Week e Conheça o Laboratório.', href: '/extensao', corTag: 'laranja' },
             ],
           },
         ]],
@@ -185,17 +185,16 @@ export const PAGINAS: Def[] = [
         quadrantes: [
           [
             { tipo: 'chip', texto: 'Programa', cor: 'laranja', estilo: 'contorno', inclinado: false },
-            { tipo: 'titulo', texto: 'Bem-estar e permanência na Elétrica', tamanho: 'g' },
-            { tipo: 'paragrafo', texto: 'Programa do PET EEL dedicado ao bem-estar e à permanência dos estudantes na Engenharia Elétrica.' },
+            { tipo: 'titulo', texto: 'Connect', tamanho: 'g' },
+            { tipo: 'paragrafo', texto: 'Iniciativas do PET EEL que conectam o grupo ao CTC e à graduação, com soluções e capacitação.' },
             { tipo: 'botoes', itens: [
-              { texto: 'O que é o Florescer', href: '/florescer/o-que-e', variante: 'solido' },
-              { texto: 'Estrutura interna', href: '/florescer/estrutura-interna', variante: 'contorno' },
+              { texto: 'Connect Build', href: '/connect/build', variante: 'solido' },
+              { texto: 'Connect Week', href: '/connect/week', variante: 'contorno' },
             ] },
           ],
           [{ tipo: 'lista', itens: [
-            { titulo: 'Acolhimento', texto: 'Espaços de conversa e apoio entre petianos e calouros do curso.' },
-            { titulo: 'Permanência', texto: 'Ações que ajudam estudantes a atravessar as fases mais críticas da graduação.' },
-            { titulo: 'Diversidade', texto: 'Iniciativas para tornar a Elétrica um curso mais plural.' },
+            { titulo: 'Connect Build', texto: 'Programa de soluções voltadas para o CTC e para a graduação.' },
+            { titulo: 'Connect Week', texto: 'Evento de capacitação com workshops ministrados por membros do PET.' },
           ] }],
         ],
       },
@@ -235,7 +234,7 @@ export const PAGINAS: Def[] = [
       faixaLinhas('Coordenações', [
         { rotulo: 'Pesquisa', titulo: 'Coordenação de Pesquisa', texto: 'Acompanha projetos internos, externos e estágios de férias.' },
         { rotulo: 'Ensino', titulo: 'Coordenação de Ensino', texto: 'Organiza cursos, seminários e a série Conheça seu Professor.' },
-        { rotulo: 'Extensão', titulo: 'Coordenação de Extensão', texto: 'Cuida da VMC, SAEEL, Tech Week e POWERCast.' },
+        { rotulo: 'Extensão', titulo: 'Coordenação de Extensão', texto: 'Cuida da VMC, SAEEL e Tech Week.' },
       ], false),
     ],
   },
@@ -361,10 +360,9 @@ export const PAGINAS: Def[] = [
   {
     slug: '/extensao', titulo: 'Extensão', ordem: 4,
     blocos: [
-      cab('Extensão', 'Extensão', 'VMC, SAEEL, Tech Week, POWERCast e Conheça o Laboratório.'),
+      cab('Extensão', 'Extensão', 'VMC, SAEEL, Tech Week e Conheça o Laboratório.'),
       faixaCards('Projetos', [
         { titulo: 'VMC', texto: 'Visitas técnicas em empresas nacionais e internacionais.', tag: 'Visitas' },
-        { titulo: 'POWERCast', texto: 'Podcast do grupo, disponível no Spotify.', tag: 'Podcast', corTag: 'azul' },
         { titulo: 'Tech Week', texto: 'Semana de oficinas e palestras técnicas.', tag: 'Evento', corTag: 'laranja' },
       ]),
     ],
@@ -385,17 +383,6 @@ export const PAGINAS: Def[] = [
     blocos: [
       cab('Extensão / VMC', 'VMC XVI', 'Registro de uma edição: roteiro, empresas visitadas e fotos.'),
       faixaTexto('offwhite', 'Sobre a edição', 'Roteiro, empresas visitadas e participantes desta edição da VMC.'),
-    ],
-  },
-  {
-    slug: '/powercast', titulo: 'POWERCast', pai: '/extensao', ordem: 2,
-    blocos: [
-      cab('Extensão / POWERCast', 'POWERCast', 'O podcast do PET EEL, disponível no Spotify.'),
-      faixaLinhas('Episódios', [
-        { rotulo: 'Ep. 03', titulo: 'Título do episódio', texto: 'Resumo curto e convidados.' },
-        { rotulo: 'Ep. 02', titulo: 'Título do episódio', texto: 'Resumo curto e convidados.' },
-        { rotulo: 'Ep. 01', titulo: 'Título do episódio', texto: 'Resumo curto e convidados.' },
-      ]),
     ],
   },
   {
@@ -428,48 +415,47 @@ export const PAGINAS: Def[] = [
     ],
   },
 
-  // ── Florescer ──
+  // ── Connect ──
   {
-    slug: '/florescer', titulo: 'Florescer', ordem: 5,
+    slug: '/connect', titulo: 'Connect', ordem: 5,
     blocos: [
-      cab('Florescer', 'Florescer', 'Programa do PET EEL dedicado ao bem-estar e à permanência dos estudantes na Engenharia Elétrica.', 'escuro'),
+      cab('Connect', 'Connect', 'Iniciativas do PET EEL que conectam o grupo ao CTC e à graduação, com soluções e capacitação.', 'escuro'),
       {
         id: id(), tipo: 'faixa', fundo: 'escuro', acento: 'laranja', layout: '2',
         alinhamento: 'start', espacamento: 'normal',
         decor: { tipo: 'raio', cor: 'laranja', lado: 'esquerda', tamanho: 'gigante', sangra: true, opacidade: 0.85 },
         quadrantes: [
           [
-            { tipo: 'titulo', texto: 'Bem-estar e permanência', tamanho: 'g' },
-            { tipo: 'paragrafo', texto: 'Tem estrutura interna própria dentro do grupo.' },
+            { tipo: 'titulo', texto: 'Duas frentes', tamanho: 'g' },
+            { tipo: 'paragrafo', texto: 'O Connect reúne as iniciativas do PET EEL voltadas a soluções e capacitação.' },
             { tipo: 'botoes', itens: [
-              { texto: 'O que é o Florescer', href: '/florescer/o-que-e', variante: 'solido' },
-              { texto: 'Estrutura interna', href: '/florescer/estrutura-interna', variante: 'contorno' },
+              { texto: 'Connect Build', href: '/connect/build', variante: 'solido' },
+              { texto: 'Connect Week', href: '/connect/week', variante: 'contorno' },
             ] },
           ],
           [{ tipo: 'lista', itens: [
-            { titulo: 'Acolhimento', texto: 'Espaços de conversa e apoio entre petianos e calouros do curso.' },
-            { titulo: 'Permanência', texto: 'Ações que ajudam estudantes a atravessar as fases mais críticas da graduação.' },
-            { titulo: 'Diversidade', texto: 'Iniciativas para tornar a Elétrica um curso mais plural.' },
+            { titulo: 'Connect Build', texto: 'Programa de soluções voltadas para o CTC e para a graduação.' },
+            { titulo: 'Connect Week', texto: 'Evento de capacitação com workshops ministrados por membros do PET.' },
           ] }],
         ],
       },
     ],
   },
   {
-    slug: '/florescer/o-que-e', titulo: 'O que é?', pai: '/florescer', ordem: 0,
+    slug: '/connect/build', titulo: 'Connect Build', pai: '/connect', ordem: 0,
     blocos: [
-      cab('Florescer / O que é?', 'O que é o Florescer', 'A origem do programa e o que ele se propõe a fazer dentro do curso.', 'escuro'),
-      faixaTexto('offwhite', 'A proposta', 'O Florescer nasceu da percepção de que permanência não é só questão acadêmica. O programa organiza ações de acolhimento, escuta e apoio entre estudantes.'),
+      cab('Connect / Connect Build', 'Connect Build', 'Programa de soluções voltadas para o CTC e para a graduação.', 'escuro'),
+      faixaTexto('offwhite', 'Sobre o programa', 'O Connect Build reúne petianos no desenvolvimento de soluções para demandas reais do Centro Tecnológico e da graduação em Engenharia Elétrica.'),
     ],
   },
   {
-    slug: '/florescer/estrutura-interna', titulo: 'Estrutura interna', pai: '/florescer', ordem: 1,
+    slug: '/connect/week', titulo: 'Connect Week', pai: '/connect', ordem: 1,
     blocos: [
-      cab('Florescer / Estrutura interna', 'Estrutura interna', 'Como o Florescer se organiza dentro do PET EEL.', 'escuro'),
-      faixaLinhas('Frentes', [
-        { rotulo: 'Acolhimento', titulo: 'Rodas de conversa', texto: 'Encontros periódicos abertos aos estudantes do curso.' },
-        { rotulo: 'Permanência', titulo: 'Apoio acadêmico', texto: 'Ações voltadas às fases mais críticas da graduação.' },
-        { rotulo: 'Diversidade', titulo: 'Ações afirmativas', texto: 'Iniciativas para tornar a Elétrica um curso mais plural.' },
+      cab('Connect / Connect Week', 'Connect Week', 'Evento de capacitação com workshops ministrados por membros do PET.', 'escuro'),
+      faixaLinhas('Programação', [
+        { rotulo: 'Dia 1', titulo: 'Workshop de abertura', texto: 'Programação a confirmar com o grupo.' },
+        { rotulo: 'Dia 2', titulo: 'Workshop técnico', texto: 'Ministrado por um membro do PET EEL.' },
+        { rotulo: 'Dia 3', titulo: 'Encerramento', texto: 'Programação a confirmar com o grupo.' },
       ], false),
     ],
   },
