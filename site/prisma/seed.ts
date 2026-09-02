@@ -31,7 +31,7 @@ async function main() {
       telefone: '(48) 3721-9729',
       email: 'peteel@contato.ufsc.br',
       instagram: 'https://instagram.com/peteel.ufsc',
-      avisoAtivo: true,
+      avisoAtivo: false,
       avisoTexto: 'Sexta, 12h10 — seminário semanal no CTC, sala divulgada nos stories',
       avisoLink: '/seminarios',
     },
@@ -81,7 +81,7 @@ async function main() {
       { nome: 'Petiano(a)', cargo: 'Coord. de Ensino', tutor: false },
       { nome: 'Petiano(a)', cargo: 'Coord. de Extensão', tutor: false },
       { nome: 'Petiano(a)', cargo: 'Comunicação', tutor: false },
-      { nome: 'Petiano(a)', cargo: 'Florescer', tutor: false },
+      { nome: 'Petiano(a)', cargo: 'Connect', tutor: false },
       { nome: 'Petiano(a)', cargo: 'Projetos internos', tutor: false },
       { nome: 'Petiano(a)', cargo: 'VMC', tutor: false },
     ]
