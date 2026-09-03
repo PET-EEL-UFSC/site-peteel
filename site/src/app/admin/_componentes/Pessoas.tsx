@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { salvarPetiano, apagarPetiano, enviarCurriculo, removerCurriculo } from '../acoes'
 import type { OpcaoMidia } from './EscolhaFoto'
 
@@ -14,6 +15,7 @@ function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { u
   const form = useRef<HTMLFormElement>(null)
   const [msg, setMsg] = useState<string | null>(null)
   const [pendente, iniciar] = useTransition()
+  const router = useRouter()
 
   return (
     <div className="campo">
@@ -31,6 +33,7 @@ function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { u
               iniciar(async () => {
                 const r = await removerCurriculo(petianoId)
                 setMsg(r.ok ? r.mensagem : r.erro)
+                if (r.ok) router.refresh()
               })
             }}
           >
@@ -49,94 +52,105 @@ function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { u
             }
             const r = await enviarCurriculo(petianoId, fd)
             setMsg(r.ok ? r.mensagem : r.erro)
-            if (r.ok) form.current?.reset()
+            if (r.ok) {
+              form.current?.reset()
+              router.refresh()
+            }
           })
         }
         style={{ display: 'flex', gap: 10, alignItems: 'center' }}
       >
         <input type="file" name="arquivo" accept="application/pdf" required />
         <button type="submit" className="btn btn-claro" disabled={pendente}>
-          {curriculo ? 'Trocar' : 'Enviar'}
+          {pendente ? 'Enviando…' : curriculo ? 'Trocar' : 'Enviar'}
         </button>
       </form>
-      {msg && <p className="dica">{msg}</p>}
+      {msg && <p className={msg.startsWith('Currículo enviado') || msg.startsWith('Currículo removido') ? 'aviso-ok' : 'aviso-erro'} style={{ marginTop: 8 }}>{msg}</p>}
     </div>
   )
 }
 
 function Ficha({ p, midias, aoFechar }: { p: P | null; midias: OpcaoMidia[]; aoFechar: () => void }) {
   return (
-    <form
-      className="cartao"
-      style={{ padding: 20, marginBottom: 22, maxWidth: 620 }}
-      action={async (fd) => {
-        await salvarPetiano(fd)
-        aoFechar()
-      }}
-    >
+    <div className="cartao" style={{ padding: 20, marginBottom: 22, maxWidth: 620 }}>
       <h2 style={{ fontSize: 20, textTransform: 'uppercase', marginBottom: 14 }}>{p ? 'Editar pessoa' : 'Nova pessoa'}</h2>
-      {p && <input type="hidden" name="id" value={p.id} />}
 
-      <label className="campo">
-        <span>Nome</span>
-        <input type="text" name="nome" required defaultValue={p?.nome ?? ''} />
-      </label>
+      <form
+        action={async (fd) => {
+          await salvarPetiano(fd)
+          aoFechar()
+        }}
+      >
+        {p && <input type="hidden" name="id" value={p.id} />}
 
-      <label className="campo">
-        <span>Cargo</span>
-        <input type="text" name="cargo" required defaultValue={p?.cargo ?? ''} placeholder="Ex: Coord. de Pesquisa" />
-      </label>
+        <label className="campo">
+          <span>Nome</span>
+          <input type="text" name="nome" required defaultValue={p?.nome ?? ''} />
+        </label>
 
-      <label className="campo">
-        <span>Foto</span>
-        <select name="fotoId" defaultValue={p?.fotoId ?? ''}>
-          <option value="">— sem foto —</option>
-          {midias.map((m) => (
-            <option key={m.id} value={m.id}>{m.alt}</option>
-          ))}
-        </select>
-      </label>
+        <label className="campo">
+          <span>Cargo</span>
+          <input type="text" name="cargo" required defaultValue={p?.cargo ?? ''} placeholder="Ex: Coord. de Pesquisa" />
+        </label>
 
-      <label className="campo">
-        <span>Descrição (opcional)</span>
-        <textarea name="bio" defaultValue={p?.bio ?? ''} />
-      </label>
+        <label className="campo">
+          <span>Foto</span>
+          <select name="fotoId" defaultValue={p?.fotoId ?? ''}>
+            <option value="">— sem foto —</option>
+            {midias.map((m) => (
+              <option key={m.id} value={m.id}>{m.alt}</option>
+            ))}
+          </select>
+        </label>
 
-      <label className="campo">
-        <span>LinkedIn (opcional)</span>
-        <input type="url" name="linkedin" defaultValue={p?.linkedin ?? ''} placeholder="https://linkedin.com/in/..." />
-        <p className="dica">Aparece como botão no card da pessoa.</p>
-      </label>
+        <label className="campo">
+          <span>Descrição (opcional)</span>
+          <textarea name="bio" defaultValue={p?.bio ?? ''} />
+        </label>
 
-      {p && <Curriculo petianoId={p.id} curriculo={p.curriculo} />}
-      {!p && <p className="dica">Salva a pessoa primeiro pra depois poder anexar o currículo.</p>}
+        <label className="campo">
+          <span>LinkedIn (opcional)</span>
+          <input type="url" name="linkedin" defaultValue={p?.linkedin ?? ''} placeholder="https://linkedin.com/in/..." />
+          <p className="dica">Aparece como botão no card da pessoa.</p>
+        </label>
 
-      <label className="campo" style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
-        <input type="checkbox" name="tutor" defaultChecked={p?.tutor ?? false} />
-        <span style={{ margin: 0, textTransform: 'none', letterSpacing: 0, font: '400 14px var(--corpo)', color: 'var(--escuro)' }}>É o tutor do grupo</span>
-      </label>
+        <label className="campo" style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
+          <input type="checkbox" name="tutor" defaultChecked={p?.tutor ?? false} />
+          <span style={{ margin: 0, textTransform: 'none', letterSpacing: 0, font: '400 14px var(--corpo)', color: 'var(--escuro)' }}>É o tutor do grupo</span>
+        </label>
 
-      <label className="campo">
-        <span>Ordem na grade</span>
-        <input type="number" name="ordem" defaultValue={p?.ordem ?? 0} />
-      </label>
+        <label className="campo">
+          <span>Ordem na grade</span>
+          <input type="number" name="ordem" defaultValue={p?.ordem ?? 0} />
+        </label>
 
-      <label className="campo">
-        <span>Data de saída (se já saiu)</span>
-        <input type="date" name="saiuEm" defaultValue={p?.saiuEm ?? ''} />
-        <p className="dica">Preencher move a pessoa para a lista de ex-PETianos.</p>
-      </label>
+        <label className="campo">
+          <span>Data de saída (se já saiu)</span>
+          <input type="date" name="saiuEm" defaultValue={p?.saiuEm ?? ''} />
+          <p className="dica">Preencher move a pessoa para a lista de ex-PETianos.</p>
+        </label>
 
-      <label className="campo">
-        <span>Destino (para egressos)</span>
-        <input type="text" name="destino" defaultValue={p?.destino ?? ''} placeholder="Ex: Mestrado na UFSC" />
-      </label>
+        <label className="campo">
+          <span>Destino (para egressos)</span>
+          <input type="text" name="destino" defaultValue={p?.destino ?? ''} placeholder="Ex: Mestrado na UFSC" />
+        </label>
 
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button type="submit" className="btn">Salvar</button>
-        <button type="button" className="btn btn-claro" onClick={aoFechar}>Cancelar</button>
-      </div>
-    </form>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button type="submit" className="btn">Salvar</button>
+          <button type="button" className="btn btn-claro" onClick={aoFechar}>Cancelar</button>
+        </div>
+      </form>
+
+      {/* fora do <form> de cima de propósito — formulário dentro de formulário é
+          inválido em HTML e o navegador descarta o de dentro */}
+      {p ? (
+        <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid rgba(44,43,34,0.12)' }}>
+          <Curriculo petianoId={p.id} curriculo={p.curriculo} />
+        </div>
+      ) : (
+        <p className="dica" style={{ marginTop: 14 }}>Salva a pessoa primeiro pra depois poder anexar o currículo.</p>
+      )}
+    </div>
   )
 }
 
