@@ -1,0 +1,979 @@
+diff --git a/logo-e-email.patch b/logo-e-email.patch
+deleted file mode 100644
+index 877e530..0000000
+--- a/logo-e-email.patch
++++ /dev/null
+@@ -1,175 +0,0 @@
+-diff --git a/site/prisma/seed.ts b/site/prisma/seed.ts
+-index 9e93e23..7cd61b4 100644
+---- a/site/prisma/seed.ts
+-+++ b/site/prisma/seed.ts
+-@@ -29,7 +29,7 @@ async function main() {
+-       descricao: 'Programa de Educação Tutorial de Engenharia Elétrica — UFSC',
+-       endereco: '3º andar do CTC - UFSC, Florianópolis - SC',
+-       telefone: '(48) 3721-9729',
+--      email: 'peteel@contato.ufsc.br',
+-+      email: 'peteel@gmail.com',
+-       instagram: 'https://instagram.com/peteel.ufsc',
+-       avisoAtivo: false,
+-       avisoTexto: 'Sexta, 12h10 — seminário semanal no CTC, sala divulgada nos stories',
+-diff --git a/site/public/marca/logo.svg b/site/public/marca/logo.svg
+-new file mode 100644
+-index 0000000..6f9aeb7
+---- /dev/null
+-+++ b/site/public/marca/logo.svg
+-@@ -0,0 +1,72 @@
+-+<svg width="1201" height="267" viewBox="0 0 1201 267" fill="none" xmlns="http://www.w3.org/2000/svg">
+-+<path d="M894.615 120.053C894.524 119.524 894.414 118.976 894.305 118.447C891.569 104.05 884.574 90.8044 874.223 80.4242C859.71 65.6821 841.017 58.1104 817.85 58.1104C794.118 58.1104 774.128 65.4084 758.739 80.1323C743.367 94.6007 735.518 113.886 735.518 137.696V138.9C735.518 162.71 743.057 181.703 758.447 196.171C773.818 210.348 793.735 217.573 818.69 217.573C830.929 217.757 843.072 215.386 854.342 210.611C865.611 205.835 875.759 198.761 884.136 189.84L857.903 164.826C847.985 174.469 834.643 179.784 820.808 179.605C796.984 179.605 781.284 167.837 780.39 149.756H879.244C890.507 147.931 896.623 141.746 895.509 126.785C895.29 124.504 894.998 122.242 894.615 120.053ZM850.528 120.509H780.864C782.069 106.351 798.061 95.2028 817.649 95.2028H817.85C835.96 95.2028 850.71 106.351 850.71 120.509H850.528Z" fill="white"/>
+-+<path d="M1070.89 120.053L1070.56 118.447C1067.83 104.05 1060.83 90.8044 1050.48 80.4242C1036 65.6639 1017.31 58.1104 994.089 58.1104C970.357 58.1104 950.276 65.4084 934.96 80.1323C919.589 94.6007 911.757 113.886 911.757 137.696V138.9C911.757 162.71 919.278 181.703 934.668 196.172C950.039 210.348 969.956 217.573 994.911 217.573C1007.15 217.757 1019.29 215.386 1030.55 210.61C1041.82 205.835 1051.97 198.76 1060.34 189.84L1034.16 164.826C1024.25 174.466 1010.91 179.781 997.083 179.605C973.242 179.605 957.542 167.837 956.647 149.756H1055.52C1066.76 147.931 1072.9 141.746 1071.77 126.785C1071.6 124.505 1071.26 122.242 1070.89 120.053ZM957.268 120.509C958.473 106.369 974.41 95.221 993.98 95.2028C1012.03 95.2028 1026.84 106.369 1026.84 120.509H957.268Z" fill="white"/>
+-+<path d="M1096.06 3.86719H1093.51V164.516C1093.51 197.223 1108.11 214.86 1137.32 217.427V23.4807C1126.12 12.5576 1111.61 5.65909 1096.06 3.86719Z" fill="white"/>
+-+<path d="M384.499 53.3481C356.988 53.3481 339.152 65.1163 330.39 80.5334V57.8729H308.008V266.798C316.37 263.478 323.981 258.515 330.39 252.202V187.487C339.152 202.885 356.988 214.672 384.499 214.672C394.729 214.891 404.89 212.96 414.325 209.003C423.76 205.046 432.257 199.151 439.266 191.701C454.071 176.302 461.629 157.035 461.629 134.01C461.629 110.985 454.071 92.0461 439.266 76.6107C432.271 69.1234 423.783 63.1847 414.35 59.1779C404.916 55.1711 394.748 53.1851 384.499 53.3481ZM423.53 176.977C418.638 182.444 412.619 186.786 405.888 189.706C399.156 192.625 391.872 194.053 384.536 193.891C376.923 194.065 369.358 192.651 362.324 189.739C355.289 186.826 348.939 182.48 343.68 176.977C333.11 165.501 327.67 151.306 327.67 134.083C327.67 116.86 333.146 102.665 343.68 91.4805C348.874 85.8823 355.199 81.4515 362.236 78.4821C369.274 75.5128 376.862 74.0726 384.499 74.2571C391.866 74.0716 399.184 75.5123 405.93 78.4768C412.677 81.4412 418.686 85.8564 423.53 91.4076C434.118 102.592 439.248 116.787 439.248 134.01C439.248 151.233 434.081 165.428 423.53 176.977Z" fill="white"/>
+-+<path d="M558.913 53.3477C536.842 53.3477 518.422 60.9012 504.146 75.698C489.87 90.4948 482.678 110.145 482.678 134.612V135.816C482.678 159.389 489.651 178.418 503.854 192.631C518.057 206.844 536.714 214.069 559.479 214.069C584.562 214.069 605.118 204.947 621.128 187.176L606.323 172.58C592.722 187.176 580.327 193.726 559.479 193.726C527.732 193.726 506.264 172.288 505.059 138.753H628.686C628.996 135.725 628.996 132.404 628.996 129.083C628.996 107.627 622.351 89.8015 609.353 75.3148C596.392 60.591 579.779 53.3477 558.913 53.3477ZM506.629 119.194C507.075 113.096 508.75 107.151 511.555 101.718C514.36 96.2836 518.236 91.4731 522.95 87.5756C532.853 78.8062 545.683 74.0611 558.913 74.2749C564.968 74.2088 570.976 75.3512 576.584 77.6351C582.192 79.919 587.288 83.2985 591.572 87.5756C595.93 91.6182 599.392 96.5287 601.734 101.99C604.077 107.452 605.248 113.344 605.173 119.286L506.629 119.194Z" fill="white"/>
+-+<path d="M723.377 78.7272V57.873H687.998V16.5842C681.649 9.81283 674.057 4.32478 665.635 0.418945V57.873H647.799V78.7272H665.635V167.545C665.635 198.963 679.235 214.672 706.436 214.672C714.304 214.672 720.055 213.76 723.377 212.245V192.924C718.667 193.581 713.912 193.88 709.156 193.818C694.351 193.818 687.998 186.885 687.998 167.545V78.7272H723.377Z" fill="white"/>
+-+<path fill-rule="evenodd" clip-rule="evenodd" d="M1154.17 195.35C1154.12 192.267 1154.68 189.203 1155.81 186.335C1156.94 183.466 1158.63 180.85 1160.78 178.635C1162.92 176.419 1165.49 174.649 1168.32 173.426C1171.15 172.202 1174.2 171.549 1177.28 171.504C1183.3 171.766 1189.01 174.238 1193.31 178.447C1197.61 182.657 1200.21 188.306 1200.6 194.31C1200.92 206.954 1189.99 217.883 1176.99 217.883C1174 217.96 1171.02 217.431 1168.23 216.329C1165.45 215.227 1162.91 213.575 1160.78 211.471C1158.65 209.367 1156.97 206.854 1155.83 204.084C1154.7 201.314 1154.13 198.344 1154.17 195.35Z" fill="white"/>
+-+<path d="M257.405 182.907C262.898 169.193 266.063 154.659 266.77 139.903C265.877 154.616 262.718 169.103 257.405 182.852V182.907Z" fill="#FDEA00"/>
+-+<path d="M80.4889 194.675C79.211 193.161 77.9331 191.61 76.71 190.041L50.1116 214.891L37.9717 226.531C39.4869 228.082 40.5457 229.14 42.1339 230.6C42.1339 230.6 42.7912 229.888 42.9007 229.797L80.4889 194.675Z" fill="#FDEA00"/>
+-+<path d="M107.38 219.835L62.9097 246.309C62.9025 246.406 62.9025 246.503 62.9097 246.601C65.2282 248.042 67.5649 249.429 69.9564 250.724L113.642 224.177C111.506 222.772 109.425 221.331 107.38 219.835Z" fill="#FDEA00"/>
+-+<path d="M246.944 203.579C249.171 199.93 251.289 196.281 253.187 192.632L252.694 193.088C251.124 196.135 249.171 199.766 246.944 203.579Z" fill="#FDEA00"/>
+-+<path d="M256.966 184.057C256.711 184.714 256.455 185.316 256.218 185.881C256.546 185.133 256.857 184.367 257.167 183.601L256.966 184.057Z" fill="#FDEA00"/>
+-+<path d="M266.988 133.627C266.988 135.451 266.988 137.276 266.842 139.101C266.915 137.258 266.988 135.451 266.988 133.627Z" fill="#FDEA00"/>
+-+<path d="M257.404 182.98L257.13 183.692C257.404 183.218 257.404 182.98 257.404 182.98Z" fill="#FDEA00"/>
+-+<path d="M224.271 231.111L224.544 230.947C233.07 225.09 240.974 213.76 246.944 203.579C240.651 213.728 233.025 222.987 224.271 231.111Z" fill="#FDEA00"/>
+-+<path d="M115.631 214.927L107.379 219.835C109.424 221.331 111.505 222.772 113.586 224.141L123.992 217.809C121.108 216.958 118.321 215.997 115.631 214.927Z" fill="#FDEA00"/>
+-+<path d="M256.966 184.057L257.167 183.619L257.441 182.907L256.966 184.057Z" fill="#FDEA00"/>
+-+<path d="M77.6963 189.11L76.7104 190.041C77.9336 191.61 79.2115 193.161 80.4894 194.675L81.895 193.361C80.4528 191.975 79.0472 190.552 77.6963 189.11Z" fill="#FDEA00"/>
+-+<path d="M64.6064 172.233C67.5563 177.218 70.7614 182.047 74.2089 186.702L74.8478 186.1C71.1129 181.723 67.6907 177.09 64.6064 172.233Z" fill="#FDEA00"/>
+-+<path d="M162.475 223.174C152.92 223.675 143.344 222.734 134.069 220.383C132.244 219.981 130.272 219.543 128.41 219.069L116.836 226.239C152.799 248.425 194.167 251.783 224.343 231.202C233.098 223.078 240.723 213.819 247.016 203.67C249.244 199.857 251.197 196.226 252.767 193.088C248.805 196.7 219.067 223.156 162.475 223.174Z" fill="#FDEA00"/>
+-+<path d="M266.824 126.109C266.97 128.627 266.988 131.127 266.988 133.626C267.006 131.163 266.97 128.664 266.824 126.109Z" fill="#FDEA00"/>
+-+<path d="M266.842 139.063C266.842 139.337 266.842 139.611 266.842 139.903C266.824 139.629 266.824 139.337 266.842 139.063Z" fill="#FDEA00"/>
+-+<path d="M256.217 185.899C255.25 188.144 254.264 190.369 253.187 192.541C253.187 192.541 254.465 190.114 256.217 185.899Z" fill="#FDEA00"/>
+-+<path d="M172.662 22.8599L184.802 12.3142L186.408 10.9093C185.057 10.3437 183.725 9.77813 182.355 9.24902L168.317 21.1814C169.777 21.7287 171.22 22.2761 172.662 22.8599Z" fill="#FDEA00"/>
+-+<path d="M59.715 124.34L58.5649 123.354L59.715 124.34Z" fill="#FDEA00"/>
+-+<path d="M68.3854 106.113L66.0669 108.084L67.29 108.996C67.6551 108.047 68.0202 107.099 68.3854 106.113Z" fill="#FDEA00"/>
+-+<path d="M41.5692 111.112C41.5692 110.875 41.4779 110.656 41.4414 110.419C41.4779 110.656 41.5327 110.875 41.5692 111.112Z" fill="#FDEA00"/>
+-+<path d="M39.1035 93.3048C39.1124 93.2505 39.1124 93.195 39.1035 93.1406C39.1124 93.195 39.1124 93.2505 39.1035 93.3048Z" fill="#FDEA00"/>
+-+<path d="M253.443 191.573C253.351 191.92 253.278 192.23 253.187 192.595C254.264 190.423 255.25 188.198 256.217 185.953C256.455 185.37 256.71 184.767 256.966 184.129C256.345 185.461 255.14 188.106 253.443 191.573Z" fill="#FDEA00"/>
+-+<path d="M233.471 73.2353L237.98 69.8599L246.688 62.5618L246.98 63.0545C247.546 63.9485 248.093 64.879 248.623 65.773C246.797 62.7808 244.972 59.8433 243 56.9971L229.418 67.3238C230.818 69.27 232.168 71.2405 233.471 73.2353Z" fill="#FDEA00"/>
+-+<path d="M40.3639 103.85C40.1996 102.719 40.0536 101.643 39.9258 100.603C40.0536 101.679 40.1631 102.774 40.3639 103.85Z" fill="#FDEA00"/>
+-+<path d="M126.219 0.199803C95.2158 1.85296 65.7674 14.2904 42.9735 35.3582C39.4877 51.425 38.0039 67.8609 38.5556 84.2918C38.7382 85.2223 38.9755 86.1163 39.1763 86.9921C41.1296 86.4812 48.5597 94.5455 62.9085 105.639L70.9045 98.8332L164.008 19.6674L178.101 7.69857C161.476 1.78206 143.84 -0.767081 126.219 0.199803Z" fill="#FDEA00"/>
+-+<path d="M178.138 7.66211C179.215 8.04526 180.311 8.41016 181.369 8.81155L178.138 7.66211Z" fill="#FDEA00"/>
+-+<path d="M67.29 108.996C68.3671 109.798 69.4807 110.619 70.6308 111.44L172.661 22.8602C171.219 22.2764 169.777 21.729 168.316 21.1816L68.3854 106.113C68.0203 107.098 67.6552 108.047 67.29 108.996Z" fill="#FDEA00"/>
+-+<path d="M266.824 126.11C265.698 105.112 259.598 84.6826 249.025 66.5029L235.607 76.629L183.798 115.345L235.151 144.537C236.008 145.023 236.723 145.726 237.223 146.574C237.723 147.423 237.991 148.389 238.001 149.374C238.01 150.359 237.76 151.329 237.276 152.187C236.792 153.045 236.09 153.76 235.242 154.262L233.234 155.485C250.504 160.009 259.504 169.862 253.443 191.574C255.141 188.162 256.345 185.516 256.966 184.111L257.441 182.907C262.754 169.157 265.913 154.671 266.806 139.958C266.806 139.666 266.806 139.392 266.806 139.119C266.897 137.294 266.952 135.47 266.952 133.645C266.988 131.127 266.97 128.628 266.824 126.11Z" fill="#FDEA00"/>
+-+<path d="M162.475 223.174C152.936 223.222 143.417 222.287 134.069 220.383C143.344 222.734 152.92 223.675 162.475 223.174Z" fill="#FDEA00"/>
+-+<path d="M217.624 144.482C218.357 144.873 218.991 145.425 219.478 146.097C219.966 146.769 220.294 147.543 220.439 148.36C220.583 149.177 220.539 150.017 220.311 150.815C220.083 151.613 219.676 152.348 219.121 152.966C222.407 153.313 225.529 153.769 228.468 154.353L228.706 154.207C229.548 153.7 230.244 152.981 230.723 152.123C231.202 151.265 231.448 150.296 231.437 149.313C231.426 148.33 231.158 147.367 230.66 146.52C230.161 145.672 229.45 144.97 228.596 144.482L177.243 115.29L233.47 73.1799C232.18 71.1851 230.829 69.2329 229.417 67.3232L166.271 115.345L217.624 144.482Z" fill="#FDEA00"/>
+-+<path d="M61.4862 125.891C61.3963 125.752 61.317 125.605 61.2489 125.454C60.7378 125.052 60.2449 124.633 59.752 124.213C60.2449 124.888 60.8838 125.417 61.4862 125.891Z" fill="#FDEA00"/>
+-+<path d="M38.5562 84.292C38.5562 84.292 38.5562 85.4962 38.6839 87.6673C38.6839 87.6673 38.6839 87.5579 38.6839 87.4849C38.6839 86.4084 38.5927 85.3685 38.5562 84.292Z" fill="#FDEA00"/>
+-+<path d="M39.925 100.603C39.6147 98.1944 39.3226 95.7678 39.1035 93.3047C39.3043 95.4394 39.5599 97.8842 39.925 100.603Z" fill="#FDEA00"/>
+-+<path d="M252.695 192.996L253.188 192.54L252.75 192.905L252.695 192.996Z" fill="#FDEA00"/>
+-+<path d="M38.8301 89.8564C38.8301 90.8417 38.9761 91.9729 39.0857 93.1953C39.0857 92.2466 38.9761 91.2613 38.9214 90.2761C38.8769 90.1396 38.8463 89.999 38.8301 89.8564Z" fill="#FDEA00"/>
+-+<path d="M41.4413 110.419C41.0397 108.248 40.6929 106.058 40.3643 103.851C40.6746 105.912 41.0397 108.12 41.4413 110.419Z" fill="#FDEA00"/>
+-+<path d="M49.1084 137.987C45.8378 129.259 43.3156 120.268 41.5688 111.112C44.7453 128.427 51.2626 151.434 64.6074 172.234C58.2152 161.423 53.0125 149.953 49.0901 138.024L49.1084 137.987Z" fill="#FDEA00"/>
+-+<path d="M79.5218 187.414L77.6963 189.111C79.0472 190.552 80.4529 191.975 81.8951 193.362L83.7206 191.647C82.2967 190.279 80.891 188.874 79.5218 187.414Z" fill="#FDEA00"/>
+-+<path d="M115.631 214.928C118.309 215.986 121.096 216.947 123.992 217.81L124.577 217.464C121.911 216.515 119.282 215.475 116.69 214.289L115.631 214.928Z" fill="#FDEA00"/>
+-+<path d="M128.429 219.069C130.254 219.544 132.171 219.982 134.088 220.383C132.262 219.927 130.437 219.453 128.611 218.905L128.429 219.069Z" fill="#FDEA00"/>
+-+<path d="M76.6743 184.367C64.7035 170.737 55.3577 155.013 49.1084 137.987C53.0307 149.917 58.2334 161.387 64.6256 172.197C67.7026 177.065 71.1187 181.711 74.8487 186.1L76.6743 184.367Z" fill="#FDEA00"/>
+-+<path d="M252.749 192.905L253.187 192.54C253.278 192.175 253.351 191.865 253.442 191.519C253.223 191.975 252.986 192.431 252.749 192.905Z" fill="#FDEA00"/>
+-+<path d="M58.6001 123.282C56.9206 121.786 55.2959 120.217 53.7441 118.538L53.3243 118.903C52.643 119.49 52.1133 120.233 51.7799 121.068C51.4465 121.903 51.3191 122.807 51.4087 123.701C51.4982 124.596 51.8019 125.456 52.2942 126.209C52.7865 126.961 53.4529 127.585 54.237 128.026L55.8435 128.938C57.2884 127.542 58.5853 126.002 59.7137 124.34L58.6001 123.282Z" fill="#FDEA00"/>
+-+<path d="M54.0374 131.365L48.1773 128.044C47.3932 127.603 46.7268 126.98 46.2345 126.227C45.7422 125.474 45.4385 124.614 45.349 123.72C45.2594 122.825 45.3868 121.922 45.7202 121.087C46.0536 120.251 46.5833 119.509 47.2646 118.921L51.1165 115.601C44.9455 108.319 40.7356 99.5836 38.8853 90.2217C38.8853 91.2069 38.9765 92.1922 39.0496 93.1409C39.0584 93.1953 39.0584 93.2507 39.0496 93.3051C39.2686 95.7682 39.5607 98.1948 39.8711 100.603C39.9988 101.643 40.1449 102.72 40.3092 103.851C40.6378 106.058 40.9846 108.248 41.3863 110.419C41.3863 110.656 41.4775 110.875 41.5141 111.112C43.2786 120.27 45.8192 129.261 49.1084 137.988L54.0374 131.365Z" fill="#FDEA00"/>
+-+<path d="M39.1768 86.9923C38.976 86.0983 38.7387 85.1678 38.5562 84.292C38.5562 85.3685 38.6839 86.4084 38.757 87.4666C38.7779 87.3572 38.8279 87.2553 38.9018 87.1719C38.9756 87.0884 39.0707 87.0264 39.1768 86.9923Z" fill="#FDEA00"/>
+-+<path d="M54.0369 131.364L49.1079 138.005C45.2077 150.815 42.2429 175.272 76.6738 184.366L103.455 159.389L54.0369 131.364Z" fill="#FDEA00"/>
+-+<path d="M85.601 140.304L81.4387 137.933C76.268 135.55 71.3037 132.742 66.597 129.54L63.8951 128.007L63.3475 127.715C62.606 127.256 61.9811 126.632 61.5219 125.891C60.9195 125.362 60.317 124.833 59.6964 124.285C58.568 125.947 57.271 127.487 55.8262 128.883L109.534 159.389L79.5219 187.413C80.8911 188.873 82.2967 190.278 83.7207 191.646L118.662 159.042L85.601 140.304Z" fill="#FDEA00"/>
+-+<path d="M219.067 152.967C218.677 153.454 218.208 153.874 217.68 154.207L116.69 214.289C119.282 215.475 121.911 216.515 124.576 217.463L228.469 154.353C225.53 153.77 222.408 153.259 219.067 152.967Z" fill="#FDEA00"/>
+-+<path d="M233.234 155.43L128.702 218.941C130.528 219.488 132.353 219.963 134.179 220.419C143.492 222.303 152.973 223.226 162.475 223.174C218.958 223.174 248.787 196.7 252.676 192.996C252.913 192.522 253.15 192.066 253.369 191.61C259.503 169.807 250.503 159.954 233.234 155.43Z" fill="#FDEA00"/>
+-+<path d="M38.8305 89.8014C38.8305 88.9986 38.721 88.287 38.6845 87.6484C38.6001 88.3689 38.6496 89.0988 38.8305 89.8014Z" fill="#FDEA00"/>
+-+<path d="M59.3802 124.637C59.6357 124.254 59.9096 123.816 60.1652 123.397C60.1072 122.562 60.2417 121.725 60.5581 120.95C60.8746 120.175 61.3647 119.483 61.9907 118.927L63.7346 117.466C65.0307 114.857 66.6788 112.397 67.8107 109.314L65.9579 108.202L53.5566 118.653C54.9854 120.396 56.5026 122.065 58.1023 123.652L59.3802 124.637Z" fill="#FDEA00"/>
+-+<path d="M60.196 123.613C60.1689 123.417 60.0604 122.109 60.0876 121.913C59.3284 122.665 58.6234 124.561 57.8643 125.248C59.3284 126 64.4981 128.605 66.0164 129.324C64.8558 128.146 60.4286 124.976 60.196 123.613Z" fill="#FDEA00"/>
+-+<path d="M70.6315 111.441C69.4814 110.62 68.3678 109.799 67.2908 108.996C66.1041 112.08 64.881 114.944 63.6396 117.553L70.6315 111.441Z" fill="#FDEA00"/>
+-+<path d="M38.9216 90.2218C38.9216 89.3278 38.7938 88.3973 38.7573 87.4668C38.7573 87.4668 38.7573 87.5763 38.7573 87.6493C38.7573 88.2878 38.7573 88.9994 38.9034 89.8022C38.8956 89.9423 38.9018 90.0829 38.9216 90.2218Z" fill="#FDEA00"/>
+-+<path d="M58.6006 123.281C57.001 121.694 55.4838 120.025 54.055 118.282L53.7446 118.538C55.2964 120.216 56.9211 121.785 58.6006 123.281Z" fill="#FDEA00"/>
+-+<path d="M65.9593 75.9632C65.8531 75.9973 38.9763 87.0877 38.9024 87.1712C38.8285 87.2547 38.7785 87.3565 38.7576 87.466C43.7259 79.2982 30.3127 86.5355 30.3857 87.466C32.2255 96.8244 44.9587 108.314 51.1166 115.6L51.6095 115.18L62.8367 105.638C48.5608 94.5451 67.9126 75.4523 65.9593 75.9632Z" fill="#FDEA00"/>
+-+<path d="M246.688 62.6162L237.98 69.9143L246.98 63.1636L246.688 62.6162Z" fill="#FDEA00"/>
+-+<path d="M249.025 66.4849L248.623 65.8281L249.025 66.5032V66.4849Z" fill="#FDEA00"/>
+-+<path d="M37.8081 226.384L37.9724 226.53L37.8264 226.366L37.8081 226.384Z" fill="#FDEA00"/>
+-+<path d="M37.8267 226.367L37.9727 226.531L50.1127 214.891L37.8267 226.367Z" fill="#FDEA00"/>
+-+<path d="M182.373 9.2308C182.026 9.10309 181.679 8.99362 181.333 8.84766L182.355 9.24905L182.373 9.2308Z" fill="#FDEA00"/>
+-+<path d="M64.6071 172.234C51.2623 151.435 44.7451 128.427 41.5686 111.113C41.5686 110.876 41.4773 110.657 41.4408 110.419C41.0392 108.121 40.6741 105.913 40.3637 103.851C40.2177 102.775 40.0534 101.68 39.9256 100.604C39.5605 97.885 39.3049 95.4401 39.1041 93.3054C39.113 93.2511 39.113 93.1956 39.1041 93.1412C38.9946 91.9188 38.9033 90.7876 38.8485 89.8024C38.6524 89.0776 38.5966 88.3221 38.6842 87.5765C38.5564 85.4053 38.5564 84.2011 38.5564 84.2011C38.0047 67.7703 39.4886 51.3343 42.9743 35.2676C17.0264 59.1569 1.61537 92.3545 0.119905 127.582C-1.37556 162.81 11.1666 197.193 34.9966 223.193L74.2096 186.556C70.7663 181.949 67.5613 177.169 64.6071 172.234Z" fill="#FDEA00"/>
+-+<path d="M116.836 226.239L73.4058 252.494C97.7243 264.769 125.223 269.3 152.197 265.477C179.171 261.654 204.325 249.66 224.27 231.111C194.093 251.6 152.726 248.334 116.836 226.239Z" fill="#FDEA00"/>
+-+</svg>
+-diff --git a/site/src/app/admin/layout.tsx b/site/src/app/admin/layout.tsx
+-index c405305..ad57118 100644
+---- a/site/src/app/admin/layout.tsx
+-+++ b/site/src/app/admin/layout.tsx
+-@@ -21,11 +21,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
+-   return (
+-     <div className="painel">
+-       <nav className="painel-nav">
+--        <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center', gap: 9 }}>
+--          <span aria-hidden style={{ width: 12, height: 21, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
+--          <span style={{ font: '900 19px/1 var(--condensada)', color: 'var(--offwhite)' }}>
+--            PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
+--          </span>
+-+        <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center' }}>
+-+          {/* eslint-disable-next-line @next/next/no-img-element */}
+-+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
+-         </div>
+- 
+-         <NavPainel itens={itens} />
+-diff --git a/site/src/app/entrar/page.tsx b/site/src/app/entrar/page.tsx
+-index 3c51a89..7b6eb3d 100644
+---- a/site/src/app/entrar/page.tsx
+-+++ b/site/src/app/entrar/page.tsx
+-@@ -27,19 +27,9 @@ export default async function Entrar({ searchParams }: Props) {
+-       }}
+-     >
+-       <div style={{ width: '100%', maxWidth: 460, background: '#fff', border: '3px solid var(--escuro)', padding: '40px 34px' }}>
+--        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+--          <span
+--            style={{
+--              width: 14,
+--              height: 24,
+--              background: 'var(--amarelo)',
+--              border: '1px solid var(--escuro)',
+--              clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)',
+--            }}
+--          />
+--          <span style={{ font: "900 22px/1 var(--condensada)", letterSpacing: '-0.02em' }}>
+--            PET<span style={{ color: 'var(--amarelo)', WebkitTextStroke: '0.5px var(--escuro)' }}>eel</span>
+--          </span>
+-+        <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--escuro)', padding: '10px 16px' }}>
+-+          {/* eslint-disable-next-line @next/next/no-img-element */}
+-+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+-         </div>
+- 
+-         <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>Painel do site</h1>
+-diff --git a/site/src/components/Footer.tsx b/site/src/components/Footer.tsx
+-index 2b1335f..17a9a57 100644
+---- a/site/src/components/Footer.tsx
+-+++ b/site/src/components/Footer.tsx
+-@@ -26,11 +26,9 @@ export function Footer({ config, arvore }: { config: ConfigSite; arvore: NoArvor
+-     <footer style={{ background: 'var(--escuro)', color: 'var(--offwhite)' }}>
+-       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 28px 34px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 40 }}>
+-         <div>
+--          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+--            <span aria-hidden style={{ width: 14, height: 24, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
+--            <span style={{ font: `900 22px/1 ${cond}`, letterSpacing: '-0.02em' }}>
+--              PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
+--            </span>
+-+          <div style={{ display: 'flex', alignItems: 'center' }}>
+-+            {/* eslint-disable-next-line @next/next/no-img-element */}
+-+            <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
+-           </div>
+-           <p style={{ marginTop: 16, maxWidth: '32ch', font: '400 14.5px/1.6 var(--corpo)', color: 'rgba(249,249,249,0.8)' }}>{config.descricao}</p>
+- 
+-diff --git a/site/src/components/Header.tsx b/site/src/components/Header.tsx
+-index 89a65ab..11ddb42 100644
+---- a/site/src/components/Header.tsx
+-+++ b/site/src/components/Header.tsx
+-@@ -17,11 +17,9 @@ export function Header({ arvore }: { arvore: NoArvore[] }) {
+-   return (
+-     <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: 'var(--escuro)' }}>
+-       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'stretch', gap: 30, height: 62 }}>
+--        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+--          <span aria-hidden style={{ width: 14, height: 24, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
+--          <span style={{ font: `900 22px/1 ${cond}`, color: 'var(--offwhite)', letterSpacing: '-0.02em' }}>
+--            PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
+--          </span>
+-+        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+-+          {/* eslint-disable-next-line @next/next/no-img-element */}
+-+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+-         </Link>
+- 
+-         <nav id="main-nav" style={{ display: 'flex', gap: 22, marginLeft: 'auto', alignItems: 'stretch' }}>
+diff --git a/site/public/marca/logo.png b/site/public/marca/logo.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..282618cd8e9a888043fc13803d3cc5cfbdfb1cef
+GIT binary patch
+literal 34704
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/site/public/marca/logo.svg b/site/public/marca/logo.svg
+deleted file mode 100644
+index 6f9aeb7..0000000
+--- a/site/public/marca/logo.svg
++++ /dev/null
+@@ -1,72 +0,0 @@
+-<svg width="1201" height="267" viewBox="0 0 1201 267" fill="none" xmlns="http://www.w3.org/2000/svg">
+-<path d="M894.615 120.053C894.524 119.524 894.414 118.976 894.305 118.447C891.569 104.05 884.574 90.8044 874.223 80.4242C859.71 65.6821 841.017 58.1104 817.85 58.1104C794.118 58.1104 774.128 65.4084 758.739 80.1323C743.367 94.6007 735.518 113.886 735.518 137.696V138.9C735.518 162.71 743.057 181.703 758.447 196.171C773.818 210.348 793.735 217.573 818.69 217.573C830.929 217.757 843.072 215.386 854.342 210.611C865.611 205.835 875.759 198.761 884.136 189.84L857.903 164.826C847.985 174.469 834.643 179.784 820.808 179.605C796.984 179.605 781.284 167.837 780.39 149.756H879.244C890.507 147.931 896.623 141.746 895.509 126.785C895.29 124.504 894.998 122.242 894.615 120.053ZM850.528 120.509H780.864C782.069 106.351 798.061 95.2028 817.649 95.2028H817.85C835.96 95.2028 850.71 106.351 850.71 120.509H850.528Z" fill="white"/>
+-<path d="M1070.89 120.053L1070.56 118.447C1067.83 104.05 1060.83 90.8044 1050.48 80.4242C1036 65.6639 1017.31 58.1104 994.089 58.1104C970.357 58.1104 950.276 65.4084 934.96 80.1323C919.589 94.6007 911.757 113.886 911.757 137.696V138.9C911.757 162.71 919.278 181.703 934.668 196.172C950.039 210.348 969.956 217.573 994.911 217.573C1007.15 217.757 1019.29 215.386 1030.55 210.61C1041.82 205.835 1051.97 198.76 1060.34 189.84L1034.16 164.826C1024.25 174.466 1010.91 179.781 997.083 179.605C973.242 179.605 957.542 167.837 956.647 149.756H1055.52C1066.76 147.931 1072.9 141.746 1071.77 126.785C1071.6 124.505 1071.26 122.242 1070.89 120.053ZM957.268 120.509C958.473 106.369 974.41 95.221 993.98 95.2028C1012.03 95.2028 1026.84 106.369 1026.84 120.509H957.268Z" fill="white"/>
+-<path d="M1096.06 3.86719H1093.51V164.516C1093.51 197.223 1108.11 214.86 1137.32 217.427V23.4807C1126.12 12.5576 1111.61 5.65909 1096.06 3.86719Z" fill="white"/>
+-<path d="M384.499 53.3481C356.988 53.3481 339.152 65.1163 330.39 80.5334V57.8729H308.008V266.798C316.37 263.478 323.981 258.515 330.39 252.202V187.487C339.152 202.885 356.988 214.672 384.499 214.672C394.729 214.891 404.89 212.96 414.325 209.003C423.76 205.046 432.257 199.151 439.266 191.701C454.071 176.302 461.629 157.035 461.629 134.01C461.629 110.985 454.071 92.0461 439.266 76.6107C432.271 69.1234 423.783 63.1847 414.35 59.1779C404.916 55.1711 394.748 53.1851 384.499 53.3481ZM423.53 176.977C418.638 182.444 412.619 186.786 405.888 189.706C399.156 192.625 391.872 194.053 384.536 193.891C376.923 194.065 369.358 192.651 362.324 189.739C355.289 186.826 348.939 182.48 343.68 176.977C333.11 165.501 327.67 151.306 327.67 134.083C327.67 116.86 333.146 102.665 343.68 91.4805C348.874 85.8823 355.199 81.4515 362.236 78.4821C369.274 75.5128 376.862 74.0726 384.499 74.2571C391.866 74.0716 399.184 75.5123 405.93 78.4768C412.677 81.4412 418.686 85.8564 423.53 91.4076C434.118 102.592 439.248 116.787 439.248 134.01C439.248 151.233 434.081 165.428 423.53 176.977Z" fill="white"/>
+-<path d="M558.913 53.3477C536.842 53.3477 518.422 60.9012 504.146 75.698C489.87 90.4948 482.678 110.145 482.678 134.612V135.816C482.678 159.389 489.651 178.418 503.854 192.631C518.057 206.844 536.714 214.069 559.479 214.069C584.562 214.069 605.118 204.947 621.128 187.176L606.323 172.58C592.722 187.176 580.327 193.726 559.479 193.726C527.732 193.726 506.264 172.288 505.059 138.753H628.686C628.996 135.725 628.996 132.404 628.996 129.083C628.996 107.627 622.351 89.8015 609.353 75.3148C596.392 60.591 579.779 53.3477 558.913 53.3477ZM506.629 119.194C507.075 113.096 508.75 107.151 511.555 101.718C514.36 96.2836 518.236 91.4731 522.95 87.5756C532.853 78.8062 545.683 74.0611 558.913 74.2749C564.968 74.2088 570.976 75.3512 576.584 77.6351C582.192 79.919 587.288 83.2985 591.572 87.5756C595.93 91.6182 599.392 96.5287 601.734 101.99C604.077 107.452 605.248 113.344 605.173 119.286L506.629 119.194Z" fill="white"/>
+-<path d="M723.377 78.7272V57.873H687.998V16.5842C681.649 9.81283 674.057 4.32478 665.635 0.418945V57.873H647.799V78.7272H665.635V167.545C665.635 198.963 679.235 214.672 706.436 214.672C714.304 214.672 720.055 213.76 723.377 212.245V192.924C718.667 193.581 713.912 193.88 709.156 193.818C694.351 193.818 687.998 186.885 687.998 167.545V78.7272H723.377Z" fill="white"/>
+-<path fill-rule="evenodd" clip-rule="evenodd" d="M1154.17 195.35C1154.12 192.267 1154.68 189.203 1155.81 186.335C1156.94 183.466 1158.63 180.85 1160.78 178.635C1162.92 176.419 1165.49 174.649 1168.32 173.426C1171.15 172.202 1174.2 171.549 1177.28 171.504C1183.3 171.766 1189.01 174.238 1193.31 178.447C1197.61 182.657 1200.21 188.306 1200.6 194.31C1200.92 206.954 1189.99 217.883 1176.99 217.883C1174 217.96 1171.02 217.431 1168.23 216.329C1165.45 215.227 1162.91 213.575 1160.78 211.471C1158.65 209.367 1156.97 206.854 1155.83 204.084C1154.7 201.314 1154.13 198.344 1154.17 195.35Z" fill="white"/>
+-<path d="M257.405 182.907C262.898 169.193 266.063 154.659 266.77 139.903C265.877 154.616 262.718 169.103 257.405 182.852V182.907Z" fill="#FDEA00"/>
+-<path d="M80.4889 194.675C79.211 193.161 77.9331 191.61 76.71 190.041L50.1116 214.891L37.9717 226.531C39.4869 228.082 40.5457 229.14 42.1339 230.6C42.1339 230.6 42.7912 229.888 42.9007 229.797L80.4889 194.675Z" fill="#FDEA00"/>
+-<path d="M107.38 219.835L62.9097 246.309C62.9025 246.406 62.9025 246.503 62.9097 246.601C65.2282 248.042 67.5649 249.429 69.9564 250.724L113.642 224.177C111.506 222.772 109.425 221.331 107.38 219.835Z" fill="#FDEA00"/>
+-<path d="M246.944 203.579C249.171 199.93 251.289 196.281 253.187 192.632L252.694 193.088C251.124 196.135 249.171 199.766 246.944 203.579Z" fill="#FDEA00"/>
+-<path d="M256.966 184.057C256.711 184.714 256.455 185.316 256.218 185.881C256.546 185.133 256.857 184.367 257.167 183.601L256.966 184.057Z" fill="#FDEA00"/>
+-<path d="M266.988 133.627C266.988 135.451 266.988 137.276 266.842 139.101C266.915 137.258 266.988 135.451 266.988 133.627Z" fill="#FDEA00"/>
+-<path d="M257.404 182.98L257.13 183.692C257.404 183.218 257.404 182.98 257.404 182.98Z" fill="#FDEA00"/>
+-<path d="M224.271 231.111L224.544 230.947C233.07 225.09 240.974 213.76 246.944 203.579C240.651 213.728 233.025 222.987 224.271 231.111Z" fill="#FDEA00"/>
+-<path d="M115.631 214.927L107.379 219.835C109.424 221.331 111.505 222.772 113.586 224.141L123.992 217.809C121.108 216.958 118.321 215.997 115.631 214.927Z" fill="#FDEA00"/>
+-<path d="M256.966 184.057L257.167 183.619L257.441 182.907L256.966 184.057Z" fill="#FDEA00"/>
+-<path d="M77.6963 189.11L76.7104 190.041C77.9336 191.61 79.2115 193.161 80.4894 194.675L81.895 193.361C80.4528 191.975 79.0472 190.552 77.6963 189.11Z" fill="#FDEA00"/>
+-<path d="M64.6064 172.233C67.5563 177.218 70.7614 182.047 74.2089 186.702L74.8478 186.1C71.1129 181.723 67.6907 177.09 64.6064 172.233Z" fill="#FDEA00"/>
+-<path d="M162.475 223.174C152.92 223.675 143.344 222.734 134.069 220.383C132.244 219.981 130.272 219.543 128.41 219.069L116.836 226.239C152.799 248.425 194.167 251.783 224.343 231.202C233.098 223.078 240.723 213.819 247.016 203.67C249.244 199.857 251.197 196.226 252.767 193.088C248.805 196.7 219.067 223.156 162.475 223.174Z" fill="#FDEA00"/>
+-<path d="M266.824 126.109C266.97 128.627 266.988 131.127 266.988 133.626C267.006 131.163 266.97 128.664 266.824 126.109Z" fill="#FDEA00"/>
+-<path d="M266.842 139.063C266.842 139.337 266.842 139.611 266.842 139.903C266.824 139.629 266.824 139.337 266.842 139.063Z" fill="#FDEA00"/>
+-<path d="M256.217 185.899C255.25 188.144 254.264 190.369 253.187 192.541C253.187 192.541 254.465 190.114 256.217 185.899Z" fill="#FDEA00"/>
+-<path d="M172.662 22.8599L184.802 12.3142L186.408 10.9093C185.057 10.3437 183.725 9.77813 182.355 9.24902L168.317 21.1814C169.777 21.7287 171.22 22.2761 172.662 22.8599Z" fill="#FDEA00"/>
+-<path d="M59.715 124.34L58.5649 123.354L59.715 124.34Z" fill="#FDEA00"/>
+-<path d="M68.3854 106.113L66.0669 108.084L67.29 108.996C67.6551 108.047 68.0202 107.099 68.3854 106.113Z" fill="#FDEA00"/>
+-<path d="M41.5692 111.112C41.5692 110.875 41.4779 110.656 41.4414 110.419C41.4779 110.656 41.5327 110.875 41.5692 111.112Z" fill="#FDEA00"/>
+-<path d="M39.1035 93.3048C39.1124 93.2505 39.1124 93.195 39.1035 93.1406C39.1124 93.195 39.1124 93.2505 39.1035 93.3048Z" fill="#FDEA00"/>
+-<path d="M253.443 191.573C253.351 191.92 253.278 192.23 253.187 192.595C254.264 190.423 255.25 188.198 256.217 185.953C256.455 185.37 256.71 184.767 256.966 184.129C256.345 185.461 255.14 188.106 253.443 191.573Z" fill="#FDEA00"/>
+-<path d="M233.471 73.2353L237.98 69.8599L246.688 62.5618L246.98 63.0545C247.546 63.9485 248.093 64.879 248.623 65.773C246.797 62.7808 244.972 59.8433 243 56.9971L229.418 67.3238C230.818 69.27 232.168 71.2405 233.471 73.2353Z" fill="#FDEA00"/>
+-<path d="M40.3639 103.85C40.1996 102.719 40.0536 101.643 39.9258 100.603C40.0536 101.679 40.1631 102.774 40.3639 103.85Z" fill="#FDEA00"/>
+-<path d="M126.219 0.199803C95.2158 1.85296 65.7674 14.2904 42.9735 35.3582C39.4877 51.425 38.0039 67.8609 38.5556 84.2918C38.7382 85.2223 38.9755 86.1163 39.1763 86.9921C41.1296 86.4812 48.5597 94.5455 62.9085 105.639L70.9045 98.8332L164.008 19.6674L178.101 7.69857C161.476 1.78206 143.84 -0.767081 126.219 0.199803Z" fill="#FDEA00"/>
+-<path d="M178.138 7.66211C179.215 8.04526 180.311 8.41016 181.369 8.81155L178.138 7.66211Z" fill="#FDEA00"/>
+-<path d="M67.29 108.996C68.3671 109.798 69.4807 110.619 70.6308 111.44L172.661 22.8602C171.219 22.2764 169.777 21.729 168.316 21.1816L68.3854 106.113C68.0203 107.098 67.6552 108.047 67.29 108.996Z" fill="#FDEA00"/>
+-<path d="M266.824 126.11C265.698 105.112 259.598 84.6826 249.025 66.5029L235.607 76.629L183.798 115.345L235.151 144.537C236.008 145.023 236.723 145.726 237.223 146.574C237.723 147.423 237.991 148.389 238.001 149.374C238.01 150.359 237.76 151.329 237.276 152.187C236.792 153.045 236.09 153.76 235.242 154.262L233.234 155.485C250.504 160.009 259.504 169.862 253.443 191.574C255.141 188.162 256.345 185.516 256.966 184.111L257.441 182.907C262.754 169.157 265.913 154.671 266.806 139.958C266.806 139.666 266.806 139.392 266.806 139.119C266.897 137.294 266.952 135.47 266.952 133.645C266.988 131.127 266.97 128.628 266.824 126.11Z" fill="#FDEA00"/>
+-<path d="M162.475 223.174C152.936 223.222 143.417 222.287 134.069 220.383C143.344 222.734 152.92 223.675 162.475 223.174Z" fill="#FDEA00"/>
+-<path d="M217.624 144.482C218.357 144.873 218.991 145.425 219.478 146.097C219.966 146.769 220.294 147.543 220.439 148.36C220.583 149.177 220.539 150.017 220.311 150.815C220.083 151.613 219.676 152.348 219.121 152.966C222.407 153.313 225.529 153.769 228.468 154.353L228.706 154.207C229.548 153.7 230.244 152.981 230.723 152.123C231.202 151.265 231.448 150.296 231.437 149.313C231.426 148.33 231.158 147.367 230.66 146.52C230.161 145.672 229.45 144.97 228.596 144.482L177.243 115.29L233.47 73.1799C232.18 71.1851 230.829 69.2329 229.417 67.3232L166.271 115.345L217.624 144.482Z" fill="#FDEA00"/>
+-<path d="M61.4862 125.891C61.3963 125.752 61.317 125.605 61.2489 125.454C60.7378 125.052 60.2449 124.633 59.752 124.213C60.2449 124.888 60.8838 125.417 61.4862 125.891Z" fill="#FDEA00"/>
+-<path d="M38.5562 84.292C38.5562 84.292 38.5562 85.4962 38.6839 87.6673C38.6839 87.6673 38.6839 87.5579 38.6839 87.4849C38.6839 86.4084 38.5927 85.3685 38.5562 84.292Z" fill="#FDEA00"/>
+-<path d="M39.925 100.603C39.6147 98.1944 39.3226 95.7678 39.1035 93.3047C39.3043 95.4394 39.5599 97.8842 39.925 100.603Z" fill="#FDEA00"/>
+-<path d="M252.695 192.996L253.188 192.54L252.75 192.905L252.695 192.996Z" fill="#FDEA00"/>
+-<path d="M38.8301 89.8564C38.8301 90.8417 38.9761 91.9729 39.0857 93.1953C39.0857 92.2466 38.9761 91.2613 38.9214 90.2761C38.8769 90.1396 38.8463 89.999 38.8301 89.8564Z" fill="#FDEA00"/>
+-<path d="M41.4413 110.419C41.0397 108.248 40.6929 106.058 40.3643 103.851C40.6746 105.912 41.0397 108.12 41.4413 110.419Z" fill="#FDEA00"/>
+-<path d="M49.1084 137.987C45.8378 129.259 43.3156 120.268 41.5688 111.112C44.7453 128.427 51.2626 151.434 64.6074 172.234C58.2152 161.423 53.0125 149.953 49.0901 138.024L49.1084 137.987Z" fill="#FDEA00"/>
+-<path d="M79.5218 187.414L77.6963 189.111C79.0472 190.552 80.4529 191.975 81.8951 193.362L83.7206 191.647C82.2967 190.279 80.891 188.874 79.5218 187.414Z" fill="#FDEA00"/>
+-<path d="M115.631 214.928C118.309 215.986 121.096 216.947 123.992 217.81L124.577 217.464C121.911 216.515 119.282 215.475 116.69 214.289L115.631 214.928Z" fill="#FDEA00"/>
+-<path d="M128.429 219.069C130.254 219.544 132.171 219.982 134.088 220.383C132.262 219.927 130.437 219.453 128.611 218.905L128.429 219.069Z" fill="#FDEA00"/>
+-<path d="M76.6743 184.367C64.7035 170.737 55.3577 155.013 49.1084 137.987C53.0307 149.917 58.2334 161.387 64.6256 172.197C67.7026 177.065 71.1187 181.711 74.8487 186.1L76.6743 184.367Z" fill="#FDEA00"/>
+-<path d="M252.749 192.905L253.187 192.54C253.278 192.175 253.351 191.865 253.442 191.519C253.223 191.975 252.986 192.431 252.749 192.905Z" fill="#FDEA00"/>
+-<path d="M58.6001 123.282C56.9206 121.786 55.2959 120.217 53.7441 118.538L53.3243 118.903C52.643 119.49 52.1133 120.233 51.7799 121.068C51.4465 121.903 51.3191 122.807 51.4087 123.701C51.4982 124.596 51.8019 125.456 52.2942 126.209C52.7865 126.961 53.4529 127.585 54.237 128.026L55.8435 128.938C57.2884 127.542 58.5853 126.002 59.7137 124.34L58.6001 123.282Z" fill="#FDEA00"/>
+-<path d="M54.0374 131.365L48.1773 128.044C47.3932 127.603 46.7268 126.98 46.2345 126.227C45.7422 125.474 45.4385 124.614 45.349 123.72C45.2594 122.825 45.3868 121.922 45.7202 121.087C46.0536 120.251 46.5833 119.509 47.2646 118.921L51.1165 115.601C44.9455 108.319 40.7356 99.5836 38.8853 90.2217C38.8853 91.2069 38.9765 92.1922 39.0496 93.1409C39.0584 93.1953 39.0584 93.2507 39.0496 93.3051C39.2686 95.7682 39.5607 98.1948 39.8711 100.603C39.9988 101.643 40.1449 102.72 40.3092 103.851C40.6378 106.058 40.9846 108.248 41.3863 110.419C41.3863 110.656 41.4775 110.875 41.5141 111.112C43.2786 120.27 45.8192 129.261 49.1084 137.988L54.0374 131.365Z" fill="#FDEA00"/>
+-<path d="M39.1768 86.9923C38.976 86.0983 38.7387 85.1678 38.5562 84.292C38.5562 85.3685 38.6839 86.4084 38.757 87.4666C38.7779 87.3572 38.8279 87.2553 38.9018 87.1719C38.9756 87.0884 39.0707 87.0264 39.1768 86.9923Z" fill="#FDEA00"/>
+-<path d="M54.0369 131.364L49.1079 138.005C45.2077 150.815 42.2429 175.272 76.6738 184.366L103.455 159.389L54.0369 131.364Z" fill="#FDEA00"/>
+-<path d="M85.601 140.304L81.4387 137.933C76.268 135.55 71.3037 132.742 66.597 129.54L63.8951 128.007L63.3475 127.715C62.606 127.256 61.9811 126.632 61.5219 125.891C60.9195 125.362 60.317 124.833 59.6964 124.285C58.568 125.947 57.271 127.487 55.8262 128.883L109.534 159.389L79.5219 187.413C80.8911 188.873 82.2967 190.278 83.7207 191.646L118.662 159.042L85.601 140.304Z" fill="#FDEA00"/>
+-<path d="M219.067 152.967C218.677 153.454 218.208 153.874 217.68 154.207L116.69 214.289C119.282 215.475 121.911 216.515 124.576 217.463L228.469 154.353C225.53 153.77 222.408 153.259 219.067 152.967Z" fill="#FDEA00"/>
+-<path d="M233.234 155.43L128.702 218.941C130.528 219.488 132.353 219.963 134.179 220.419C143.492 222.303 152.973 223.226 162.475 223.174C218.958 223.174 248.787 196.7 252.676 192.996C252.913 192.522 253.15 192.066 253.369 191.61C259.503 169.807 250.503 159.954 233.234 155.43Z" fill="#FDEA00"/>
+-<path d="M38.8305 89.8014C38.8305 88.9986 38.721 88.287 38.6845 87.6484C38.6001 88.3689 38.6496 89.0988 38.8305 89.8014Z" fill="#FDEA00"/>
+-<path d="M59.3802 124.637C59.6357 124.254 59.9096 123.816 60.1652 123.397C60.1072 122.562 60.2417 121.725 60.5581 120.95C60.8746 120.175 61.3647 119.483 61.9907 118.927L63.7346 117.466C65.0307 114.857 66.6788 112.397 67.8107 109.314L65.9579 108.202L53.5566 118.653C54.9854 120.396 56.5026 122.065 58.1023 123.652L59.3802 124.637Z" fill="#FDEA00"/>
+-<path d="M60.196 123.613C60.1689 123.417 60.0604 122.109 60.0876 121.913C59.3284 122.665 58.6234 124.561 57.8643 125.248C59.3284 126 64.4981 128.605 66.0164 129.324C64.8558 128.146 60.4286 124.976 60.196 123.613Z" fill="#FDEA00"/>
+-<path d="M70.6315 111.441C69.4814 110.62 68.3678 109.799 67.2908 108.996C66.1041 112.08 64.881 114.944 63.6396 117.553L70.6315 111.441Z" fill="#FDEA00"/>
+-<path d="M38.9216 90.2218C38.9216 89.3278 38.7938 88.3973 38.7573 87.4668C38.7573 87.4668 38.7573 87.5763 38.7573 87.6493C38.7573 88.2878 38.7573 88.9994 38.9034 89.8022C38.8956 89.9423 38.9018 90.0829 38.9216 90.2218Z" fill="#FDEA00"/>
+-<path d="M58.6006 123.281C57.001 121.694 55.4838 120.025 54.055 118.282L53.7446 118.538C55.2964 120.216 56.9211 121.785 58.6006 123.281Z" fill="#FDEA00"/>
+-<path d="M65.9593 75.9632C65.8531 75.9973 38.9763 87.0877 38.9024 87.1712C38.8285 87.2547 38.7785 87.3565 38.7576 87.466C43.7259 79.2982 30.3127 86.5355 30.3857 87.466C32.2255 96.8244 44.9587 108.314 51.1166 115.6L51.6095 115.18L62.8367 105.638C48.5608 94.5451 67.9126 75.4523 65.9593 75.9632Z" fill="#FDEA00"/>
+-<path d="M246.688 62.6162L237.98 69.9143L246.98 63.1636L246.688 62.6162Z" fill="#FDEA00"/>
+-<path d="M249.025 66.4849L248.623 65.8281L249.025 66.5032V66.4849Z" fill="#FDEA00"/>
+-<path d="M37.8081 226.384L37.9724 226.53L37.8264 226.366L37.8081 226.384Z" fill="#FDEA00"/>
+-<path d="M37.8267 226.367L37.9727 226.531L50.1127 214.891L37.8267 226.367Z" fill="#FDEA00"/>
+-<path d="M182.373 9.2308C182.026 9.10309 181.679 8.99362 181.333 8.84766L182.355 9.24905L182.373 9.2308Z" fill="#FDEA00"/>
+-<path d="M64.6071 172.234C51.2623 151.435 44.7451 128.427 41.5686 111.113C41.5686 110.876 41.4773 110.657 41.4408 110.419C41.0392 108.121 40.6741 105.913 40.3637 103.851C40.2177 102.775 40.0534 101.68 39.9256 100.604C39.5605 97.885 39.3049 95.4401 39.1041 93.3054C39.113 93.2511 39.113 93.1956 39.1041 93.1412C38.9946 91.9188 38.9033 90.7876 38.8485 89.8024C38.6524 89.0776 38.5966 88.3221 38.6842 87.5765C38.5564 85.4053 38.5564 84.2011 38.5564 84.2011C38.0047 67.7703 39.4886 51.3343 42.9743 35.2676C17.0264 59.1569 1.61537 92.3545 0.119905 127.582C-1.37556 162.81 11.1666 197.193 34.9966 223.193L74.2096 186.556C70.7663 181.949 67.5613 177.169 64.6071 172.234Z" fill="#FDEA00"/>
+-<path d="M116.836 226.239L73.4058 252.494C97.7243 264.769 125.223 269.3 152.197 265.477C179.171 261.654 204.325 249.66 224.27 231.111C194.093 251.6 152.726 248.334 116.836 226.239Z" fill="#FDEA00"/>
+-</svg>
+diff --git a/site/src/app/admin/layout.tsx b/site/src/app/admin/layout.tsx
+index ad57118..516b5ee 100644
+--- a/site/src/app/admin/layout.tsx
++++ b/site/src/app/admin/layout.tsx
+@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
+       <nav className="painel-nav">
+         <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center' }}>
+           {/* eslint-disable-next-line @next/next/no-img-element */}
+-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
++          <img src="/marca/logo.png" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
+         </div>
+ 
+         <NavPainel itens={itens} />
+diff --git a/site/src/app/entrar/page.tsx b/site/src/app/entrar/page.tsx
+index 7b6eb3d..e2e7318 100644
+--- a/site/src/app/entrar/page.tsx
++++ b/site/src/app/entrar/page.tsx
+@@ -29,7 +29,7 @@ export default async function Entrar({ searchParams }: Props) {
+       <div style={{ width: '100%', maxWidth: 460, background: '#fff', border: '3px solid var(--escuro)', padding: '40px 34px' }}>
+         <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--escuro)', padding: '10px 16px' }}>
+           {/* eslint-disable-next-line @next/next/no-img-element */}
+-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
++          <img src="/marca/logo.png" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+         </div>
+ 
+         <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>Painel do site</h1>
+diff --git a/site/src/components/Footer.tsx b/site/src/components/Footer.tsx
+index 17a9a57..40e4f84 100644
+--- a/site/src/components/Footer.tsx
++++ b/site/src/components/Footer.tsx
+@@ -28,7 +28,7 @@ export function Footer({ config, arvore }: { config: ConfigSite; arvore: NoArvor
+         <div>
+           <div style={{ display: 'flex', alignItems: 'center' }}>
+             {/* eslint-disable-next-line @next/next/no-img-element */}
+-            <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
++            <img src="/marca/logo.png" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
+           </div>
+           <p style={{ marginTop: 16, maxWidth: '32ch', font: '400 14.5px/1.6 var(--corpo)', color: 'rgba(249,249,249,0.8)' }}>{config.descricao}</p>
+ 
+diff --git a/site/src/components/Header.tsx b/site/src/components/Header.tsx
+index 11ddb42..da5ca76 100644
+--- a/site/src/components/Header.tsx
++++ b/site/src/components/Header.tsx
+@@ -19,7 +19,7 @@ export function Header({ arvore }: { arvore: NoArvore[] }) {
+       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'stretch', gap: 30, height: 62 }}>
+         <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+           {/* eslint-disable-next-line @next/next/no-img-element */}
+-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
++          <img src="/marca/logo.png" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+         </Link>
+ 
+         <nav id="main-nav" style={{ display: 'flex', gap: 22, marginLeft: 'auto', alignItems: 'stretch' }}>
