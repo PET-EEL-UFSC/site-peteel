@@ -6,3 +6,5 @@ site/public/uploads/*
 !site/public/uploads/.gitkeep
 *.tsbuildinfo
 .DS_Store
+.vercel
+.env*
