@@ -8,3 +8,4 @@ site/public/uploads/*
 .DS_Store
 .vercel
 .env*
+*.patch
