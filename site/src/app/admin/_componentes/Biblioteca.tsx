@@ -20,6 +20,11 @@ export function Biblioteca({ midias }: { midias: M[] }) {
         style={{ padding: 20, marginBottom: 26, maxWidth: 560 }}
         action={(fd) =>
           iniciar(async () => {
+            const arquivo = fd.get('arquivo')
+            if (arquivo instanceof File && arquivo.size > 8 * 1024 * 1024) {
+              setMsg({ ok: false, texto: `A imagem tem ${(arquivo.size / 1024 / 1024).toFixed(1)} MB. O limite é 8 MB — redimensiona ou comprime antes de enviar.` })
+              return
+            }
             const r = await enviarImagem(fd)
             setMsg(r.ok ? { ok: true, texto: r.mensagem } : { ok: false, texto: r.erro })
             if (r.ok) form.current?.reset()
