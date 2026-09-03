@@ -102,7 +102,6 @@ export function Equipe({
                       href={p.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       style={{ font: '700 9.5px/1 var(--condensada)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--escuro)', background: 'rgba(44,43,34,0.12)', padding: '4px 8px' }}
                     >
                       LinkedIn
@@ -113,7 +112,6 @@ export function Equipe({
                       href={p.curriculo.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       style={{ font: '700 9.5px/1 var(--condensada)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--escuro)', background: 'rgba(44,43,34,0.12)', padding: '4px 8px' }}
                     >
                       CV
