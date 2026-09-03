@@ -27,19 +27,9 @@ export default async function Entrar({ searchParams }: Props) {
       }}
     >
       <div style={{ width: '100%', maxWidth: 460, background: '#fff', border: '3px solid var(--escuro)', padding: '40px 34px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <span
-            style={{
-              width: 14,
-              height: 24,
-              background: 'var(--amarelo)',
-              border: '1px solid var(--escuro)',
-              clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)',
-            }}
-          />
-          <span style={{ font: "900 22px/1 var(--condensada)", letterSpacing: '-0.02em' }}>
-            PET<span style={{ color: 'var(--amarelo)', WebkitTextStroke: '0.5px var(--escuro)' }}>eel</span>
-          </span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--escuro)', padding: '10px 16px' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
         </div>
 
         <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>Painel do site</h1>

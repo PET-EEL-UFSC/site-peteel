@@ -29,7 +29,7 @@ async function main() {
       descricao: 'Programa de Educação Tutorial de Engenharia Elétrica — UFSC',
       endereco: '3º andar do CTC - UFSC, Florianópolis - SC',
       telefone: '(48) 3721-9729',
-      email: 'peteel@contato.ufsc.br',
+      email: 'peteel@gmail.com',
       instagram: 'https://instagram.com/peteel.ufsc',
       avisoAtivo: false,
       avisoTexto: 'Sexta, 12h10 — seminário semanal no CTC, sala divulgada nos stories',

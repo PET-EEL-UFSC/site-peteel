@@ -21,11 +21,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="painel">
       <nav className="painel-nav">
-        <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center', gap: 9 }}>
-          <span aria-hidden style={{ width: 12, height: 21, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
-          <span style={{ font: '900 19px/1 var(--condensada)', color: 'var(--offwhite)' }}>
-            PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
-          </span>
+        <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
         </div>
 
         <NavPainel itens={itens} />

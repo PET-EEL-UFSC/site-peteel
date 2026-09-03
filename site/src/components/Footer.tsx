@@ -26,11 +26,9 @@ export function Footer({ config, arvore }: { config: ConfigSite; arvore: NoArvor
     <footer style={{ background: 'var(--escuro)', color: 'var(--offwhite)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 28px 34px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 40 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-            <span aria-hidden style={{ width: 14, height: 24, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
-            <span style={{ font: `900 22px/1 ${cond}`, letterSpacing: '-0.02em' }}>
-              PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ marginTop: 16, maxWidth: '32ch', font: '400 14.5px/1.6 var(--corpo)', color: 'rgba(249,249,249,0.8)' }}>{config.descricao}</p>
 

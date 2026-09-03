@@ -17,11 +17,9 @@ export function Header({ arvore }: { arvore: NoArvore[] }) {
   return (
     <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: 'var(--escuro)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'stretch', gap: 30, height: 62 }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <span aria-hidden style={{ width: 14, height: 24, background: 'var(--amarelo)', clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' }} />
-          <span style={{ font: `900 22px/1 ${cond}`, color: 'var(--offwhite)', letterSpacing: '-0.02em' }}>
-            PET<span style={{ color: 'var(--amarelo)' }}>eel</span>
-          </span>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
         </Link>
 
         <nav id="main-nav" style={{ display: 'flex', gap: 22, marginLeft: 'auto', alignItems: 'stretch' }}>
