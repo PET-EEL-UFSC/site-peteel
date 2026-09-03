@@ -1,10 +1,68 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { salvarPetiano, apagarPetiano } from '../acoes'
+import { useState, useTransition, useRef } from 'react'
+import { salvarPetiano, apagarPetiano, enviarCurriculo, removerCurriculo } from '../acoes'
 import type { OpcaoMidia } from './EscolhaFoto'
 
-type P = { id: string; nome: string; cargo: string; tutor: boolean; bio: string | null; fotoId: string | null; ordem: number; saiuEm: string | null; destino: string | null }
+type P = {
+  id: string; nome: string; cargo: string; tutor: boolean; bio: string | null
+  fotoId: string | null; ordem: number; saiuEm: string | null; destino: string | null
+  linkedin: string | null; curriculo: { url: string; nome: string } | null
+}
+
+function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { url: string; nome: string } | null }) {
+  const form = useRef<HTMLFormElement>(null)
+  const [msg, setMsg] = useState<string | null>(null)
+  const [pendente, iniciar] = useTransition()
+
+  return (
+    <div className="campo">
+      <span>Currículo (PDF)</span>
+      {curriculo && (
+        <p style={{ margin: '4px 0 8px', font: '400 13px var(--corpo)' }}>
+          Atual: <a href={curriculo.url} target="_blank" rel="noopener noreferrer">{curriculo.nome}</a>{' '}
+          <button
+            type="button"
+            className="btn btn-perigo"
+            style={{ marginLeft: 8, padding: '2px 10px', fontSize: 12 }}
+            disabled={pendente}
+            onClick={() => {
+              if (!confirm('Remover o currículo atual?')) return
+              iniciar(async () => {
+                const r = await removerCurriculo(petianoId)
+                setMsg(r.ok ? r.mensagem : r.erro)
+              })
+            }}
+          >
+            remover
+          </button>
+        </p>
+      )}
+      <form
+        ref={form}
+        action={(fd) =>
+          iniciar(async () => {
+            const arquivo = fd.get('arquivo')
+            if (arquivo instanceof File && arquivo.size > 8 * 1024 * 1024) {
+              setMsg(`O arquivo tem ${(arquivo.size / 1024 / 1024).toFixed(1)} MB. O limite é 8 MB.`)
+              return
+            }
+            const r = await enviarCurriculo(petianoId, fd)
+            setMsg(r.ok ? r.mensagem : r.erro)
+            if (r.ok) form.current?.reset()
+          })
+        }
+        style={{ display: 'flex', gap: 10, alignItems: 'center' }}
+      >
+        <input type="file" name="arquivo" accept="application/pdf" required />
+        <button type="submit" className="btn btn-claro" disabled={pendente}>
+          {curriculo ? 'Trocar' : 'Enviar'}
+        </button>
+      </form>
+      {msg && <p className="dica">{msg}</p>}
+    </div>
+  )
+}
 
 function Ficha({ p, midias, aoFechar }: { p: P | null; midias: OpcaoMidia[]; aoFechar: () => void }) {
   return (
@@ -43,6 +101,15 @@ function Ficha({ p, midias, aoFechar }: { p: P | null; midias: OpcaoMidia[]; aoF
         <span>Descrição (opcional)</span>
         <textarea name="bio" defaultValue={p?.bio ?? ''} />
       </label>
+
+      <label className="campo">
+        <span>LinkedIn (opcional)</span>
+        <input type="url" name="linkedin" defaultValue={p?.linkedin ?? ''} placeholder="https://linkedin.com/in/..." />
+        <p className="dica">Aparece como botão no card da pessoa.</p>
+      </label>
+
+      {p && <Curriculo petianoId={p.id} curriculo={p.curriculo} />}
+      {!p && <p className="dica">Salva a pessoa primeiro pra depois poder anexar o currículo.</p>}
 
       <label className="campo" style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
         <input type="checkbox" name="tutor" defaultChecked={p?.tutor ?? false} />

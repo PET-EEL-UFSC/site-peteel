@@ -46,6 +46,7 @@ model User {
   sessions Session[]
   revisoes PaginaRevisao[]
   midias   Midia[]
+  documentos Documento[]
 
   @@index([ativo])
 }
@@ -164,6 +165,26 @@ model Midia {
   @@index([criadoEm])
 }
 
+// Currículo em PDF, vinculado a um Petiano. Modelo separado de Midia
+// porque documento não tem largura/altura — forçar isso pra PDF seria
+// artificial.
+model Documento {
+  id      String @id @default(cuid())
+  chave   String @unique // caminho no storage (Blob/local)
+  url     String
+  nome    String // nome original do arquivo, exibido/baixado com esse nome
+  tamanho Int // bytes
+
+  enviadoPorId String?
+  enviadoPor   User?   @relation(fields: [enviadoPorId], references: [id], onDelete: SetNull)
+
+  criadoEm DateTime @default(now())
+
+  petianos Petiano[]
+
+  @@index([criadoEm])
+}
+
 // Aparece em toda página (rodapé, contato, redes). Linha única.
 model Config {
   id Int @id @default(1)
@@ -202,6 +223,9 @@ model Petiano {
 
   fotoId String?
   foto   Midia?  @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+
+  curriculoId String?
+  curriculo   Documento? @relation(fields: [curriculoId], references: [id], onDelete: SetNull)
 
   entrouEm DateTime
   saiuEm   DateTime? // preenchido = ex-petiano

@@ -17,12 +17,24 @@ export function validarImagem(arquivo: File): string | null {
   return null
 }
 
+const TAMANHO_MAX_DOC = 8 * 1024 * 1024 // 8 MB
+
+export function validarPdf(arquivo: File): string | null {
+  if (arquivo.type !== 'application/pdf') {
+    return 'Formato não aceito. Envie um arquivo PDF.'
+  }
+  if (arquivo.size > TAMANHO_MAX_DOC) {
+    return `O arquivo tem ${(arquivo.size / 1024 / 1024).toFixed(1)} MB. O limite é 8 MB.`
+  }
+  return null
+}
+
 /**
  * Dev grava em public/uploads; produção usa Vercel Blob. A troca é via
  * STORAGE no ambiente para o painel funcionar igual nos dois.
  */
 export async function salvarArquivo(arquivo: File): Promise<Salvo> {
-  const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif' }[arquivo.type] ?? 'bin'
+  const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'application/pdf': 'pdf' }[arquivo.type] ?? 'bin'
   const chave = `${randomUUID()}.${ext}`
   const bytes = Buffer.from(await arquivo.arrayBuffer())
 

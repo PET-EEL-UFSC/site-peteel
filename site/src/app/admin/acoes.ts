@@ -158,11 +158,15 @@ export async function salvarPetiano(formData: FormData): Promise<void> {
     tutor: formData.get('tutor') === 'on',
     bio: String(formData.get('bio') ?? '').trim() || null,
     fotoId: String(formData.get('fotoId') ?? '') || null,
+    linkedin: String(formData.get('linkedin') ?? '').trim() || null,
     saiuEm: formData.get('saiuEm') ? new Date(String(formData.get('saiuEm'))) : null,
     destino: String(formData.get('destino') ?? '').trim() || null,
     ordem: Number(formData.get('ordem') ?? 0),
   }
   if (!dados.nome || !dados.cargo) throw new Error('nome e cargo são obrigatórios')
+  if (dados.linkedin && !/^https?:\/\//.test(dados.linkedin)) {
+    throw new Error('o link do LinkedIn precisa começar com http:// ou https://')
+  }
 
   if (id) await db.petiano.update({ where: { id }, data: dados })
   else await db.petiano.create({ data: { ...dados, entrouEm: new Date() } })
@@ -181,6 +185,52 @@ export async function apagarPetiano(id: string): Promise<Resultado> {
   revalidatePath('/admin/pessoas')
   revalidatePath('/membros')
   return { ok: true, mensagem: 'Removido.' }
+}
+
+export async function enviarCurriculo(petianoId: string, formData: FormData): Promise<Resultado> {
+  let usuario
+  try {
+    usuario = await exigirPermissaoAction('gerenciarPetianos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const arquivo = formData.get('arquivo')
+  if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: 'nenhum arquivo selecionado' }
+
+  const { validarPdf, salvarArquivo } = await import('@/lib/storage')
+  const problema = validarPdf(arquivo)
+  if (problema) return { ok: false, erro: problema }
+
+  let chave: string
+  let url: string
+  try {
+    ;({ chave, url } = await salvarArquivo(arquivo))
+  } catch (e) {
+    console.error('Falha ao salvar currículo no storage:', e)
+    return { ok: false, erro: 'não consegui salvar o arquivo no armazenamento — avisa o time técnico' }
+  }
+
+  const doc = await db.documento.create({
+    data: { chave, url, nome: arquivo.name, tamanho: arquivo.size, enviadoPorId: usuario.id },
+  })
+  await db.petiano.update({ where: { id: petianoId }, data: { curriculoId: doc.id } })
+
+  revalidatePath('/admin/pessoas')
+  revalidatePath('/membros')
+  return { ok: true, mensagem: 'Currículo enviado.' }
+}
+
+export async function removerCurriculo(petianoId: string): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarPetianos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+  await db.petiano.update({ where: { id: petianoId }, data: { curriculoId: null } })
+  revalidatePath('/admin/pessoas')
+  revalidatePath('/membros')
+  return { ok: true, mensagem: 'Currículo removido.' }
 }
 
 // ─────────────────────────── acessos ───────────────────────────

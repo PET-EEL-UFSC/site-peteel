@@ -6,7 +6,10 @@ export default async function PessoasPage() {
   await exigirPermissao('gerenciarPetianos')
 
   const [petianos, midias] = await Promise.all([
-    db.petiano.findMany({ orderBy: [{ saiuEm: 'asc' }, { tutor: 'desc' }, { ordem: 'asc' }] }),
+    db.petiano.findMany({
+      orderBy: [{ saiuEm: 'asc' }, { tutor: 'desc' }, { ordem: 'asc' }],
+      include: { curriculo: { select: { url: true, nome: true } } },
+    }),
     db.midia.findMany({ select: { id: true, url: true, alt: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
   ])
 
@@ -19,7 +22,8 @@ export default async function PessoasPage() {
       <Pessoas
         petianos={petianos.map((p) => ({
           id: p.id, nome: p.nome, cargo: p.cargo, tutor: p.tutor, bio: p.bio,
-          fotoId: p.fotoId, ordem: p.ordem, destino: p.destino,
+          fotoId: p.fotoId, ordem: p.ordem, destino: p.destino, linkedin: p.linkedin,
+          curriculo: p.curriculo,
           saiuEm: p.saiuEm ? p.saiuEm.toISOString().slice(0, 10) : null,
         }))}
         midias={midias}
