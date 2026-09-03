@@ -360,7 +360,14 @@ export async function enviarImagem(formData: FormData): Promise<Resultado> {
   const buf = Buffer.from(await arquivo.arrayBuffer())
   const dim = dimensoes(buf) ?? { largura: 1200, altura: 900 }
 
-  const { chave, url } = await salvarArquivo(arquivo)
+  let chave: string
+  let url: string
+  try {
+    ;({ chave, url } = await salvarArquivo(arquivo))
+  } catch (e) {
+    console.error('Falha ao salvar imagem no storage:', e)
+    return { ok: false, erro: 'não consegui salvar a imagem no armazenamento — avisa o time técnico' }
+  }
 
   const usuario = await exigirPermissaoAction('subirMidia')
   await db.midia.create({
