@@ -29,7 +29,7 @@ export default async function Entrar({ searchParams }: Props) {
       <div style={{ width: '100%', maxWidth: 460, background: '#fff', border: '3px solid var(--escuro)', padding: '40px 34px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--escuro)', padding: '10px 16px' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+          <img src="/marca/logo-v2.png" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
         </div>
 
         <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>Painel do site</h1>

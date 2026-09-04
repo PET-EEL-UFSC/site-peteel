@@ -28,7 +28,7 @@ export function Footer({ config, arvore }: { config: ConfigSite; arvore: NoArvor
         <div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
+            <img src="/marca/logo-v2.png" alt="PET EEL" style={{ height: 24, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ marginTop: 16, maxWidth: '32ch', font: '400 14.5px/1.6 var(--corpo)', color: 'rgba(249,249,249,0.8)' }}>{config.descricao}</p>
 

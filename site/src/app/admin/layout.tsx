@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav className="painel-nav">
         <div style={{ padding: '0 22px 18px', display: 'flex', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
+          <img src="/marca/logo-v2.png" alt="PET EEL" style={{ height: 22, width: 'auto', display: 'block' }} />
         </div>
 
         <NavPainel itens={itens} />

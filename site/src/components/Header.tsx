@@ -19,7 +19,7 @@ export function Header({ arvore }: { arvore: NoArvore[] }) {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'stretch', gap: 30, height: 62 }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/marca/logo.svg" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
+          <img src="/marca/logo-v2.png" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
         </Link>
 
         <nav id="main-nav" style={{ display: 'flex', gap: 22, marginLeft: 'auto', alignItems: 'stretch' }}>
