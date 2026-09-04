@@ -14,6 +14,8 @@ export type Ctx = {
 const cond = "var(--condensada)"
 const corpo = 'var(--corpo)'
 
+const TAMANHOS_ROTULO = { p: '12px', m: '15px', g: '18px' } as const
+
 function Chip({ el, ctx }: { el: Extract<Elemento, { tipo: 'chip' }>; ctx: Ctx }) {
   const cor = el.cor ?? (ctx.escuro ? 'amarelo' : 'escuro')
   const solido = el.estilo !== 'contorno'
@@ -225,7 +227,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                     style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
                   />
                 )}
-                <span style={{ font: `900 12px/1.4 ${cond}`, letterSpacing: '0.12em', textTransform: 'uppercase', color: hexDe(ctx.acento), paddingTop: 4 }}>
+                <span style={{ font: `900 ${TAMANHOS_ROTULO[el.tamanhoRotulo]}/1.4 ${cond}`, letterSpacing: '0.12em', textTransform: 'uppercase', color: hexDe(ctx.acento), paddingTop: 4 }}>
                   {it.rotulo}
                 </span>
                 <div>

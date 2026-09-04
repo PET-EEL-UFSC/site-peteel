@@ -109,6 +109,8 @@ export const linhasSchema = z.object({
     .min(1)
     .max(30),
   comFoto: z.boolean().default(true),
+  /** tamanho do rótulo (ex: "COO", "Sex · 12h10") — o padrão ficou pequeno demais pra algumas listas */
+  tamanhoRotulo: z.enum(['p', 'm', 'g']).default('p'),
 })
 
 /** Vídeo do YouTube ou player do Spotify. */

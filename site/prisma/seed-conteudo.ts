@@ -60,7 +60,7 @@ function faixaLinhas(
     decor: null,
     quadrantes: [[
       { tipo: 'titulo', texto: titulo, tamanho: 'm' },
-      { tipo: 'linhas', itens: itens.map((i) => ({ ...i, foto: { midiaId: null, legenda: 'foto' } })), comFoto },
+      { tipo: 'linhas', itens: itens.map((i) => ({ ...i, foto: { midiaId: null, legenda: 'foto' } })), comFoto, tamanhoRotulo: 'p' },
     ]],
   }
 }

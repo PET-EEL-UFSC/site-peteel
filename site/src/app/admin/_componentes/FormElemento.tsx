@@ -30,7 +30,7 @@ export function novoElemento(tipo: Elemento['tipo']): Elemento {
     case 'foto': return { tipo, foto: { ...FOTO_VAZIA }, proporcao: '4/3' }
     case 'galeria': return { tipo, itens: [{ ...FOTO_VAZIA }, { ...FOTO_VAZIA }], colunas: 2, proporcao: '1/1', destaque: false }
     case 'cards': return { tipo, itens: [{ titulo: 'Card', texto: '' }], colunas: 3 }
-    case 'linhas': return { tipo, itens: [{ rotulo: 'Rótulo', titulo: 'Item', texto: '' }], comFoto: true }
+    case 'linhas': return { tipo, itens: [{ rotulo: 'Rótulo', titulo: 'Item', texto: '' }], comFoto: true, tamanhoRotulo: 'p' }
     case 'embed': return { tipo, provedor: 'youtube', url: 'https://www.youtube.com/watch?v=' }
   }
 }
@@ -182,6 +182,12 @@ export function FormElemento({ el, onChange, midias }: Props) {
       return (
         <>
           <Alternador rotulo="Mostrar miniatura em cada linha" valor={el.comFoto} onChange={(comFoto) => onChange({ ...el, comFoto })} />
+          <Selecao
+            rotulo="Tamanho do rótulo"
+            valor={el.tamanhoRotulo}
+            opcoes={[['p', 'Pequeno'], ['m', 'Médio'], ['g', 'Grande']]}
+            onChange={(tamanhoRotulo) => onChange({ ...el, tamanhoRotulo })}
+          />
           <Secao titulo="Linhas">
             <ListaItens
               itens={el.itens}
