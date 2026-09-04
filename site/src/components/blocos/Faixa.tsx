@@ -1,9 +1,7 @@
 import { fundoDe, fundoEscuro } from '@/lib/content/cores'
-import { LAYOUTS, TAMANHOS_RAIO, recuoDoRaio, type Faixa as FaixaT } from '@/lib/content/blocos'
+import { LAYOUTS, TAMANHOS_RAIO, ESTILO_FORMA, recuoDoRaio, type Faixa as FaixaT } from '@/lib/content/blocos'
 import type { MapaMidia } from '@/lib/content/midia'
 import { RenderElemento, type Ctx } from './Elementos'
-
-const RAIO = 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)'
 
 const COLUNAS: Record<keyof typeof LAYOUTS, string> = {
   '1': '1fr',
@@ -24,7 +22,24 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden', background: fundo }}>
-      {bloco.decor && (
+      {bloco.decor?.tipo === 'imagem' && bloco.decor.midiaId && midias[bloco.decor.midiaId] && (
+        <img
+          aria-hidden
+          alt=""
+          src={midias[bloco.decor.midiaId].url}
+          style={{
+            position: 'absolute',
+            top: 0,
+            [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
+            width: TAMANHOS_RAIO[bloco.decor.tamanho],
+            height: '100%',
+            objectFit: 'contain',
+            opacity: bloco.decor.opacidade,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {bloco.decor?.tipo === 'raio' && (
         <span
           aria-hidden
           style={{
@@ -34,7 +49,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
             background: fundoDe(bloco.decor.cor),
-            clipPath: RAIO,
+            ...ESTILO_FORMA[bloco.decor.forma],
             opacity: bloco.decor.opacidade,
             pointerEvents: 'none',
           }}

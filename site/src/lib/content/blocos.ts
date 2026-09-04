@@ -21,18 +21,53 @@ export const LAYOUTS = {
 
 export type Layout = keyof typeof LAYOUTS
 
+/** também usado pra dimensionar a imagem decorativa — não é mais só do raio */
 export const TAMANHOS_RAIO = { pequeno: 140, medio: 220, gigante: 340 } as const
 export type TamanhoRaio = keyof typeof TAMANHOS_RAIO
 
-export const decorSchema = z.object({
-  tipo: z.literal('raio'),
-  cor: corSchema,
+export const FORMAS_DECOR = ['raio', 'gota', 'circulo'] as const
+export type FormaDecor = (typeof FORMAS_DECOR)[number]
+
+/** Recorte de cada forma: clipPath pras angulares, borderRadius pras orgânicas. */
+export const ESTILO_FORMA: Record<FormaDecor, { clipPath?: string; borderRadius?: string }> = {
+  raio: { clipPath: 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)' },
+  gota: { borderRadius: '42% 58% 68% 32% / 48% 40% 60% 52%' },
+  circulo: { borderRadius: '50%' },
+}
+
+const decorComumSchema = {
   lado: z.enum(['esquerda', 'direita']),
   tamanho: z.enum(['pequeno', 'medio', 'gigante']).default('medio'),
-  /** o raio corta na borda da faixa em vez de caber inteiro dentro */
+  /** a decoração corta na borda da faixa em vez de caber inteira dentro */
   sangra: z.boolean().default(false),
+}
+
+/**
+ * `tipo` continua "raio" mesmo cobrindo outras formas (gota, círculo) —
+ * renomear quebraria toda decoração já publicada, que tem esse literal
+ * salvo no banco. `forma` é quem escolhe o recorte de fato.
+ */
+export const decorFormaSchema = z.object({
+  tipo: z.literal('raio'),
+  forma: z.enum(FORMAS_DECOR).default('raio'),
+  cor: corSchema,
+  ...decorComumSchema,
   opacidade: z.number().min(0).max(1).default(0.9),
 })
+
+/**
+ * Decoração livre: qualquer PNG/webp enviado na biblioteca de imagens.
+ * Existe pra não depender de mexer em código toda vez que uma frente
+ * nova (ex.: a VMC) tem uma peça gráfica própria pra usar como decoração.
+ */
+export const decorImagemSchema = z.object({
+  tipo: z.literal('imagem'),
+  midiaId: z.string().cuid().nullable(),
+  ...decorComumSchema,
+  opacidade: z.number().min(0).max(1).default(1),
+})
+
+export const decorSchema = z.discriminatedUnion('tipo', [decorFormaSchema, decorImagemSchema])
 
 export type Decor = z.infer<typeof decorSchema>
 

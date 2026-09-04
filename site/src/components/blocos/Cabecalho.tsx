@@ -1,17 +1,33 @@
 import { fundoDe, fundoEscuro } from '@/lib/content/cores'
-import { TAMANHOS_RAIO, type Bloco } from '@/lib/content/blocos'
+import { TAMANHOS_RAIO, ESTILO_FORMA, type Bloco } from '@/lib/content/blocos'
+import type { MapaMidia } from '@/lib/content/midia'
 
 type CabecalhoT = Extract<Bloco, { tipo: 'cabecalho' }>
-const RAIO = 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)'
 
-export function Cabecalho({ bloco }: { bloco: CabecalhoT }) {
+export function Cabecalho({ bloco, midias }: { bloco: CabecalhoT; midias: MapaMidia }) {
   const fundo = fundoDe(bloco.fundo)
   const escuro = fundoEscuro(bloco.fundo)
   const texto = escuro ? '#F9F9F9' : '#2C2B22'
 
   return (
     <div className="cabecalho" style={{ position: 'relative', background: fundo, overflow: 'hidden', padding: '128px 28px 54px' }}>
-      {bloco.decor && (
+      {bloco.decor?.tipo === 'imagem' && bloco.decor.midiaId && midias[bloco.decor.midiaId] && (
+        <img
+          aria-hidden
+          alt=""
+          src={midias[bloco.decor.midiaId].url}
+          style={{
+            position: 'absolute',
+            top: 0,
+            [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
+            width: TAMANHOS_RAIO[bloco.decor.tamanho],
+            height: '100%',
+            objectFit: 'contain',
+            opacity: bloco.decor.opacidade,
+          }}
+        />
+      )}
+      {bloco.decor?.tipo === 'raio' && (
         <span
           aria-hidden
           style={{
@@ -21,7 +37,7 @@ export function Cabecalho({ bloco }: { bloco: CabecalhoT }) {
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
             background: fundoDe(bloco.decor.cor),
-            clipPath: RAIO,
+            ...ESTILO_FORMA[bloco.decor.forma],
             opacity: bloco.decor.opacidade,
           }}
         />

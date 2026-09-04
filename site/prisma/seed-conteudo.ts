@@ -23,7 +23,7 @@ function cab(migalha: string, titulo: string, texto?: string, fundo: 'amarelo' |
     titulo,
     texto,
     fundo,
-    decor: { tipo: 'raio', cor: fundo === 'amarelo' ? 'offwhite' : 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 1 },
+    decor: { tipo: 'raio', forma: 'raio', cor: fundo === 'amarelo' ? 'offwhite' : 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 1 },
   }
 }
 
@@ -137,7 +137,7 @@ export const PAGINAS: Def[] = [
         layout: '2-60/40',
         alinhamento: 'center',
         espacamento: 'normal',
-        decor: { tipo: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'gigante', sangra: false, opacidade: 0.9 },
+        decor: { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'gigante', sangra: false, opacidade: 0.9 },
         quadrantes: [
           [
             { tipo: 'chip', texto: 'Destaque', cor: 'amarelo', estilo: 'solido', inclinado: false },
@@ -181,7 +181,7 @@ export const PAGINAS: Def[] = [
         layout: '2',
         alinhamento: 'start',
         espacamento: 'normal',
-        decor: { tipo: 'raio', cor: 'laranja', lado: 'esquerda', tamanho: 'gigante', sangra: true, opacidade: 0.85 },
+        decor: { tipo: 'raio', forma: 'raio', cor: 'laranja', lado: 'esquerda', tamanho: 'gigante', sangra: true, opacidade: 0.85 },
         quadrantes: [
           [
             { tipo: 'chip', texto: 'Programa', cor: 'laranja', estilo: 'contorno', inclinado: false },
@@ -206,7 +206,7 @@ export const PAGINAS: Def[] = [
         layout: '2-60/40',
         alinhamento: 'center',
         espacamento: 'normal',
-        decor: { tipo: 'raio', cor: 'offwhite', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 1 },
+        decor: { tipo: 'raio', forma: 'raio', cor: 'offwhite', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 1 },
         quadrantes: [
           [
             { tipo: 'chip', texto: 'Processo seletivo', estilo: 'contorno', inclinado: false },
@@ -423,7 +423,7 @@ export const PAGINAS: Def[] = [
       {
         id: id(), tipo: 'faixa', fundo: 'escuro', acento: 'laranja', layout: '2',
         alinhamento: 'start', espacamento: 'normal',
-        decor: { tipo: 'raio', cor: 'laranja', lado: 'esquerda', tamanho: 'gigante', sangra: true, opacidade: 0.85 },
+        decor: { tipo: 'raio', forma: 'raio', cor: 'laranja', lado: 'esquerda', tamanho: 'gigante', sangra: true, opacidade: 0.85 },
         quadrantes: [
           [
             { tipo: 'titulo', texto: 'Duas frentes', tamanho: 'g' },

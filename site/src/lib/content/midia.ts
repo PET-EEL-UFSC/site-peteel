@@ -36,6 +36,9 @@ export function coletarMidiaIds(blocos: Blocos): string[] {
       b.fotos.forEach((f) => f.midiaId && ids.add(f.midiaId))
     } else if (b.tipo === 'faixa') {
       b.quadrantes.flat().forEach((el) => idsDoElemento(el).forEach((id) => ids.add(id)))
+      if (b.decor?.tipo === 'imagem' && b.decor.midiaId) ids.add(b.decor.midiaId)
+    } else if (b.tipo === 'cabecalho') {
+      if (b.decor?.tipo === 'imagem' && b.decor.midiaId) ids.add(b.decor.midiaId)
     }
   }
   return [...ids]

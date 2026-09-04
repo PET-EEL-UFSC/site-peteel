@@ -20,7 +20,7 @@ export function RenderBlocos({ blocos, dados }: { blocos: Blocos; dados: DadosPa
           case 'hero':
             return <Hero key={b.id} bloco={b} midias={dados.midias} />
           case 'cabecalho':
-            return <Cabecalho key={b.id} bloco={b} />
+            return <Cabecalho key={b.id} bloco={b} midias={dados.midias} />
           case 'faixa':
             return <Faixa key={b.id} bloco={b} midias={dados.midias} />
           case 'equipe':

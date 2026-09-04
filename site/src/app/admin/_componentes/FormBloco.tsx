@@ -4,7 +4,7 @@ import type { Bloco, Decor } from '@/lib/content/blocos'
 import { LAYOUTS } from '@/lib/content/blocos'
 import type { Elemento } from '@/lib/content/elementos'
 import { Texto, Area, Selecao, Alternador, EscolhaCor, Secao } from './campos'
-import { EscolhaFoto, type OpcaoMidia } from './EscolhaFoto'
+import { EscolhaFoto, EscolhaMidia, type OpcaoMidia } from './EscolhaFoto'
 import { FormElemento, ROTULOS, novoElemento } from './FormElemento'
 
 export const ROTULOS_BLOCO: Record<Bloco['tipo'], string> = {
@@ -17,17 +17,44 @@ export const ROTULOS_BLOCO: Record<Bloco['tipo'], string> = {
 
 const TIPOS_ELEMENTO = Object.keys(ROTULOS) as Elemento['tipo'][]
 
-function FormDecor({ decor, onChange }: { decor: Decor | null; onChange: (d: Decor | null) => void }) {
+function FormDecor({ decor, onChange, midias }: { decor: Decor | null; onChange: (d: Decor | null) => void; midias: OpcaoMidia[] }) {
   return (
-    <Secao titulo="Raio decorativo">
+    <Secao titulo="Decoração">
       <Alternador
-        rotulo="Mostrar raio"
+        rotulo="Mostrar decoração"
         valor={!!decor}
-        onChange={(v) => onChange(v ? { tipo: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 0.9 } : null)}
+        onChange={(v) => onChange(v ? { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 0.9 } : null)}
       />
       {decor && (
         <>
-          <EscolhaCor rotulo="Cor do raio" valor={decor.cor} onChange={(cor) => cor && onChange({ ...decor, cor })} />
+          <Selecao
+            rotulo="Tipo"
+            valor={decor.tipo}
+            opcoes={[['raio', 'Forma'], ['imagem', 'Imagem enviada']]}
+            onChange={(tipo) =>
+              onChange(
+                tipo === 'imagem'
+                  ? { tipo: 'imagem', midiaId: null, lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: 1 }
+                  : { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: decor.opacidade }
+              )
+            }
+          />
+
+          {decor.tipo === 'raio' ? (
+            <>
+              <Selecao rotulo="Estilo" valor={decor.forma} opcoes={[['raio', 'Raio'], ['gota', 'Gota'], ['circulo', 'Círculo']]} onChange={(forma) => onChange({ ...decor, forma })} />
+              <EscolhaCor rotulo="Cor" valor={decor.cor} onChange={(cor) => cor && onChange({ ...decor, cor })} />
+            </>
+          ) : (
+            <EscolhaMidia
+              rotulo="Imagem"
+              valor={decor.midiaId}
+              midias={midias}
+              onChange={(midiaId) => onChange({ ...decor, midiaId })}
+              dica="PNG com fundo transparente funciona melhor. Suba em Imagens antes de escolher aqui."
+            />
+          )}
+
           <Selecao rotulo="Lado" valor={decor.lado} opcoes={[['esquerda', 'Esquerda'], ['direita', 'Direita']]} onChange={(lado) => onChange({ ...decor, lado })} />
           <Selecao rotulo="Tamanho" valor={decor.tamanho} opcoes={[['pequeno', 'Pequeno'], ['medio', 'Médio'], ['gigante', 'Gigante']]} onChange={(tamanho) => onChange({ ...decor, tamanho })} />
           <Alternador rotulo="Corta na borda da faixa" valor={decor.sangra} onChange={(sangra) => onChange({ ...decor, sangra })} />
@@ -35,7 +62,7 @@ function FormDecor({ decor, onChange }: { decor: Decor | null; onChange: (d: Dec
             <span>Transparência ({Math.round(decor.opacidade * 100)}%)</span>
             <input type="range" min={10} max={100} value={Math.round(decor.opacidade * 100)} onChange={(e) => onChange({ ...decor, opacidade: Number(e.target.value) / 100 })} style={{ width: '100%' }} />
           </label>
-          <p className="dica" style={{ marginBottom: 10 }}>O texto se afasta do raio automaticamente — não precisa ajustar espaçamento.</p>
+          <p className="dica" style={{ marginBottom: 10 }}>O texto se afasta da decoração automaticamente — não precisa ajustar espaçamento.</p>
         </>
       )}
     </Secao>
@@ -69,7 +96,7 @@ export function FormBloco({ bloco, onChange, midias }: { bloco: Bloco; onChange:
         <Area rotulo="Texto de apoio" valor={bloco.texto ?? ''} onChange={(texto) => onChange({ ...bloco, texto: texto || undefined })} />
         <EscolhaCor rotulo="Cor de fundo" valor={bloco.fundo} onChange={(fundo) => fundo && onChange({ ...bloco, fundo })} />
         <p className="dica" style={{ marginTop: -8, marginBottom: 12 }}>A cor do texto se ajusta sozinha ao fundo.</p>
-        <FormDecor decor={bloco.decor} onChange={(decor) => onChange({ ...bloco, decor })} />
+        <FormDecor decor={bloco.decor} midias={midias} onChange={(decor) => onChange({ ...bloco, decor })} />
       </>
     )
   }
@@ -131,7 +158,7 @@ export function FormBloco({ bloco, onChange, midias }: { bloco: Bloco; onChange:
       <Selecao rotulo="Alinhamento vertical" valor={bloco.alinhamento} opcoes={[['start', 'Topo'], ['center', 'Centro']]} onChange={(alinhamento) => onChange({ ...bloco, alinhamento })} />
       <Selecao rotulo="Espaçamento" valor={bloco.espacamento} opcoes={[['compacto', 'Compacto'], ['normal', 'Normal'], ['amplo', 'Amplo']]} onChange={(espacamento) => onChange({ ...bloco, espacamento })} />
 
-      <FormDecor decor={bloco.decor} onChange={(decor) => onChange({ ...bloco, decor })} />
+      <FormDecor decor={bloco.decor} midias={midias} onChange={(decor) => onChange({ ...bloco, decor })} />
 
       {Array.from({ length: nQuadrantes }, (_, qi) => {
         const conteudo = bloco.quadrantes[qi] ?? []
