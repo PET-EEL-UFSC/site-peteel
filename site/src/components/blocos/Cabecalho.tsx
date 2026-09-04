@@ -1,11 +1,11 @@
-import { hexDe, fundoEscuro } from '@/lib/content/cores'
+import { fundoDe, fundoEscuro } from '@/lib/content/cores'
 import { TAMANHOS_RAIO, type Bloco } from '@/lib/content/blocos'
 
 type CabecalhoT = Extract<Bloco, { tipo: 'cabecalho' }>
 const RAIO = 'polygon(58% 0,0 58%,42% 58%,30% 100%,100% 38%,52% 38%)'
 
 export function Cabecalho({ bloco }: { bloco: CabecalhoT }) {
-  const fundo = hexDe(bloco.fundo)
+  const fundo = fundoDe(bloco.fundo)
   const escuro = fundoEscuro(bloco.fundo)
   const texto = escuro ? '#F9F9F9' : '#2C2B22'
 
@@ -20,7 +20,7 @@ export function Cabecalho({ bloco }: { bloco: CabecalhoT }) {
             [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
-            background: hexDe(bloco.decor.cor),
+            background: fundoDe(bloco.decor.cor),
             clipPath: RAIO,
             opacity: bloco.decor.opacidade,
           }}

@@ -1,4 +1,4 @@
-import { hexDe, fundoEscuro } from '@/lib/content/cores'
+import { fundoDe, fundoEscuro } from '@/lib/content/cores'
 import { LAYOUTS, TAMANHOS_RAIO, recuoDoRaio, type Faixa as FaixaT } from '@/lib/content/blocos'
 import type { MapaMidia } from '@/lib/content/midia'
 import { RenderElemento, type Ctx } from './Elementos'
@@ -16,7 +16,7 @@ const COLUNAS: Record<keyof typeof LAYOUTS, string> = {
 const ESPACO = { compacto: '48px 28px', normal: '80px 28px', amplo: '112px 28px' }
 
 export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
-  const fundo = hexDe(bloco.fundo)
+  const fundo = fundoDe(bloco.fundo)
   const escuro = fundoEscuro(bloco.fundo)
   const ctx: Ctx = { escuro, acento: bloco.acento ?? (escuro ? 'amarelo' : 'azul'), midias }
 
@@ -33,7 +33,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
             [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
-            background: hexDe(bloco.decor.cor),
+            background: fundoDe(bloco.decor.cor),
             clipPath: RAIO,
             opacity: bloco.decor.opacidade,
             pointerEvents: 'none',

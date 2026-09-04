@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { hexDe, fundoEscuro, type Cor } from '@/lib/content/cores'
+import { hexDe, fundoDe, fundoEscuro, type Cor } from '@/lib/content/cores'
 import type { Elemento } from '@/lib/content/elementos'
 import type { MapaMidia } from '@/lib/content/midia'
 import { Foto } from '@/components/Foto'
@@ -15,15 +15,16 @@ const cond = "var(--condensada)"
 const corpo = 'var(--corpo)'
 
 function Chip({ el, ctx }: { el: Extract<Elemento, { tipo: 'chip' }>; ctx: Ctx }) {
-  const c = hexDe(el.cor ?? (ctx.escuro ? 'amarelo' : 'escuro'))
+  const cor = el.cor ?? (ctx.escuro ? 'amarelo' : 'escuro')
   const solido = el.estilo !== 'contorno'
   return (
     <span
       style={{
         display: 'inline-block',
         ...(solido
-          ? { background: c, color: fundoEscuro(c) ? '#F9F9F9' : '#2C2B22' }
-          : { border: `2px solid ${c}`, color: c }),
+          ? { background: fundoDe(cor), color: fundoEscuro(cor) ? '#F9F9F9' : '#2C2B22' }
+          // contorno é borda + texto: CSS não aceita gradiente aí, cai pra cor sólida representativa
+          : { border: `2px solid ${hexDe(cor)}`, color: hexDe(cor) }),
         padding: '6px 12px',
         font: `900 11px/1 ${cond}`,
         letterSpacing: '0.16em',
@@ -41,7 +42,6 @@ function Botoes({ el, ctx }: { el: Extract<Elemento, { tipo: 'botoes' }>; ctx: C
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
       {el.itens.map((b, i) => {
-        const acc = hexDe(ctx.acento)
         return (
           <Link
             key={i}
@@ -57,8 +57,8 @@ function Botoes({ el, ctx }: { el: Extract<Elemento, { tipo: 'botoes' }>; ctx: C
                     textTransform: 'uppercase',
                   }
                 : {
-                    background: acc,
-                    color: fundoEscuro(acc) ? '#F9F9F9' : '#2C2B22',
+                    background: fundoDe(ctx.acento),
+                    color: fundoEscuro(ctx.acento) ? '#F9F9F9' : '#2C2B22',
                     padding: '15px 26px',
                     font: `900 13px/1 ${cond}`,
                     letterSpacing: '0.12em',
@@ -151,7 +151,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
         >
           {el.itens.map((c, i) => {
             const Wrapper = (c.href ? Link : 'div') as React.ElementType
-            const tagCor = hexDe(c.corTag ?? 'amarelo')
+            const tagCor = c.corTag ?? 'amarelo'
             return (
               <Wrapper
                 key={i}
@@ -174,7 +174,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                     <span
                       style={{
                         display: 'inline-block',
-                        background: tagCor,
+                        background: fundoDe(tagCor),
                         color: fundoEscuro(tagCor) ? '#F9F9F9' : '#2C2B22',
                         padding: '5px 10px',
                         font: `900 10.5px/1 ${cond}`,
@@ -188,7 +188,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                   <h3 style={{ marginTop: 12, font: `900 22px/1.05 ${cond}`, textTransform: 'uppercase' }}>{c.titulo}</h3>
                   {c.texto && <p style={{ marginTop: 9, font: `400 14.5px/1.55 ${corpo}` }}>{c.texto}</p>}
                 </div>
-                <span style={{ position: 'absolute', top: 0, right: 0, width: 44, height: 44, background: tagCor, clipPath: 'polygon(100% 0,100% 100%,0 0)' }} />
+                <span style={{ position: 'absolute', top: 0, right: 0, width: 44, height: 44, background: fundoDe(tagCor), clipPath: 'polygon(100% 0,100% 100%,0 0)' }} />
               </Wrapper>
             )
           })}
