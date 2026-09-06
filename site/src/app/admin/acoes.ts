@@ -129,6 +129,75 @@ export async function criarPagina(formData: FormData): Promise<void> {
   redirect(`/admin/paginas/${pagina.id}`)
 }
 
+export type ResultadoPagina = { ok: true; mensagem: string; titulo: string; slug: string } | { ok: false; erro: string }
+
+/**
+ * Nome, endereço, hierarquia e posição no menu — tudo que não é bloco de
+ * conteúdo mas ainda assim define a página. Mesma permissão de criar:
+ * quem já escolhe endereço na criação pode corrigir depois.
+ */
+export async function atualizarPagina(
+  paginaId: string,
+  dados: { titulo: string; slug: string; paiId: string | null; ordem: number; noMenu: boolean }
+): Promise<ResultadoPagina> {
+  try {
+    await exigirPermissaoAction('criarPagina')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const atual = await db.pagina.findUnique({
+    where: { id: paginaId },
+    select: { slug: true, fixa: true, _count: { select: { filhos: true } } },
+  })
+  if (!atual) return { ok: false, erro: 'página não encontrada' }
+
+  const titulo = dados.titulo.trim()
+  if (!titulo) return { ok: false, erro: 'título é obrigatório' }
+
+  const data: Prisma.PaginaUpdateInput = { titulo, ordem: dados.ordem, noMenu: dados.noMenu }
+  let slugFinal = atual.slug
+
+  // página fixa (home, mapa do site): endereço e hierarquia ficam travados
+  // porque outras partes do código dependem desses valores específicos
+  if (!atual.fixa) {
+    let slug = dados.slug.trim().toLowerCase()
+    if (!slug.startsWith('/')) slug = '/' + slug
+    slug = slug.replace(/\s+/g, '-').replace(/[^a-z0-9/-]/g, '')
+    if (slug === '/') return { ok: false, erro: 'endereço é obrigatório' }
+
+    if (slug !== atual.slug) {
+      const existe = await db.pagina.findUnique({ where: { slug }, select: { id: true } })
+      if (existe) return { ok: false, erro: `já existe uma página em ${slug}` }
+      data.slug = slug
+      slugFinal = slug
+    }
+
+    const paiId = dados.paiId || null
+    if (paiId === paginaId) return { ok: false, erro: 'uma página não pode ser filha de si mesma' }
+    if (paiId && atual._count.filhos > 0) {
+      return { ok: false, erro: 'esta página tem subpáginas; não pode virar filha de outra' }
+    }
+    if (paiId) {
+      // o menu só tem um nível de aninhamento — a página-pai não pode
+      // ela mesma ter pai, senão viraria neta e o header não mostra
+      const pai = await db.pagina.findUnique({ where: { id: paiId }, select: { paiId: true } })
+      if (!pai) return { ok: false, erro: 'página-pai não encontrada' }
+      if (pai.paiId) return { ok: false, erro: 'só é possível aninhar um nível — escolha uma página que não tenha pai' }
+    }
+    data.pai = paiId ? { connect: { id: paiId } } : { disconnect: true }
+  }
+
+  await db.pagina.update({ where: { id: paginaId }, data })
+
+  revalidatePath('/admin')
+  revalidatePath(`/admin/paginas/${paginaId}`)
+  revalidatePath(atual.slug)
+  if (slugFinal !== atual.slug) revalidatePath(slugFinal)
+
+  return { ok: true, mensagem: 'Configurações salvas.', titulo, slug: slugFinal }
+}
+
 export async function apagarPagina(paginaId: string): Promise<Resultado> {
   try {
     await exigirPermissaoAction('apagarPagina')

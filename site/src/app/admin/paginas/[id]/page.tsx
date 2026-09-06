@@ -10,8 +10,8 @@ export default async function EditarPagina({ params }: { params: Promise<{ id: s
   const { id } = await params
   const u = await exigirUsuario()
 
-  const [pagina, midias, revisoes] = await Promise.all([
-    db.pagina.findUnique({ where: { id } }),
+  const [pagina, midias, revisoes, raizes] = await Promise.all([
+    db.pagina.findUnique({ where: { id }, include: { _count: { select: { filhos: true } } } }),
     db.midia.findMany({ select: { id: true, url: true, alt: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
     db.paginaRevisao.findMany({
       where: { paginaId: id },
@@ -19,6 +19,7 @@ export default async function EditarPagina({ params }: { params: Promise<{ id: s
       orderBy: { criadoEm: 'desc' },
       take: 10,
     }),
+    db.pagina.findMany({ where: { paiId: null }, select: { id: true, titulo: true }, orderBy: { titulo: 'asc' } }),
   ])
 
   if (!pagina) notFound()
@@ -33,6 +34,14 @@ export default async function EditarPagina({ params }: { params: Promise<{ id: s
         paginaId={pagina.id}
         slug={pagina.slug}
         titulo={pagina.titulo}
+        paiId={pagina.paiId}
+        ordem={pagina.ordem}
+        noMenu={pagina.noMenu}
+        fixa={pagina.fixa}
+        temFilhos={pagina._count.filhos > 0}
+        raizes={raizes.filter((r) => r.id !== pagina.id).map((r) => ({ id: r.id, titulo: r.titulo }))}
+        podeGerenciarPagina={pode(u.papel, 'criarPagina')}
+        podeApagarPagina={pode(u.papel, 'apagarPagina')}
         inicial={blocos}
         temRascunho={pagina.rascunho !== null}
         podePublicar={pode(u.papel, 'publicar')}

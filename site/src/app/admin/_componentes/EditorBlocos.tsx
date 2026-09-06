@@ -7,11 +7,20 @@ import { salvarRascunho, publicar, descartarRascunho } from '../acoes'
 import { FormBloco, ROTULOS_BLOCO } from './FormBloco'
 import type { OpcaoMidia } from './EscolhaFoto'
 import { Previa } from './Previa'
+import { ConfigPagina } from './ConfigPagina'
 
 type Props = {
   paginaId: string
   slug: string
   titulo: string
+  paiId: string | null
+  ordem: number
+  noMenu: boolean
+  fixa: boolean
+  temFilhos: boolean
+  raizes: { id: string; titulo: string }[]
+  podeGerenciarPagina: boolean
+  podeApagarPagina: boolean
   inicial: Blocos
   temRascunho: boolean
   podePublicar: boolean
@@ -52,12 +61,29 @@ function resumo(b: Bloco): string {
   }
 }
 
-export function EditorBlocos({ paginaId, slug, titulo, inicial, temRascunho, podePublicar, midias }: Props) {
+export function EditorBlocos({
+  paginaId,
+  slug,
+  titulo,
+  paiId,
+  ordem,
+  noMenu,
+  fixa,
+  temFilhos,
+  raizes,
+  podeGerenciarPagina,
+  podeApagarPagina,
+  inicial,
+  temRascunho,
+  podePublicar,
+  midias,
+}: Props) {
   const [blocos, setBlocos] = useState<Blocos>(inicial)
   const [sel, setSel] = useState(0)
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null)
   const [sujo, setSujo] = useState(false)
   const [pendente, iniciar] = useTransition()
+  const [meta, setMeta] = useState({ titulo, slug })
 
   const atual = blocos[sel]
 
@@ -97,12 +123,27 @@ export function EditorBlocos({ paginaId, slug, titulo, inicial, temRascunho, pod
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
         <Link href="/admin" style={{ font: '400 13px var(--corpo)' }}>← Páginas</Link>
-        <h1 style={{ fontSize: 30, lineHeight: 1, textTransform: 'uppercase' }}>{titulo}</h1>
-        <span style={{ font: '400 13px var(--condensada)', color: 'rgba(44,43,34,0.55)' }}>{slug}</span>
-        <a href={slug} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', font: '400 13px var(--corpo)' }}>
+        <h1 style={{ fontSize: 30, lineHeight: 1, textTransform: 'uppercase' }}>{meta.titulo}</h1>
+        <span style={{ font: '400 13px var(--condensada)', color: 'rgba(44,43,34,0.55)' }}>{meta.slug}</span>
+        <a href={meta.slug} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', font: '400 13px var(--corpo)' }}>
           Ver no site ↗
         </a>
       </div>
+
+      <ConfigPagina
+        paginaId={paginaId}
+        titulo={meta.titulo}
+        slug={meta.slug}
+        paiId={paiId}
+        ordem={ordem}
+        noMenu={noMenu}
+        fixa={fixa}
+        temFilhos={temFilhos}
+        raizes={raizes}
+        podeGerenciar={podeGerenciarPagina}
+        podeApagar={podeApagarPagina}
+        onSalvo={(t, s) => setMeta({ titulo: t, slug: s })}
+      />
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', margin: '14px 0 18px' }}>
         <button className="btn btn-claro" disabled={pendente} onClick={() => executar(() => salvarRascunho(paginaId, blocos))}>
