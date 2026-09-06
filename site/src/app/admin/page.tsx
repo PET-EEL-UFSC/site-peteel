@@ -3,15 +3,18 @@ import { db } from '@/lib/db'
 import { exigirUsuario } from '@/lib/auth/sessao'
 import { pode } from '@/lib/auth/acesso'
 import { NovaPagina } from './_componentes/NovaPagina'
+import { ApagarPaginaBotao } from './_componentes/ApagarPaginaBotao'
 
 export default async function ListaPaginas() {
   const u = await exigirUsuario()
+  const podeApagar = pode(u.papel, 'apagarPagina')
 
   const paginas = await db.pagina.findMany({
     select: {
       id: true, slug: true, titulo: true, status: true, rascunho: true, fixa: true,
       atualizadoEm: true, paiId: true,
       pai: { select: { titulo: true } },
+      _count: { select: { filhos: true } },
     },
     orderBy: [{ ordem: 'asc' }, { slug: 'asc' }],
   })
@@ -37,7 +40,7 @@ export default async function ListaPaginas() {
             <th>Página</th>
             <th>Endereço</th>
             <th>Situação</th>
-            <th style={{ width: 120 }}></th>
+            <th style={{ width: podeApagar ? 210 : 120 }}></th>
           </tr>
         </thead>
         <tbody>
@@ -64,9 +67,14 @@ export default async function ListaPaginas() {
                 ) : null}
               </td>
               <td style={{ textAlign: 'right' }}>
-                <Link href={`/admin/paginas/${p.id}`} className="btn btn-claro" style={{ display: 'inline-block' }}>
-                  Editar
-                </Link>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                  <Link href={`/admin/paginas/${p.id}`} className="btn btn-claro" style={{ display: 'inline-block' }}>
+                    Editar
+                  </Link>
+                  {podeApagar && !p.fixa && (
+                    <ApagarPaginaBotao paginaId={p.id} titulo={p.titulo} temFilhos={p._count.filhos > 0} />
+                  )}
+                </div>
               </td>
             </tr>
           ))}
