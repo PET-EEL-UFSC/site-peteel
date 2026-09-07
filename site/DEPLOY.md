@@ -81,6 +81,7 @@ git push -u origin main
 | `NEXTAUTH_URL` | `https://SEU-PROJETO.vercel.app` (ajuste depois se usar domínio próprio) |
 | `ADMIN_INICIAL` | o Gmail do primeiro administrador |
 | `STORAGE` | `blob` |
+| `NEXT_PUBLIC_STORAGE` | `blob` — sem essa, upload de foto/currículo acima de uns 4 MB quebra (teto de corpo de requisição da Vercel) |
 | `AUTH_GOOGLE_ID` | deixe vazio por ora — passo 6 |
 | `AUTH_GOOGLE_SECRET` | idem |
 

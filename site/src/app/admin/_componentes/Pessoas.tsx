@@ -2,8 +2,12 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { upload } from '@vercel/blob/client'
 import { salvarPetiano, apagarPetiano, enviarCurriculo, removerCurriculo } from '../acoes'
 import type { OpcaoMidia } from './EscolhaFoto'
+
+/** Mesma razão de existir do equivalente em Biblioteca.tsx: contornar o teto de 4,5 MB de Server Action da Vercel. */
+const USA_BLOB = process.env.NEXT_PUBLIC_STORAGE === 'blob'
 
 type P = {
   id: string; nome: string; cargo: string; tutor: boolean; bio: string | null
@@ -46,10 +50,31 @@ function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { u
         action={(fd) =>
           iniciar(async () => {
             const arquivo = fd.get('arquivo')
-            if (arquivo instanceof File && arquivo.size > 8 * 1024 * 1024) {
+            if (!(arquivo instanceof File) || arquivo.size === 0) {
+              setMsg('nenhum arquivo selecionado')
+              return
+            }
+            if (arquivo.size > 8 * 1024 * 1024) {
               setMsg(`O arquivo tem ${(arquivo.size / 1024 / 1024).toFixed(1)} MB. O limite é 8 MB.`)
               return
             }
+
+            if (USA_BLOB) {
+              try {
+                await upload(arquivo.name, arquivo, {
+                  access: 'public',
+                  handleUploadUrl: '/api/curriculo/upload',
+                  clientPayload: JSON.stringify({ petianoId, nome: arquivo.name, tamanho: arquivo.size }),
+                })
+                setMsg('Currículo enviado.')
+                form.current?.reset()
+                router.refresh()
+              } catch (e) {
+                setMsg((e as Error).message || 'não consegui enviar o currículo')
+              }
+              return
+            }
+
             const r = await enviarCurriculo(petianoId, fd)
             setMsg(r.ok ? r.mensagem : r.erro)
             if (r.ok) {

@@ -4,8 +4,8 @@ import { randomUUID } from 'node:crypto'
 
 export type Salvo = { chave: string; url: string }
 
-const TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'] as const
-const TAMANHO_MAX = 8 * 1024 * 1024 // 8 MB
+export const TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'] as const
+export const TAMANHO_MAX = 8 * 1024 * 1024 // 8 MB
 
 export function validarImagem(arquivo: File): string | null {
   if (!TIPOS_OK.includes(arquivo.type as (typeof TIPOS_OK)[number])) {
@@ -17,7 +17,7 @@ export function validarImagem(arquivo: File): string | null {
   return null
 }
 
-const TAMANHO_MAX_DOC = 8 * 1024 * 1024 // 8 MB
+export const TAMANHO_MAX_DOC = 8 * 1024 * 1024 // 8 MB
 
 export function validarPdf(arquivo: File): string | null {
   if (arquivo.type !== 'application/pdf') {
