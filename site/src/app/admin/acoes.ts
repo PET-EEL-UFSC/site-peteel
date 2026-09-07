@@ -458,44 +458,57 @@ export async function salvarConfig(formData: FormData): Promise<void> {
 // ─────────────────────────── mídia ───────────────────────────
 
 export async function enviarImagem(formData: FormData): Promise<Resultado> {
+  let usuario
   try {
-    await exigirPermissaoAction('subirMidia')
+    usuario = await exigirPermissaoAction('subirMidia')
   } catch (e) {
     return { ok: false, erro: (e as Error).message }
   }
 
-  const { validarImagem, salvarArquivo, dimensoes } = await import('@/lib/storage')
-
-  const arquivo = formData.get('arquivo')
-  if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: 'nenhum arquivo escolhido' }
-
-  const alt = String(formData.get('alt') ?? '').trim()
-  // alt obrigatório: sem ele o site não é acessível, e o PET é um
-  // programa de ensino público
-  if (alt.length < 3) return { ok: false, erro: 'descreva a imagem em poucas palavras — é o que leitores de tela leem' }
-
-  const problema = validarImagem(arquivo)
-  if (problema) return { ok: false, erro: problema }
-
-  const buf = Buffer.from(await arquivo.arrayBuffer())
-  const dim = dimensoes(buf) ?? { largura: 1200, altura: 900 }
-
-  let chave: string
-  let url: string
+  // rede de segurança: qualquer falha não prevista aqui embaixo vira
+  // aviso amigável em vez de estourar sem tratamento pro navegador —
+  // era assim que um upload virava "erro genérico" sem explicação
   try {
-    ;({ chave, url } = await salvarArquivo(arquivo))
+    const { validarImagem, salvarArquivo, dimensoes } = await import('@/lib/storage')
+
+    const arquivo = formData.get('arquivo')
+    if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: 'nenhum arquivo escolhido' }
+
+    const alt = String(formData.get('alt') ?? '').trim()
+    // alt obrigatório: sem ele o site não é acessível, e o PET é um
+    // programa de ensino público
+    if (alt.length < 3) return { ok: false, erro: 'descreva a imagem em poucas palavras — é o que leitores de tela leem' }
+
+    const problema = validarImagem(arquivo)
+    if (problema) return { ok: false, erro: problema }
+
+    const buf = Buffer.from(await arquivo.arrayBuffer())
+    const dim = dimensoes(buf) ?? { largura: 1200, altura: 900 }
+
+    let chave: string
+    let url: string
+    try {
+      ;({ chave, url } = await salvarArquivo(arquivo))
+    } catch (e) {
+      console.error('Falha ao salvar imagem no storage:', e)
+      return { ok: false, erro: 'não consegui salvar a imagem no armazenamento — avisa o time técnico' }
+    }
+
+    try {
+      await db.midia.create({
+        data: { chave, url, alt, largura: dim.largura, altura: dim.altura, tamanho: arquivo.size, mimeType: arquivo.type, enviadoPorId: usuario.id },
+      })
+    } catch (e) {
+      console.error('Falha ao registrar imagem no banco:', e)
+      return { ok: false, erro: 'a imagem foi enviada mas não consegui registrar ela no banco — avisa o time técnico' }
+    }
+
+    revalidatePath('/admin/midia')
+    return { ok: true, mensagem: 'Imagem enviada.' }
   } catch (e) {
-    console.error('Falha ao salvar imagem no storage:', e)
-    return { ok: false, erro: 'não consegui salvar a imagem no armazenamento — avisa o time técnico' }
+    console.error('Falha inesperada ao enviar imagem:', e)
+    return { ok: false, erro: 'algo deu errado ao enviar a imagem — tenta de novo daqui a pouco. Se continuar, avisa o time técnico.' }
   }
-
-  const usuario = await exigirPermissaoAction('subirMidia')
-  await db.midia.create({
-    data: { chave, url, alt, largura: dim.largura, altura: dim.altura, tamanho: arquivo.size, mimeType: arquivo.type, enviadoPorId: usuario.id },
-  })
-
-  revalidatePath('/admin/midia')
-  return { ok: true, mensagem: 'Imagem enviada.' }
 }
 
 export async function apagarImagem(id: string): Promise<Resultado> {

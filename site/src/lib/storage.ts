@@ -53,43 +53,55 @@ export async function salvarArquivo(arquivo: File): Promise<Salvo> {
 /**
  * Lê largura/altura do cabeçalho do arquivo. Sem isso o layout não
  * consegue reservar a caixa da imagem e a página pula durante o load.
+ *
+ * Tudo dentro de um try/catch: é parsing manual de binário em cima de
+ * arquivo de usuário. Um JPEG com segmento fora do padrão (comum em
+ * fotos de celular, com APPn/EXIF grandes) pode empurrar a leitura pra
+ * fora do buffer — sem o catch isso derruba o upload inteiro com um
+ * erro genérico em vez de só deixar de saber a dimensão.
  */
 export function dimensoes(buf: Buffer): { largura: number; altura: number } | null {
-  // PNG: IHDR nos bytes 16..24
-  if (buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47) {
-    return { largura: buf.readUInt32BE(16), altura: buf.readUInt32BE(20) }
-  }
+  try {
+    // PNG: IHDR nos bytes 16..24
+    if (buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47) {
+      return { largura: buf.readUInt32BE(16), altura: buf.readUInt32BE(20) }
+    }
 
-  // JPEG: percorre os segmentos até um SOF
-  if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
-    let i = 2
-    while (i < buf.length - 9) {
-      if (buf[i] !== 0xff) { i++; continue }
-      const marcador = buf[i + 1]
-      // SOF0..SOF15, pulando DHT(c4), JPG(c8) e DAC(cc)
-      if (marcador >= 0xc0 && marcador <= 0xcf && marcador !== 0xc4 && marcador !== 0xc8 && marcador !== 0xcc) {
-        return { altura: buf.readUInt16BE(i + 5), largura: buf.readUInt16BE(i + 7) }
+    // JPEG: percorre os segmentos até um SOF
+    if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
+      let i = 2
+      while (i < buf.length - 9) {
+        if (buf[i] !== 0xff) { i++; continue }
+        const marcador = buf[i + 1]
+        // SOF0..SOF15, pulando DHT(c4), JPG(c8) e DAC(cc)
+        if (marcador >= 0xc0 && marcador <= 0xcf && marcador !== 0xc4 && marcador !== 0xc8 && marcador !== 0xcc) {
+          return { altura: buf.readUInt16BE(i + 5), largura: buf.readUInt16BE(i + 7) }
+        }
+        const tamanhoSegmento = buf.readUInt16BE(i + 2)
+        if (tamanhoSegmento < 2) break // segmento inválido — para em vez de girar no lugar
+        i += 2 + tamanhoSegmento
       }
-      i += 2 + buf.readUInt16BE(i + 2)
     }
-  }
 
-  // WebP: VP8X / VP8 / VP8L. Cada variante guarda as dimensões em um
-  // offset diferente, então o tamanho mínimo é conferido por variante —
-  // um VP8X válido tem exatamente 30 bytes de cabeçalho.
-  if (buf.length >= 16 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
-    const tipo = buf.toString('ascii', 12, 16)
-    if (tipo === 'VP8X' && buf.length >= 30) {
-      return { largura: buf.readUIntLE(24, 3) + 1, altura: buf.readUIntLE(27, 3) + 1 }
+    // WebP: VP8X / VP8 / VP8L. Cada variante guarda as dimensões em um
+    // offset diferente, então o tamanho mínimo é conferido por variante —
+    // um VP8X válido tem exatamente 30 bytes de cabeçalho.
+    if (buf.length >= 16 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+      const tipo = buf.toString('ascii', 12, 16)
+      if (tipo === 'VP8X' && buf.length >= 30) {
+        return { largura: buf.readUIntLE(24, 3) + 1, altura: buf.readUIntLE(27, 3) + 1 }
+      }
+      if (tipo === 'VP8 ' && buf.length >= 30) {
+        return { largura: buf.readUInt16LE(26) & 0x3fff, altura: buf.readUInt16LE(28) & 0x3fff }
+      }
+      if (tipo === 'VP8L' && buf.length >= 25) {
+        const b = buf.readUInt32LE(21)
+        return { largura: (b & 0x3fff) + 1, altura: ((b >> 14) & 0x3fff) + 1 }
+      }
     }
-    if (tipo === 'VP8 ' && buf.length >= 30) {
-      return { largura: buf.readUInt16LE(26) & 0x3fff, altura: buf.readUInt16LE(28) & 0x3fff }
-    }
-    if (tipo === 'VP8L' && buf.length >= 25) {
-      const b = buf.readUInt32LE(21)
-      return { largura: (b & 0x3fff) + 1, altura: ((b >> 14) & 0x3fff) + 1 }
-    }
-  }
 
-  return null
+    return null
+  } catch {
+    return null
+  }
 }
