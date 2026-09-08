@@ -14,7 +14,8 @@ export type Ctx = {
 const cond = "var(--condensada)"
 const corpo = 'var(--corpo)'
 
-const TAMANHOS_ROTULO = { p: '12px', m: '15px', g: '18px' } as const
+const TAMANHOS_ROTULO = { p: '12px', m: '15px', g: '18px', gg: '22px' } as const
+const LARGURAS_FOTO = { p: 96, m: 150, g: 220 } as const
 
 function Chip({ el, ctx }: { el: Extract<Elemento, { tipo: 'chip' }>; ctx: Ctx }) {
   const cor = el.cor ?? (ctx.escuro ? 'amarelo' : 'escuro')
@@ -209,7 +210,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 className={el.comFoto ? 'linha-com-foto' : undefined}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: el.comFoto ? '150px 96px 1fr' : '96px 1fr',
+                  gridTemplateColumns: el.comFoto ? `${LARGURAS_FOTO[el.tamanhoFoto]}px 96px 1fr` : '96px 1fr',
                   gap: 20,
                   padding: '18px 0',
                   borderTop: `2px solid ${linha}`,
