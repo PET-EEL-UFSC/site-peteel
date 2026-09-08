@@ -31,7 +31,6 @@ export function Hero({ bloco, midias }: { bloco: HeroT; midias: MapaMidia }) {
           height: '100%',
           background: 'var(--offwhite)',
           clipPath: 'polygon(46% 0,100% 0,100% 100%,0 100%,38% 52%,10% 52%)',
-          animation: 'boltshift 14s ease-in-out infinite alternate',
         }}
       />
 

@@ -50,11 +50,6 @@ a:hover { color: var(--escuro); }
 .navmenu a { padding: 9px 18px; font: 400 13.5px var(--corpo); color: rgba(249, 249, 249, 0.8); }
 .navmenu a:hover { color: var(--escuro); background: var(--amarelo); }
 
-@keyframes boltshift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-3%); }
-}
-
 /* ── hero ── */
 .hero-media { grid-template-rows: 1.5fr 1fr; height: min(70svh, 560px); }
 
