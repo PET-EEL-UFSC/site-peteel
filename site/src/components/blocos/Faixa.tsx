@@ -26,6 +26,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
         <img
           aria-hidden
           alt=""
+          className="decor-bloco"
           src={midias[bloco.decor.midiaId].url}
           style={{
             position: 'absolute',
@@ -42,6 +43,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
       {bloco.decor?.tipo === 'raio' && (
         <span
           aria-hidden
+          className="decor-bloco"
           style={{
             position: 'absolute',
             top: 0,

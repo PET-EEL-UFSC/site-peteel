@@ -15,6 +15,7 @@ export function Cabecalho({ bloco, midias }: { bloco: CabecalhoT; midias: MapaMi
         <img
           aria-hidden
           alt=""
+          className="decor-bloco"
           src={midias[bloco.decor.midiaId].url}
           style={{
             position: 'absolute',
@@ -30,6 +31,7 @@ export function Cabecalho({ bloco, midias }: { bloco: CabecalhoT; midias: MapaMi
       {bloco.decor?.tipo === 'raio' && (
         <span
           aria-hidden
+          className="decor-bloco"
           style={{
             position: 'absolute',
             top: 0,

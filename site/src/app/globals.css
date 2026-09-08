@@ -83,4 +83,7 @@ a:hover { color: var(--escuro); }
   .linha-com-foto .linha-foto { grid-row: span 2; }
   .secao { padding-left: 22px !important; padding-right: 22px !important; }
   .cabecalho { padding-left: 22px !important; padding-right: 22px !important; }
+  /* em tela estreita não sobra espaço pro texto desviar da decoração —
+     e o padding acima já cancela o respiro calculado pra ela no desktop */
+  .decor-bloco { display: none !important; }
 }
