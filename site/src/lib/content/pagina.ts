@@ -47,16 +47,18 @@ export async function carregarDados(blocos: Blocos): Promise<DadosPagina> {
   const precisaEquipe = blocos.some((b) => b.tipo === 'equipe')
   const precisaMapa = blocos.some((b) => b.tipo === 'mapa')
 
-  const petianos = precisaEquipe
+  // busca atuais e ex-membros juntos: o dropdown da grade de pessoas
+  // alterna entre os dois no navegador, sem outra ida ao banco
+  const petianosBrutos = precisaEquipe
     ? await db.petiano.findMany({
-        where: { saiuEm: null },
         select: {
           id: true, nome: true, cargo: true, tutor: true, bio: true, fotoId: true,
-          linkedin: true, curriculo: { select: { url: true } },
+          linkedin: true, saiuEm: true, curriculo: { select: { url: true } },
         },
         orderBy: [{ tutor: 'desc' }, { ordem: 'asc' }],
       })
     : []
+  const petianos = petianosBrutos.map(({ saiuEm, ...p }) => ({ ...p, exMembro: saiuEm !== null }))
 
   const idsBlocos = coletarMidiaIds(blocos)
   const idsPetianos = petianos.map((p) => p.fotoId).filter((v): v is string => !!v)

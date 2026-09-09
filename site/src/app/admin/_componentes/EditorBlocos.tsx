@@ -50,7 +50,7 @@ function resumo(b: Bloco): string {
   switch (b.tipo) {
     case 'hero': return b.titulo
     case 'cabecalho': return b.titulo
-    case 'equipe': return b.titulo ?? 'Grade de petianos'
+    case 'equipe': return b.titulo ?? 'Grade de pessoas'
     case 'mapa': return 'Gerado automaticamente'
     case 'faixa': {
       const t = b.quadrantes.flat().find((e) => e.tipo === 'titulo')

@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import type { Bloco } from '@/lib/content/blocos'
 import type { MapaMidia } from '@/lib/content/midia'
 import { Foto } from '@/components/Foto'
@@ -12,12 +15,15 @@ export type PetianoResolvido = {
   bio: string | null
   fotoId: string | null
   linkedin: string | null
+  /** data de saída preenchida no cadastro — não vem pro navegador, só o resultado */
+  exMembro: boolean
   curriculo: { url: string } | null
 }
 
 /**
  * Sai do banco de pessoas, não de conteúdo digitado — senão toda gestão
- * redigita os 12 membros.
+ * redigita os 12 membros. O dropdown alterna entre atuais e ex-membros
+ * sem outra ida ao banco: os dois grupos já chegam prontos do servidor.
  */
 export function Equipe({
   bloco,
@@ -28,16 +34,40 @@ export function Equipe({
   petianos: PetianoResolvido[]
   midias: MapaMidia
 }) {
-  const tutor = petianos.find((p) => p.tutor)
-  const membros = petianos.filter((p) => !p.tutor).slice(0, bloco.limite ?? undefined)
+  const [mostrar, setMostrar] = useState<'atuais' | 'exmembros'>('atuais')
+
+  const grupo = petianos.filter((p) => p.exMembro === (mostrar === 'exmembros'))
+  const tutor = mostrar === 'atuais' ? grupo.find((p) => p.tutor) : undefined
+  const membros = grupo.filter((p) => !p.tutor).slice(0, bloco.limite ?? undefined)
 
   return (
     <section className="secao" style={{ maxWidth: 1280, margin: '0 auto', padding: '54px 28px 88px' }}>
-      {bloco.titulo && (
-        <h2 style={{ display: 'inline-block', background: 'var(--escuro)', color: 'var(--offwhite)', padding: '10px 22px 12px', fontSize: 34, lineHeight: 1, marginBottom: 32 }}>
-          {bloco.titulo}
-        </h2>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginBottom: 32 }}>
+        {bloco.titulo && (
+          <h2 style={{ display: 'inline-block', background: 'var(--escuro)', color: 'var(--offwhite)', padding: '10px 22px 12px', fontSize: 34, lineHeight: 1, margin: 0 }}>
+            {bloco.titulo}
+          </h2>
+        )}
+
+        <select
+          value={mostrar}
+          onChange={(e) => setMostrar(e.target.value as 'atuais' | 'exmembros')}
+          style={{
+            marginLeft: 'auto',
+            border: '2px solid var(--escuro)',
+            background: '#fff',
+            padding: '10px 14px',
+            font: '900 12px var(--condensada)',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--escuro)',
+            cursor: 'pointer',
+          }}
+        >
+          <option value="atuais">Petianos atuais</option>
+          <option value="exmembros">Ex-membros</option>
+        </select>
+      </div>
 
       {bloco.mostrarTutor && tutor && (
         <div
@@ -125,7 +155,9 @@ export function Equipe({
 
       {membros.length === 0 && (
         <p style={{ font: '400 15px/1.6 var(--corpo)', color: 'rgba(44,43,34,0.6)' }}>
-          Nenhum petiano cadastrado ainda. Adicione em Painel → Pessoas.
+          {mostrar === 'atuais'
+            ? 'Nenhuma pessoa cadastrada ainda. Adicione em Painel → Pessoas.'
+            : 'Nenhum ex-membro cadastrado ainda.'}
         </p>
       )}
     </section>

@@ -80,7 +80,7 @@ export function FormBloco({ bloco, onChange, midias }: { bloco: Bloco; onChange:
         <Texto rotulo="Título (opcional)" valor={bloco.titulo ?? ''} onChange={(titulo) => onChange({ ...bloco, titulo: titulo || undefined })} />
         <Alternador rotulo="Mostrar o tutor em destaque" valor={bloco.mostrarTutor} onChange={(mostrarTutor) => onChange({ ...bloco, mostrarTutor })} />
         <label className="campo">
-          <span>Quantos petianos mostrar</span>
+          <span>Quantas pessoas mostrar</span>
           <input type="number" min={1} max={40} value={bloco.limite ?? ''} placeholder="todos" onChange={(e) => onChange({ ...bloco, limite: e.target.value ? Number(e.target.value) : null })} />
           <p className="dica">Deixe vazio para mostrar todos. As pessoas vêm da aba Pessoas.</p>
         </label>

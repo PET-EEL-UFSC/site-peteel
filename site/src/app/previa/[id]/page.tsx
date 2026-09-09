@@ -29,19 +29,19 @@ export default async function Previa({ params }: { params: Promise<{ id: string 
   // Carrega todo o catálogo de mídia e pessoas, não só o que os blocos
   // usam agora: quem está editando pode trocar a foto de um bloco e a
   // prévia precisa resolver a nova sem ida ao servidor.
-  const [arvore, config, midias, petianos] = await Promise.all([
+  const [arvore, config, midias, petianosBrutos] = await Promise.all([
     carregarArvore(),
     db.config.findUnique({ where: { id: 1 } }),
     db.midia.findMany({ select: { id: true, url: true, alt: true, largura: true, altura: true }, take: 300 }),
     db.petiano.findMany({
-      where: { saiuEm: null },
       select: {
         id: true, nome: true, cargo: true, tutor: true, bio: true, fotoId: true,
-        linkedin: true, curriculo: { select: { url: true } },
+        linkedin: true, saiuEm: true, curriculo: { select: { url: true } },
       },
       orderBy: [{ tutor: 'desc' }, { ordem: 'asc' }],
     }),
   ])
+  const petianos = petianosBrutos.map(({ saiuEm, ...p }) => ({ ...p, exMembro: saiuEm !== null }))
 
   return (
     <PreviaViva
