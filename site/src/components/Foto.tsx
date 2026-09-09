@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { MapaMidia } from '@/lib/content/midia'
 
 /**
@@ -13,6 +14,8 @@ export function Foto({
   className,
   style,
   claro = false,
+  sizes = '(max-width: 900px) 100vw, 640px',
+  prioridade = false,
 }: {
   midiaId: string | null | undefined
   legenda?: string
@@ -22,6 +25,14 @@ export function Foto({
   className?: string
   style?: React.CSSProperties
   claro?: boolean
+  /**
+   * Dica de largura real na tela pro otimizador da Vercel escolher a
+   * variante certa — sem isso ele assume a imagem cheia da viewport e
+   * uma miniatura de 96px baixa o arquivo inteiro à toa.
+   */
+  sizes?: string
+  /** só a primeira foto acima da dobra (a manchete da home) deve pular o lazy-load */
+  prioridade?: boolean
 }) {
   const m = midiaId ? midias[midiaId] : undefined
 
@@ -35,15 +46,7 @@ export function Foto({
   if (m) {
     return (
       <div className={className} style={base}>
-        {/* img simples: as fotos vêm do Blob/uploads com dimensões conhecidas
-            e o layout já reserva a caixa pela aspect-ratio */}
-        <img
-          src={m.url}
-          alt={m.alt}
-          width={m.largura}
-          height={m.altura}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
+        <Image src={m.url} alt={m.alt} fill sizes={sizes} priority={prioridade} style={{ objectFit: 'cover' }} />
       </div>
     )
   }

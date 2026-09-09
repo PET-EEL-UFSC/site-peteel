@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { fundoDe, fundoEscuro } from '@/lib/content/cores'
 import { TAMANHOS_RAIO, ESTILO_FORMA, type Bloco } from '@/lib/content/blocos'
 import type { MapaMidia } from '@/lib/content/midia'
@@ -12,21 +13,20 @@ export function Cabecalho({ bloco, midias }: { bloco: CabecalhoT; midias: MapaMi
   return (
     <div className="cabecalho" style={{ position: 'relative', background: fundo, overflow: 'hidden', padding: '128px 28px 54px' }}>
       {bloco.decor?.tipo === 'imagem' && bloco.decor.midiaId && midias[bloco.decor.midiaId] && (
-        <img
+        <div
           aria-hidden
-          alt=""
           className="decor-bloco"
-          src={midias[bloco.decor.midiaId].url}
           style={{
             position: 'absolute',
             top: 0,
             [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
-            objectFit: 'contain',
             opacity: bloco.decor.opacidade,
           }}
-        />
+        >
+          <Image src={midias[bloco.decor.midiaId].url} alt="" fill sizes={`${TAMANHOS_RAIO[bloco.decor.tamanho]}px`} style={{ objectFit: 'contain' }} />
+        </div>
       )}
       {bloco.decor?.tipo === 'raio' && (
         <span

@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { upload } from '@vercel/blob/client'
 import { enviarImagem, apagarImagem } from '../acoes'
 
@@ -106,8 +107,8 @@ export function Biblioteca({ midias }: { midias: M[] }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 16 }}>
           {midias.map((m) => (
             <div key={m.id} className="cartao">
-              <div style={{ aspectRatio: '4/3', overflow: 'hidden', borderBottom: '2px solid var(--escuro)' }}>
-                <img src={m.url} alt={m.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', borderBottom: '2px solid var(--escuro)' }}>
+                <Image src={m.url} alt={m.alt} fill sizes="190px" style={{ objectFit: 'cover' }} />
               </div>
               <div style={{ padding: '10px 12px 12px' }}>
                 <p style={{ font: '400 13px/1.4 var(--corpo)' }}>{m.alt}</p>

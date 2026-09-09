@@ -78,9 +78,9 @@ export function Hero({ bloco, midias }: { bloco: HeroT; midias: MapaMidia }) {
           className="hero-media"
           style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
         >
-          <Foto midiaId={f1?.midiaId} legenda={f1?.legenda ?? 'foto principal do grupo'} midias={midias} proporcao={null} style={{ gridColumn: 'span 2', minHeight: 0, border: '3px solid var(--escuro)' }} />
-          <Foto midiaId={f2?.midiaId} legenda={f2?.legenda ?? 'foto secundária'} midias={midias} proporcao={null} style={{ minHeight: 0, border: '3px solid var(--escuro)' }} />
-          <Foto midiaId={f3?.midiaId} legenda={f3?.legenda ?? 'foto secundária'} midias={midias} proporcao={null} style={{ minHeight: 0, border: '3px solid var(--escuro)' }} />
+          <Foto midiaId={f1?.midiaId} legenda={f1?.legenda ?? 'foto principal do grupo'} midias={midias} proporcao={null} style={{ gridColumn: 'span 2', minHeight: 0, border: '3px solid var(--escuro)' }} sizes="(max-width: 900px) 100vw, 620px" prioridade />
+          <Foto midiaId={f2?.midiaId} legenda={f2?.legenda ?? 'foto secundária'} midias={midias} proporcao={null} style={{ minHeight: 0, border: '3px solid var(--escuro)' }} sizes="(max-width: 900px) 50vw, 300px" />
+          <Foto midiaId={f3?.midiaId} legenda={f3?.legenda ?? 'foto secundária'} midias={midias} proporcao={null} style={{ minHeight: 0, border: '3px solid var(--escuro)' }} sizes="(max-width: 900px) 50vw, 300px" />
           <span aria-hidden style={{ position: 'absolute', top: 0, right: 0, width: 54, height: 54, background: 'var(--amarelo)', clipPath: 'polygon(100% 0,100% 100%,0 0)' }} />
         </div>
       </div>

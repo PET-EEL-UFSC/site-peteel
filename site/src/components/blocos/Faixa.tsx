@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { fundoDe, fundoEscuro } from '@/lib/content/cores'
 import { LAYOUTS, TAMANHOS_RAIO, ESTILO_FORMA, recuoDoRaio, type Faixa as FaixaT } from '@/lib/content/blocos'
 import type { MapaMidia } from '@/lib/content/midia'
@@ -23,22 +24,21 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
   return (
     <section style={{ position: 'relative', overflow: 'hidden', background: fundo }}>
       {bloco.decor?.tipo === 'imagem' && bloco.decor.midiaId && midias[bloco.decor.midiaId] && (
-        <img
+        <div
           aria-hidden
-          alt=""
           className="decor-bloco"
-          src={midias[bloco.decor.midiaId].url}
           style={{
             position: 'absolute',
             top: 0,
             [bloco.decor.lado === 'direita' ? 'right' : 'left']: bloco.decor.sangra ? '-3%' : 0,
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
-            objectFit: 'contain',
             opacity: bloco.decor.opacidade,
             pointerEvents: 'none',
           }}
-        />
+        >
+          <Image src={midias[bloco.decor.midiaId].url} alt="" fill sizes={`${TAMANHOS_RAIO[bloco.decor.tamanho]}px`} style={{ objectFit: 'contain' }} />
+        </div>
       )}
       {bloco.decor?.tipo === 'raio' && (
         <span

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import type { FotoRef } from '@/lib/content/elementos'
 
 export type OpcaoMidia = { id: string; url: string; alt: string }
@@ -11,8 +12,8 @@ export function EscolhaFoto({ rotulo, valor, midias, onChange }: { rotulo: strin
     <div className="campo">
       <span>{rotulo}</span>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <div style={{ width: 74, height: 58, flex: 'none', border: '2px solid var(--escuro)', overflow: 'hidden', background: 'repeating-linear-gradient(135deg,#e6e5dd 0 7px,#d8d7cc 7px 14px)' }}>
-          {atual && <img src={atual.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+        <div style={{ position: 'relative', width: 74, height: 58, flex: 'none', border: '2px solid var(--escuro)', overflow: 'hidden', background: 'repeating-linear-gradient(135deg,#e6e5dd 0 7px,#d8d7cc 7px 14px)' }}>
+          {atual && <Image src={atual.url} alt="" fill sizes="74px" style={{ objectFit: 'cover' }} />}
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -49,8 +50,8 @@ export function EscolhaMidia({ rotulo, valor, midias, onChange, dica }: { rotulo
     <div className="campo">
       <span>{rotulo}</span>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <div style={{ width: 74, height: 58, flex: 'none', border: '2px solid var(--escuro)', overflow: 'hidden', background: 'repeating-linear-gradient(135deg,#e6e5dd 0 7px,#d8d7cc 7px 14px)', display: 'grid', placeItems: 'center' }}>
-          {atual && <img src={atual.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />}
+        <div style={{ position: 'relative', width: 74, height: 58, flex: 'none', border: '2px solid var(--escuro)', overflow: 'hidden', background: 'repeating-linear-gradient(135deg,#e6e5dd 0 7px,#d8d7cc 7px 14px)' }}>
+          {atual && <Image src={atual.url} alt="" fill sizes="74px" style={{ objectFit: 'contain' }} />}
         </div>
         <select
           value={valor ?? ''}

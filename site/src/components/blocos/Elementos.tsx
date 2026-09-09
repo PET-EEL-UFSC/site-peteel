@@ -141,6 +141,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}`,
                 ...(el.destaque && i === 0 ? { gridColumn: 'span 2', gridRow: 'span 2' } : {}),
               }}
+              sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`}
             />
           ))}
         </div>
@@ -170,7 +171,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 }}
               >
                 {c.foto && (
-                  <Foto midiaId={c.foto.midiaId} legenda={c.foto.legenda} midias={ctx.midias} proporcao="4/3" style={{ borderBottom: '2px solid #2C2B22' }} />
+                  <Foto midiaId={c.foto.midiaId} legenda={c.foto.legenda} midias={ctx.midias} proporcao="4/3" style={{ borderBottom: '2px solid #2C2B22' }} sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`} />
                 )}
                 <div style={{ padding: '20px 20px 22px' }}>
                   {c.tag && (
@@ -226,6 +227,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                     midias={ctx.midias}
                     proporcao="4/3"
                     style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
+                    sizes={`(max-width: 900px) 96px, ${LARGURAS_FOTO[el.tamanhoFoto]}px`}
                   />
                 )}
                 <span style={{ font: `900 ${TAMANHOS_ROTULO[el.tamanhoRotulo]}/1.4 ${cond}`, letterSpacing: '0.12em', textTransform: 'uppercase', color: hexDe(ctx.acento), paddingTop: 4 }}>
