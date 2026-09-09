@@ -146,6 +146,9 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                   ? `(max-width: 900px) 100vw, ${Math.round((2 * 1280) / el.colunas)}px`
                   : `(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`
               }
+              // a de destaque encaixa inteira (com tarja se a proporção não bater)
+              // em vez de cortar as bordas — é a foto que carrega o destaque
+              ajuste={el.destaque && i === 0 ? 'contain' : 'cover'}
             />
           ))}
         </div>

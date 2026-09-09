@@ -20,6 +20,7 @@ export function Foto({
   // navegador estica, borrando a foto.
   sizes = '(max-width: 900px) 100vw, 1200px',
   prioridade = false,
+  ajuste = 'cover',
 }: {
   midiaId: string | null | undefined
   legenda?: string
@@ -37,6 +38,8 @@ export function Foto({
   sizes?: string
   /** só a primeira foto acima da dobra (a manchete da home) deve pular o lazy-load */
   prioridade?: boolean
+  /** 'contain' encaixa a foto inteira na caixa (com tarja se a proporção não bater) em vez de cortar as bordas */
+  ajuste?: 'cover' | 'contain'
 }) {
   const m = midiaId ? midias[midiaId] : undefined
 
@@ -50,7 +53,7 @@ export function Foto({
   if (m) {
     return (
       <div className={className} style={base}>
-        <Image src={m.url} alt={m.alt} fill sizes={sizes} priority={prioridade} quality={85} style={{ objectFit: 'cover' }} />
+        <Image src={m.url} alt={m.alt} fill sizes={sizes} priority={prioridade} quality={85} style={{ objectFit: ajuste }} />
       </div>
     )
   }
