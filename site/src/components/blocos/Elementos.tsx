@@ -136,7 +136,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
               midiaId={f.midiaId}
               legenda={f.legenda}
               midias={ctx.midias}
-              proporcao={el.destaque && i === 0 ? null : el.proporcao}
+              proporcao={el.proporcao}
               style={{
                 border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}`,
                 ...(el.destaque && i === 0 ? { gridColumn: 'span 2', gridRow: 'span 2' } : {}),
