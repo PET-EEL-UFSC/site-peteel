@@ -124,35 +124,47 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
         />
       )
 
-    case 'galeria':
+    case 'galeria': {
+      // a de destaque não cabe numa célula 2×2 uniforme sem cortar ou
+      // sobrar espaço — a proporção dela quase nunca bate com a das
+      // outras. Por isso vira uma faixa própria, do tamanho real dela,
+      // acima da grade — não uma célula maior dentro da grade.
+      const destaque = el.destaque ? el.itens[0] : undefined
+      const resto = el.destaque ? el.itens.slice(1) : el.itens
+      const midiaDestaque = destaque?.midiaId ? ctx.midias[destaque.midiaId] : undefined
+      const proporcaoDestaque = midiaDestaque ? `${midiaDestaque.largura} / ${midiaDestaque.altura}` : el.proporcao
+
       return (
-        <div
-          className="grid-galeria"
-          style={{ display: 'grid', gridTemplateColumns: `repeat(${el.colunas},1fr)`, gap: 12 }}
-        >
-          {el.itens.map((f, i) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {destaque && (
             <Foto
-              key={i}
-              midiaId={f.midiaId}
-              legenda={f.legenda}
+              midiaId={destaque.midiaId}
+              legenda={destaque.legenda}
               midias={ctx.midias}
-              proporcao={el.proporcao}
-              style={{
-                border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}`,
-                ...(el.destaque && i === 0 ? { gridColumn: 'span 2', gridRow: 'span 2' } : {}),
-              }}
-              sizes={
-                el.destaque && i === 0
-                  ? `(max-width: 900px) 100vw, ${Math.round((2 * 1280) / el.colunas)}px`
-                  : `(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`
-              }
-              // a de destaque encaixa inteira (com tarja se a proporção não bater)
-              // em vez de cortar as bordas — é a foto que carrega o destaque
-              ajuste={el.destaque && i === 0 ? 'contain' : 'cover'}
+              proporcao={proporcaoDestaque}
+              style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
+              sizes="(max-width: 900px) 100vw, 1200px"
             />
-          ))}
+          )}
+          <div
+            className="grid-galeria"
+            style={{ display: 'grid', gridTemplateColumns: `repeat(${el.colunas},1fr)`, gap: 12 }}
+          >
+            {resto.map((f, i) => (
+              <Foto
+                key={i}
+                midiaId={f.midiaId}
+                legenda={f.legenda}
+                midias={ctx.midias}
+                proporcao={el.proporcao}
+                style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
+                sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`}
+              />
+            ))}
+          </div>
         </div>
       )
+    }
 
     case 'cards':
       return (
