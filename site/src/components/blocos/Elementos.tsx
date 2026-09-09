@@ -141,7 +141,11 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}`,
                 ...(el.destaque && i === 0 ? { gridColumn: 'span 2', gridRow: 'span 2' } : {}),
               }}
-              sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`}
+              sizes={
+                el.destaque && i === 0
+                  ? `(max-width: 900px) 100vw, ${Math.round((2 * 1280) / el.colunas)}px`
+                  : `(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`
+              }
             />
           ))}
         </div>

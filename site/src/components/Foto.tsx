@@ -14,7 +14,11 @@ export function Foto({
   className,
   style,
   claro = false,
-  sizes = '(max-width: 900px) 100vw, 640px',
+  // 1200px cobre o conteúdo em largura cheia (maxWidth 1280 menos o
+  // padding) — subestimar aqui é pior que superestimar: sizes pequeno
+  // demais faz a Vercel mandar uma variante baixa-resolução que o
+  // navegador estica, borrando a foto.
+  sizes = '(max-width: 900px) 100vw, 1200px',
   prioridade = false,
 }: {
   midiaId: string | null | undefined
@@ -46,7 +50,7 @@ export function Foto({
   if (m) {
     return (
       <div className={className} style={base}>
-        <Image src={m.url} alt={m.alt} fill sizes={sizes} priority={prioridade} style={{ objectFit: 'cover' }} />
+        <Image src={m.url} alt={m.alt} fill sizes={sizes} priority={prioridade} quality={85} style={{ objectFit: 'cover' }} />
       </div>
     )
   }
