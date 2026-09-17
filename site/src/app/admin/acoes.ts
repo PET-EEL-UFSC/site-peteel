@@ -61,6 +61,9 @@ export async function publicar(paginaId: string, blocos: unknown): Promise<Resul
   revalidatePath(pagina.slug)
   revalidatePath('/admin')
   revalidatePath(`/admin/paginas/${paginaId}`)
+  // publicar pode trocar o status pra "no ar" — isso muda quem entra
+  // no menu, então o layout do site (header/footer) precisa invalidar
+  revalidatePath('/', 'layout')
   return { ok: true, mensagem: 'Publicado.' }
 }
 
@@ -194,6 +197,9 @@ export async function atualizarPagina(
   revalidatePath(`/admin/paginas/${paginaId}`)
   revalidatePath(atual.slug)
   if (slugFinal !== atual.slug) revalidatePath(slugFinal)
+  // nome, endereço, pai e "aparece no menu" alimentam o header/footer —
+  // sem isso o menu fica com dado velho até o cache expirar sozinho
+  revalidatePath('/', 'layout')
 
   return { ok: true, mensagem: 'Configurações salvas.', titulo, slug: slugFinal }
 }
@@ -205,13 +211,17 @@ export async function apagarPagina(paginaId: string): Promise<Resultado> {
     return { ok: false, erro: (e as Error).message }
   }
 
-  const p = await db.pagina.findUnique({ where: { id: paginaId }, select: { fixa: true, titulo: true, _count: { select: { filhos: true } } } })
+  const p = await db.pagina.findUnique({ where: { id: paginaId }, select: { slug: true, fixa: true, titulo: true, _count: { select: { filhos: true } } } })
   if (!p) return { ok: false, erro: 'página não encontrada' }
   if (p.fixa) return { ok: false, erro: `"${p.titulo}" é uma página fixa do site e não pode ser apagada` }
   if (p._count.filhos > 0) return { ok: false, erro: 'esta página tem subpáginas; mova ou apague elas antes' }
 
   await db.pagina.delete({ where: { id: paginaId } })
   revalidatePath('/admin')
+  revalidatePath(p.slug)
+  // a página apagada pode ter estado no menu — sem isso o header/footer
+  // continuam mostrando o link até o cache expirar sozinho
+  revalidatePath('/', 'layout')
   return { ok: true, mensagem: 'Página apagada.' }
 }
 
