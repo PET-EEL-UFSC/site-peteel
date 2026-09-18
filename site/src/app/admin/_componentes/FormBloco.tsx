@@ -147,7 +147,7 @@ export function FormBloco({ bloco, onChange, midias }: { bloco: Bloco; onChange:
       <Selecao
         rotulo="Divisão em quadrantes"
         valor={bloco.layout}
-        opcoes={[['1', '1 quadrante'], ['2', '2 quadrantes iguais'], ['2-60/40', '2 quadrantes (60% / 40%)'], ['3', '3 quadrantes'], ['2x2', '4 quadrantes (2 × 2)']]}
+        opcoes={[['1', '1 quadrante'], ['1-largo', '1 quadrante estendido (texto ocupa a largura toda)'], ['2', '2 quadrantes iguais'], ['2-60/40', '2 quadrantes (60% / 40%)'], ['3', '3 quadrantes'], ['2x2', '4 quadrantes (2 × 2)']]}
         onChange={(layout) => {
           const alvo = LAYOUTS[layout]
           const q = [...bloco.quadrantes]

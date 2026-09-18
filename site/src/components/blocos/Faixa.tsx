@@ -6,6 +6,7 @@ import { RenderElemento, type Ctx } from './Elementos'
 
 const COLUNAS: Record<keyof typeof LAYOUTS, string> = {
   '1': '1fr',
+  '1-largo': '1fr',
   '2': '1.05fr 0.95fr',
   '2-60/40': '1.4fr 1fr',
   '3': 'repeat(3,minmax(0,1fr))',
@@ -17,7 +18,10 @@ const ESPACO = { compacto: '48px 28px', normal: '80px 28px', amplo: '112px 28px'
 export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
   const fundo = fundoDe(bloco.fundo)
   const escuro = fundoEscuro(bloco.fundo)
-  const ctx: Ctx = { escuro, acento: bloco.acento ?? (escuro ? 'amarelo' : 'azul'), midias }
+  // "1 largo" é o mesmo quadrante único, só sem o teto de largura do
+  // parágrafo — sem isso o texto fica preso numa faixa estreita mesmo
+  // ocupando a tela toda no computador
+  const ctx: Ctx = { escuro, acento: bloco.acento ?? (escuro ? 'amarelo' : 'azul'), midias, estendido: bloco.layout === '1-largo' }
 
   const recuo = recuoDoRaio(bloco.decor)
 

@@ -13,6 +13,7 @@ import { elementoSchema } from './elementos'
 /** Quantos quadrantes cada layout comporta. */
 export const LAYOUTS = {
   '1': 1,
+  '1-largo': 1,
   '2': 2,
   '2-60/40': 2,
   '3': 3,
@@ -77,7 +78,7 @@ const faixaBase = z.object({
   fundo: corSchema,
   /** cor dos destaques (títulos de lista, botão sólido) */
   acento: corSchema.optional(),
-  layout: z.enum(['1', '2', '2-60/40', '3', '2x2']),
+  layout: z.enum(['1', '1-largo', '2', '2-60/40', '3', '2x2']),
   alinhamento: z.enum(['start', 'center']).default('start'),
   espacamento: z.enum(['compacto', 'normal', 'amplo']).default('normal'),
   decor: decorSchema.nullable().default(null),

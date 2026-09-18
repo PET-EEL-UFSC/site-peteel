@@ -9,6 +9,8 @@ export type Ctx = {
   escuro: boolean
   acento: Cor
   midias: MapaMidia
+  /** layout "1 largo" — parágrafo não trava em 52ch, ocupa o quadrante inteiro */
+  estendido?: boolean
 }
 
 const cond = "var(--condensada)"
@@ -96,7 +98,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
     }
 
     case 'paragrafo':
-      return <p style={{ marginTop: 14, maxWidth: '52ch', font: `400 16px/1.6 ${corpo}`, color: textoFraco }}>{el.texto}</p>
+      return <p style={{ marginTop: 14, maxWidth: ctx.estendido ? 'none' : '52ch', font: `400 16px/1.6 ${corpo}`, color: textoFraco }}>{el.texto}</p>
 
     case 'botoes':
       return <Botoes el={el} ctx={ctx} />
