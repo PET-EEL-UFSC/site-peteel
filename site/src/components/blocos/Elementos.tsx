@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import Script from 'next/script'
+import { createElement } from 'react'
 import { hexDe, fundoDe, fundoEscuro, type Cor } from '@/lib/content/cores'
 import type { Elemento } from '@/lib/content/elementos'
 import type { MapaMidia } from '@/lib/content/midia'
@@ -281,5 +283,15 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
         </div>
       )
     }
+
+    case 'widget':
+      // 'behold' é o único provedor por enquanto — o feed-id é a única
+      // entrada do editor, o script e a tag vêm hardcoded aqui.
+      return (
+        <div style={{ border: `3px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}`, padding: 16 }}>
+          {createElement('behold-widget', { 'feed-id': el.feedId } as never)}
+          <Script src="https://w.behold.so/widget.js" type="module" strategy="lazyOnload" />
+        </div>
+      )
   }
 }

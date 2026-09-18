@@ -16,6 +16,7 @@ export const ROTULOS: Record<Elemento['tipo'], string> = {
   cards: 'Cards',
   linhas: 'Lista com miniaturas',
   embed: 'Vídeo / player',
+  widget: 'Widget (Instagram)',
 }
 
 const FOTO_VAZIA: FotoRef = { midiaId: null, legenda: '' }
@@ -32,6 +33,7 @@ export function novoElemento(tipo: Elemento['tipo']): Elemento {
     case 'cards': return { tipo, itens: [{ titulo: 'Card', texto: '' }], colunas: 3 }
     case 'linhas': return { tipo, itens: [{ rotulo: 'Rótulo', titulo: 'Item', texto: '' }], comFoto: true, tamanhoRotulo: 'p', tamanhoFoto: 'm' }
     case 'embed': return { tipo, provedor: 'youtube', url: 'https://www.youtube.com/watch?v=' }
+    case 'widget': return { tipo, provedor: 'behold', feedId: '' }
   }
 }
 
@@ -222,6 +224,19 @@ export function FormElemento({ el, onChange, midias }: Props) {
           <Selecao rotulo="Onde está" valor={el.provedor} opcoes={[['youtube', 'YouTube'], ['spotify', 'Spotify']]} onChange={(provedor) => onChange({ ...el, provedor })} />
           <Texto rotulo="Endereço" valor={el.url} onChange={(url) => onChange({ ...el, url })} dica="Cole o link normal do vídeo ou do episódio." />
           <Texto rotulo="Descrição para leitores de tela" valor={el.titulo ?? ''} onChange={(titulo) => onChange({ ...el, titulo: titulo || undefined })} />
+        </>
+      )
+
+    case 'widget':
+      return (
+        <>
+          <Texto
+            rotulo="Feed ID do Behold"
+            valor={el.feedId}
+            onChange={(feedId) => onChange({ ...el, feedId })}
+            dica='Crie uma conta grátis em behold.so, conecte o Instagram do PET e cole o "Feed ID" gerado lá.'
+          />
+          <p className="dica">Plano grátis do Behold: até 1.200 visualizações/mês, com a marca "Made with Behold" no widget.</p>
         </>
       )
   }

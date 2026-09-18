@@ -123,6 +123,19 @@ export const embedSchema = z.object({
   titulo: z.string().max(120).optional(),
 })
 
+/**
+ * Widget de terceiro incorporado. Diferente do `embed`, aqui não guardamos
+ * uma URL — só um identificador curto (o feed do Behold), e é o nosso
+ * código que decide o script e a marcação exibidos. Isso evita abrir a
+ * porta pra colar HTML/script arbitrário no editor (várias pessoas têm
+ * acesso ao admin).
+ */
+export const widgetSchema = z.object({
+  tipo: z.literal('widget'),
+  provedor: z.enum(['behold']),
+  feedId: z.string().min(1).max(60),
+})
+
 export const elementoSchema = z.discriminatedUnion('tipo', [
   chipSchema,
   tituloSchema,
@@ -134,6 +147,7 @@ export const elementoSchema = z.discriminatedUnion('tipo', [
   cardsSchema,
   linhasSchema,
   embedSchema,
+  widgetSchema,
 ])
 
 export type Elemento = z.infer<typeof elementoSchema>
