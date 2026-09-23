@@ -238,6 +238,7 @@ export async function salvarPetiano(formData: FormData): Promise<void> {
     bio: String(formData.get('bio') ?? '').trim() || null,
     fotoId: String(formData.get('fotoId') ?? '') || null,
     linkedin: String(formData.get('linkedin') ?? '').trim() || null,
+    email: String(formData.get('email') ?? '').trim() || null,
     saiuEm: formData.get('saiuEm') ? new Date(String(formData.get('saiuEm'))) : null,
     destino: String(formData.get('destino') ?? '').trim() || null,
     ordem: Number(formData.get('ordem') ?? 0),
@@ -245,6 +246,9 @@ export async function salvarPetiano(formData: FormData): Promise<void> {
   if (!dados.nome || !dados.cargo) throw new Error('nome e cargo são obrigatórios')
   if (dados.linkedin && !/^https?:\/\//.test(dados.linkedin)) {
     throw new Error('o link do LinkedIn precisa começar com http:// ou https://')
+  }
+  if (dados.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
+    throw new Error('o e-mail parece inválido')
   }
 
   if (id) await db.petiano.update({ where: { id }, data: dados })

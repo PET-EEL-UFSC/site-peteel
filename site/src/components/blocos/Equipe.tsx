@@ -15,6 +15,7 @@ export type PetianoResolvido = {
   bio: string | null
   fotoId: string | null
   linkedin: string | null
+  email: string | null
   /** data de saída preenchida no cadastro — não vem pro navegador, só o resultado */
   exMembro: boolean
   curriculo: { url: string } | null
@@ -81,8 +82,8 @@ export function Equipe({
             </span>
             <h2 style={{ marginTop: 16, fontSize: 'clamp(30px,3.4vw,46px)', lineHeight: 1, textTransform: 'uppercase' }}>{tutor.nome}</h2>
             {tutor.bio && <p style={{ marginTop: 14, maxWidth: '52ch', font: '400 16px/1.6 var(--corpo)' }}>{tutor.bio}</p>}
-            {(tutor.linkedin || tutor.curriculo) && (
-              <div style={{ display: 'flex', gap: 12, marginTop: 18 }}>
+            {(tutor.linkedin || tutor.email || tutor.curriculo) && (
+              <div style={{ display: 'flex', gap: 12, marginTop: 18, flexWrap: 'wrap' }}>
                 {tutor.linkedin && (
                   <a
                     href={tutor.linkedin}
@@ -91,6 +92,14 @@ export function Equipe({
                     style={{ background: 'var(--escuro)', color: 'var(--amarelo)', padding: '12px 22px', font: '900 12px/1 var(--condensada)', letterSpacing: '0.12em', textTransform: 'uppercase' }}
                   >
                     LinkedIn
+                  </a>
+                )}
+                {tutor.email && (
+                  <a
+                    href={`mailto:${tutor.email}`}
+                    style={{ color: 'var(--escuro)', border: '2px solid var(--escuro)', padding: '10px 20px', font: '900 12px/1 var(--condensada)', letterSpacing: '0.12em', textTransform: 'uppercase' }}
+                  >
+                    {tutor.email}
                   </a>
                 )}
                 {tutor.curriculo && (
@@ -123,8 +132,8 @@ export function Equipe({
             >
               <div style={{ font: '900 16px/1 var(--condensada)', textTransform: 'uppercase', color: 'var(--escuro)' }}>{p.nome}</div>
               <div style={{ marginTop: 5, font: '700 10.5px/1.2 var(--condensada)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--escuro)' }}>{p.cargo}</div>
-              {(p.linkedin || p.curriculo) && (
-                <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+              {(p.linkedin || p.email || p.curriculo) && (
+                <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
                   {p.linkedin && (
                     <a
                       href={p.linkedin}
@@ -133,6 +142,14 @@ export function Equipe({
                       style={{ font: '700 9.5px/1 var(--condensada)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--escuro)', background: 'rgba(44,43,34,0.12)', padding: '4px 8px' }}
                     >
                       LinkedIn
+                    </a>
+                  )}
+                  {p.email && (
+                    <a
+                      href={`mailto:${p.email}`}
+                      style={{ font: '700 9.5px/1 var(--condensada)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--escuro)', background: 'rgba(44,43,34,0.12)', padding: '4px 8px' }}
+                    >
+                      E-mail
                     </a>
                   )}
                   {p.curriculo && (

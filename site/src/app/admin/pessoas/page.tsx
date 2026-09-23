@@ -22,7 +22,7 @@ export default async function PessoasPage() {
       <Pessoas
         petianos={petianos.map((p) => ({
           id: p.id, nome: p.nome, cargo: p.cargo, tutor: p.tutor, bio: p.bio,
-          fotoId: p.fotoId, ordem: p.ordem, destino: p.destino, linkedin: p.linkedin,
+          fotoId: p.fotoId, ordem: p.ordem, destino: p.destino, linkedin: p.linkedin, email: p.email,
           curriculo: p.curriculo,
           saiuEm: p.saiuEm ? p.saiuEm.toISOString().slice(0, 10) : null,
         }))}

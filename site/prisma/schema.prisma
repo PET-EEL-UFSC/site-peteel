@@ -233,6 +233,7 @@ model Petiano {
 
   lattes    String?
   linkedin  String?
+  email     String?
 
   ordem    Int      @default(0)
   criadoEm DateTime @default(now())

@@ -12,7 +12,7 @@ const USA_BLOB = process.env.NEXT_PUBLIC_STORAGE === 'blob'
 type P = {
   id: string; nome: string; cargo: string; tutor: boolean; bio: string | null
   fotoId: string | null; ordem: number; saiuEm: string | null; destino: string | null
-  linkedin: string | null; curriculo: { url: string; nome: string } | null
+  linkedin: string | null; email: string | null; curriculo: { url: string; nome: string } | null
 }
 
 function Curriculo({ petianoId, curriculo }: { petianoId: string; curriculo: { url: string; nome: string } | null }) {
@@ -137,6 +137,12 @@ function Ficha({ p, midias, aoFechar }: { p: P | null; midias: OpcaoMidia[]; aoF
           <span>LinkedIn (opcional)</span>
           <input type="url" name="linkedin" defaultValue={p?.linkedin ?? ''} placeholder="https://linkedin.com/in/..." />
           <p className="dica">Aparece como botão no card da pessoa.</p>
+        </label>
+
+        <label className="campo">
+          <span>E-mail do PET (opcional)</span>
+          <input type="email" name="email" defaultValue={p?.email ?? ''} placeholder="muc.peteel@gmail.com" />
+          <p className="dica">O e-mail com a sigla da pessoa no PET (ex: muc.peteel@gmail.com). Aparece como botão no card da pessoa, no site público.</p>
         </label>
 
         <label className="campo" style={{ display: 'flex', gap: 9, alignItems: 'center' }}>

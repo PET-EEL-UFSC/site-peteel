@@ -53,7 +53,7 @@ export async function carregarDados(blocos: Blocos): Promise<DadosPagina> {
     ? await db.petiano.findMany({
         select: {
           id: true, nome: true, cargo: true, tutor: true, bio: true, fotoId: true,
-          linkedin: true, saiuEm: true, curriculo: { select: { url: true } },
+          linkedin: true, email: true, saiuEm: true, curriculo: { select: { url: true } },
         },
         orderBy: [{ tutor: 'desc' }, { ordem: 'asc' }],
       })
