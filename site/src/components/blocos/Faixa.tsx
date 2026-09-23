@@ -38,6 +38,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
             width: TAMANHOS_RAIO[bloco.decor.tamanho],
             height: '100%',
             opacity: bloco.decor.opacidade,
+            transform: `translate(${bloco.decor.deslocX}px, ${bloco.decor.deslocY}px)`,
             pointerEvents: 'none',
           }}
         >
@@ -57,6 +58,7 @@ export function Faixa({ bloco, midias }: { bloco: FaixaT; midias: MapaMidia }) {
             background: fundoDe(bloco.decor.cor),
             ...ESTILO_FORMA[bloco.decor.forma],
             opacity: bloco.decor.opacidade,
+            transform: `translate(${bloco.decor.deslocX}px, ${bloco.decor.deslocY}px)`,
             pointerEvents: 'none',
           }}
         />

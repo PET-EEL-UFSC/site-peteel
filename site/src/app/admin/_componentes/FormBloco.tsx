@@ -23,7 +23,7 @@ function FormDecor({ decor, onChange, midias }: { decor: Decor | null; onChange:
       <Alternador
         rotulo="Mostrar decoração"
         valor={!!decor}
-        onChange={(v) => onChange(v ? { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 0.9 } : null)}
+        onChange={(v) => onChange(v ? { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: 'direita', tamanho: 'medio', sangra: false, opacidade: 0.9, deslocX: 0, deslocY: 0 } : null)}
       />
       {decor && (
         <>
@@ -34,8 +34,8 @@ function FormDecor({ decor, onChange, midias }: { decor: Decor | null; onChange:
             onChange={(tipo) =>
               onChange(
                 tipo === 'imagem'
-                  ? { tipo: 'imagem', midiaId: null, lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: 1 }
-                  : { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: decor.opacidade }
+                  ? { tipo: 'imagem', midiaId: null, lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: 1, deslocX: decor.deslocX, deslocY: decor.deslocY }
+                  : { tipo: 'raio', forma: 'raio', cor: 'amarelo', lado: decor.lado, tamanho: decor.tamanho, sangra: decor.sangra, opacidade: decor.opacidade, deslocX: decor.deslocX, deslocY: decor.deslocY }
               )
             }
           />
@@ -58,6 +58,17 @@ function FormDecor({ decor, onChange, midias }: { decor: Decor | null; onChange:
           <Selecao rotulo="Lado" valor={decor.lado} opcoes={[['esquerda', 'Esquerda'], ['direita', 'Direita']]} onChange={(lado) => onChange({ ...decor, lado })} />
           <Selecao rotulo="Tamanho" valor={decor.tamanho} opcoes={[['pequeno', 'Pequeno'], ['medio', 'Médio'], ['gigante', 'Gigante']]} onChange={(tamanho) => onChange({ ...decor, tamanho })} />
           <Alternador rotulo="Corta na borda da faixa" valor={decor.sangra} onChange={(sangra) => onChange({ ...decor, sangra })} />
+          <div style={{ display: 'flex', gap: 12 }}>
+            <label className="campo" style={{ flex: 1 }}>
+              <span>Deslocar horizontal (px)</span>
+              <input type="number" value={decor.deslocX} onChange={(e) => onChange({ ...decor, deslocX: Number(e.target.value) || 0 })} />
+            </label>
+            <label className="campo" style={{ flex: 1 }}>
+              <span>Deslocar vertical (px)</span>
+              <input type="number" value={decor.deslocY} onChange={(e) => onChange({ ...decor, deslocY: Number(e.target.value) || 0 })} />
+            </label>
+          </div>
+          <p className="dica" style={{ marginBottom: 10 }}>Ajuste fino pra encaixar melhor imagens que não bateram certo com o tamanho/lado — positivo desloca pra direita/baixo, negativo pra esquerda/cima.</p>
           <label className="campo">
             <span>Transparência ({Math.round(decor.opacidade * 100)}%)</span>
             <input type="range" min={10} max={100} value={Math.round(decor.opacidade * 100)} onChange={(e) => onChange({ ...decor, opacidade: Number(e.target.value) / 100 })} style={{ width: '100%' }} />

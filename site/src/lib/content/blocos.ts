@@ -41,6 +41,12 @@ const decorComumSchema = {
   tamanho: z.enum(['pequeno', 'medio', 'gigante']).default('medio'),
   /** a decoração corta na borda da faixa em vez de caber inteira dentro */
   sangra: z.boolean().default(false),
+  /**
+   * ajuste fino de posição, em px, a partir do ponto padrão (lado + topo).
+   * Default 0 em ambos — decoração já publicada renderiza igual a antes.
+   */
+  deslocX: z.number().default(0),
+  deslocY: z.number().default(0),
 }
 
 /**
