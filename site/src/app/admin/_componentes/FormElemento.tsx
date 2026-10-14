@@ -4,6 +4,7 @@ import type { Elemento, FotoRef } from '@/lib/content/elementos'
 import type { Cor } from '@/lib/content/cores'
 import { Texto, Area, Selecao, Alternador, EscolhaCor, Secao } from './campos'
 import { EscolhaFoto, type OpcaoMidia } from './EscolhaFoto'
+import { EnvioApresentacao } from './EnvioApresentacao'
 
 export const ROTULOS: Record<Elemento['tipo'], string> = {
   chip: 'Etiqueta',
@@ -17,6 +18,7 @@ export const ROTULOS: Record<Elemento['tipo'], string> = {
   linhas: 'Lista com miniaturas',
   embed: 'Vídeo / player',
   widget: 'Widget (Instagram)',
+  apresentacao: 'Apresentação (HTML)',
 }
 
 const FOTO_VAZIA: FotoRef = { midiaId: null, legenda: '' }
@@ -34,6 +36,7 @@ export function novoElemento(tipo: Elemento['tipo']): Elemento {
     case 'linhas': return { tipo, itens: [{ rotulo: 'Rótulo', titulo: 'Item', texto: '' }], comFoto: true, tamanhoRotulo: 'p', tamanhoFoto: 'm' }
     case 'embed': return { tipo, provedor: 'youtube', url: 'https://www.youtube.com/watch?v=' }
     case 'widget': return { tipo, provedor: 'behold', feedId: '' }
+    case 'apresentacao': return { tipo, apresentacaoId: null, proporcao: '16/9' }
   }
 }
 
@@ -224,6 +227,18 @@ export function FormElemento({ el, onChange, midias }: Props) {
           <Selecao rotulo="Onde está" valor={el.provedor} opcoes={[['youtube', 'YouTube'], ['spotify', 'Spotify']]} onChange={(provedor) => onChange({ ...el, provedor })} />
           <Texto rotulo="Endereço" valor={el.url} onChange={(url) => onChange({ ...el, url })} dica="Cole o link normal do vídeo ou do episódio." />
           <Texto rotulo="Descrição para leitores de tela" valor={el.titulo ?? ''} onChange={(titulo) => onChange({ ...el, titulo: titulo || undefined })} />
+        </>
+      )
+
+    case 'apresentacao':
+      return (
+        <>
+          <EnvioApresentacao
+            nomeAtual={el.apresentacaoId ? el.arquivoNome : undefined}
+            onEnviado={(apresentacaoId, arquivoNome) => onChange({ ...el, apresentacaoId, arquivoNome })}
+          />
+          <Selecao rotulo="Formato da tela" valor={el.proporcao} opcoes={[['16/9', 'Widescreen 16:9'], ['4/3', 'Clássico 4:3']]} onChange={(proporcao) => onChange({ ...el, proporcao })} />
+          <Texto rotulo="Descrição para leitores de tela" valor={el.titulo ?? ''} onChange={(titulo) => onChange({ ...el, titulo: titulo || undefined })} dica="Ex: Aula 1, introdução à IA." />
         </>
       )
 

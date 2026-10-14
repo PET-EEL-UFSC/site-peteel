@@ -316,6 +316,77 @@ export async function removerCurriculo(petianoId: string): Promise<Resultado> {
   return { ok: true, mensagem: 'Currículo removido.' }
 }
 
+// ─────────────────────────── apresentações ───────────────────────────
+
+export type ResultadoApresentacao =
+  | { ok: true; id: string; nome: string }
+  | { ok: false; erro: string }
+
+/** Caminho sem Blob (dev): o arquivo passa pela Server Action e vai pro disco. */
+export async function enviarApresentacao(formData: FormData): Promise<ResultadoApresentacao> {
+  let usuario
+  try {
+    usuario = await exigirPermissaoAction('subirMidia')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const arquivo = formData.get('arquivo')
+  if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: 'nenhum arquivo selecionado' }
+
+  const { validarHtml, salvarArquivo } = await import('@/lib/storage')
+  const problema = validarHtml(arquivo)
+  if (problema) return { ok: false, erro: problema }
+
+  let salvo
+  try {
+    // alguns navegadores mandam .html sem tipo; o storage escolhe a extensão pelo tipo
+    salvo = await salvarArquivo(new File([arquivo], arquivo.name, { type: 'text/html' }))
+  } catch (e) {
+    console.error('Falha ao salvar apresentação no storage:', e)
+    return { ok: false, erro: 'não consegui salvar o arquivo no armazenamento — avisa o time técnico' }
+  }
+
+  const ap = await db.apresentacao.create({
+    data: { chave: salvo.chave, url: salvo.url, nome: arquivo.name, tamanho: arquivo.size, enviadoPorId: usuario.id },
+  })
+  return { ok: true, id: ap.id, nome: ap.nome }
+}
+
+/**
+ * Caminho com Blob (produção): o navegador já mandou o arquivo direto pro
+ * Blob (pra fugir do teto de 4,5 MB de Server Action) e só avisa aqui.
+ * A URL vem do cliente, então só aceita endereço do nosso próprio Blob —
+ * senão qualquer link externo viraria "apresentação" servida pelo site.
+ */
+export async function registrarApresentacao(dados: { url: string; chave: string; nome: string; tamanho: number }): Promise<ResultadoApresentacao> {
+  let usuario
+  try {
+    usuario = await exigirPermissaoAction('subirMidia')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  let host: string
+  try {
+    const u = new URL(dados.url)
+    if (u.protocol !== 'https:') throw new Error('protocolo')
+    host = u.hostname
+  } catch {
+    return { ok: false, erro: 'endereço do arquivo inválido' }
+  }
+  if (!host.endsWith('.public.blob.vercel-storage.com')) return { ok: false, erro: 'o arquivo precisa estar no armazenamento do site' }
+
+  const { validarHtml } = await import('@/lib/storage')
+  const problema = validarHtml({ name: dados.nome, type: 'text/html', size: dados.tamanho })
+  if (problema) return { ok: false, erro: problema }
+
+  const ap = await db.apresentacao.create({
+    data: { chave: dados.chave, url: dados.url, nome: dados.nome.slice(0, 200), tamanho: dados.tamanho, enviadoPorId: usuario.id },
+  })
+  return { ok: true, id: ap.id, nome: ap.nome }
+}
+
 // ─────────────────────────── acessos ───────────────────────────
 
 export async function convidar(formData: FormData): Promise<Resultado> {

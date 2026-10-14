@@ -5,6 +5,7 @@ import { hexDe, fundoDe, fundoEscuro, type Cor } from '@/lib/content/cores'
 import type { Elemento } from '@/lib/content/elementos'
 import type { MapaMidia } from '@/lib/content/midia'
 import { Foto } from '@/components/Foto'
+import { Apresentacao } from './Apresentacao'
 
 export type Ctx = {
   /** o fundo da faixa é escuro? define a cor do texto */
@@ -283,6 +284,9 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
         </div>
       )
     }
+
+    case 'apresentacao':
+      return <Apresentacao apresentacaoId={el.apresentacaoId} proporcao={el.proporcao} titulo={el.titulo} escuro={ctx.escuro} />
 
     case 'widget':
       // 'behold' é o único provedor por enquanto — o feed-id é a única

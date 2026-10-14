@@ -47,6 +47,7 @@ model User {
   revisoes PaginaRevisao[]
   midias   Midia[]
   documentos Documento[]
+  apresentacoes Apresentacao[]
 
   @@index([ativo])
 }
@@ -181,6 +182,25 @@ model Documento {
   criadoEm DateTime @default(now())
 
   petianos Petiano[]
+
+  @@index([criadoEm])
+}
+
+// Apresentação em HTML (um arquivo só, autocontido) exibida dentro de uma
+// página. Modelo próprio, e não Documento, porque a rota que serve o
+// arquivo entrega o conteúdo como HTML: reaproveitar a tabela de PDFs
+// deixaria essa rota servir um currículo como se fosse página.
+model Apresentacao {
+  id      String @id @default(cuid())
+  chave   String @unique // caminho no storage (Blob/local)
+  url     String
+  nome    String // nome original do arquivo
+  tamanho Int // bytes
+
+  enviadoPorId String?
+  enviadoPor   User?   @relation(fields: [enviadoPorId], references: [id], onDelete: SetNull)
+
+  criadoEm DateTime @default(now())
 
   @@index([criadoEm])
 }

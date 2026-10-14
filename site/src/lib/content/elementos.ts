@@ -136,6 +136,20 @@ export const widgetSchema = z.object({
   feedId: z.string().min(1).max(60),
 })
 
+/**
+ * Apresentação em HTML enviada como arquivo. O JSON só guarda o id da linha
+ * de `Apresentacao`; o conteúdo nunca passa pelo editor (mesma regra do
+ * widget: ninguém cola HTML/script solto numa página).
+ */
+export const apresentacaoSchema = z.object({
+  tipo: z.literal('apresentacao'),
+  apresentacaoId: z.string().cuid().nullable(),
+  /** só pra o admin mostrar qual arquivo está em uso */
+  arquivoNome: z.string().max(200).optional(),
+  proporcao: z.enum(['16/9', '4/3']).default('16/9'),
+  titulo: z.string().max(120).optional(),
+})
+
 export const elementoSchema = z.discriminatedUnion('tipo', [
   chipSchema,
   tituloSchema,
@@ -148,6 +162,7 @@ export const elementoSchema = z.discriminatedUnion('tipo', [
   linhasSchema,
   embedSchema,
   widgetSchema,
+  apresentacaoSchema,
 ])
 
 export type Elemento = z.infer<typeof elementoSchema>

@@ -29,12 +29,27 @@ export function validarPdf(arquivo: File): string | null {
   return null
 }
 
+// Slides autocontidos costumam carregar imagens embutidas em base64, então o
+// teto é bem maior que o de foto. Em dev local o corpo da Server Action
+// ainda é limitado pelo bodySizeLimit do next.config (10 MB).
+export const TAMANHO_MAX_HTML = 25 * 1024 * 1024 // 25 MB
+
+export function validarHtml(arquivo: { name: string; type: string; size: number }): string | null {
+  const ehHtml = arquivo.type === 'text/html' || /\.html?$/i.test(arquivo.name)
+  if (!ehHtml) return 'Formato não aceito. Envie um arquivo .html.'
+  if (arquivo.size === 0) return 'O arquivo está vazio.'
+  if (arquivo.size > TAMANHO_MAX_HTML) {
+    return `O arquivo tem ${(arquivo.size / 1024 / 1024).toFixed(1)} MB. O limite é 25 MB.`
+  }
+  return null
+}
+
 /**
  * Dev grava em public/uploads; produção usa Vercel Blob. A troca é via
  * STORAGE no ambiente para o painel funcionar igual nos dois.
  */
 export async function salvarArquivo(arquivo: File): Promise<Salvo> {
-  const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'application/pdf': 'pdf' }[arquivo.type] ?? 'bin'
+  const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'application/pdf': 'pdf', 'text/html': 'html' }[arquivo.type] ?? 'bin'
   const chave = `${randomUUID()}.${ext}`
   const bytes = Buffer.from(await arquivo.arrayBuffer())
 
