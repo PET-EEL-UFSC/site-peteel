@@ -27,7 +27,7 @@ export default async function MinicursosPage() {
       <p style={{ font: '400 14px/1.6 var(--corpo)', color: 'rgba(44,43,34,0.65)', marginBottom: 22, maxWidth: '68ch' }}>
         Quem estiver inscrito entra na Área do aluno com a conta Google do e-mail cadastrado aqui e vê as aulas do minicurso. As aulas
         são páginas comuns: em <strong>Configurações da página</strong>, escolha &quot;Só alunos do minicurso&quot;. Os dados dos alunos
-        (e-mail, matrícula) só aparecem nesta tela e pra própria pessoa, nunca no site público. Os certificados (PDF assinado) são enviados em
+        (e-mail, matrícula) só aparecem nesta tela e pra própria pessoa, nunca no site público. Os certificados (PDF assinado) são enviados em{' '}
         <strong>Enviar certificados</strong>, dentro de cada minicurso.
       </p>
       <Minicursos
