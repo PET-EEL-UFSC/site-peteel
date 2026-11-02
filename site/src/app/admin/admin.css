@@ -1,8 +1,32 @@
-.painel { min-height: 100svh; display: grid; grid-template-columns: 232px 1fr; background: #f4f3ee; }
-.painel-nav { background: var(--escuro); padding: 22px 0; display: flex; flex-direction: column; }
-.painel-nav a { display: block; padding: 11px 22px; font: 700 13px var(--condensada); letter-spacing: 0.09em; text-transform: uppercase; color: rgba(249,249,249,0.72); }
+.painel { --nav-largura: 232px; min-height: 100svh; display: grid; grid-template-columns: var(--nav-largura) 1fr; background: #f4f3ee; transition: grid-template-columns 0.18s ease; }
+.painel-nav { background: var(--escuro); padding: 22px 0; display: flex; flex-direction: column; overflow: hidden; }
+.painel-nav a { display: flex; align-items: center; gap: 12px; padding: 11px 22px; font: 700 13px var(--condensada); letter-spacing: 0.09em; text-transform: uppercase; color: rgba(249,249,249,0.72); }
 .painel-nav a:hover { background: rgba(249,249,249,0.08); color: var(--offwhite); }
 .painel-nav a[data-ativo='1'] { color: var(--escuro); background: var(--amarelo); }
+.nav-icone { flex: none; }
+.nav-rotulo { display: inline-flex; align-items: center; }
+
+.painel-logo { padding: 0 22px 18px; }
+.logo-caixa { display: block; line-height: 0; overflow: hidden; }
+.logo-caixa img { height: 22px; width: auto; display: block; max-width: none; }
+
+.painel-rodape { margin-top: auto; padding-top: 18px; display: flex; flex-direction: column; }
+.painel-usuario { padding: 0 22px 8px; font: 400 12px/1.4 var(--corpo); color: rgba(249,249,249,0.55); }
+.painel-usuario .papel { color: var(--amarelo); font: 700 10.5px var(--condensada); letter-spacing: 0.1em; text-transform: uppercase; }
+.painel-nav .rodape-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 22px; background: none; border: none; text-align: left; color: rgba(249,249,249,0.6); font: 400 12.5px var(--corpo); text-transform: none; letter-spacing: 0; cursor: pointer; }
+.painel-nav .rodape-item:hover { background: rgba(249,249,249,0.08); color: var(--offwhite); }
+
+/* só no computador: no celular o menu é uma fileira rolável e não recolhe */
+@media (min-width: 861px) {
+  .painel[data-recolhido='1'] { --nav-largura: 64px; }
+  .painel[data-recolhido='1'] .nav-rotulo,
+  .painel[data-recolhido='1'] .painel-usuario { display: none; }
+  .painel[data-recolhido='1'] .painel-nav a,
+  .painel[data-recolhido='1'] .painel-nav .rodape-item { justify-content: center; padding-left: 0; padding-right: 0; }
+  .painel[data-recolhido='1'] .painel-logo { padding: 0 0 18px; display: flex; justify-content: center; }
+  .painel[data-recolhido='1'] .logo-caixa { width: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .painel { transition: none; } }
 .painel-corpo { padding: 30px 34px 70px; min-width: 0; }
 
 .cartao { background: #fff; border: 2px solid var(--escuro); }
@@ -50,8 +74,13 @@
 .tag { display: inline-block; padding: 3px 8px; font: 900 10px var(--condensada); letter-spacing: 0.1em; text-transform: uppercase; }
 
 @media (max-width: 860px) {
-  .painel { grid-template-columns: 1fr; }
+  /* menu com a altura do próprio conteúdo; sem isso as duas linhas dividem a altura mínima da tela e a faixa fica enorme */
+  .painel { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .painel-nav { flex-direction: row; overflow-x: auto; padding: 0; }
+  .painel-logo { padding: 0 22px; display: flex; align-items: center; }
+  .painel-rodape { flex-direction: row; align-items: center; padding-top: 0; }
+  .painel-nav .rodape-item { width: auto; white-space: nowrap; }
+  .btn-recolher { display: none !important; }
 }
 
 @keyframes pulsa { 0%, 100% { opacity: 1 } 50% { opacity: 0.45 } }

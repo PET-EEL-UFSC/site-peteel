@@ -2,28 +2,31 @@
 
 import Link, { useLinkStatus } from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Icone, type NomeIcone } from './icones'
 
 /**
  * useLinkStatus fica pendente enquanto o Next busca a página no
  * servidor. É o que permite marcar a aba no instante do clique, em vez
  * de esperar a navegação terminar.
  */
-export function NavPainel({ itens }: { itens: [string, string][] }) {
+export function NavPainel({ itens }: { itens: [string, string, NomeIcone][] }) {
   const pathname = usePathname()
 
   return (
     <>
-      {itens.map(([href, label]) => (
-        <ItemComEstado key={href} href={href} label={label} ativo={href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)} />
+      {itens.map(([href, label, icone]) => (
+        <ItemComEstado key={href} href={href} label={label} icone={icone} ativo={href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)} />
       ))}
     </>
   )
 }
 
 /** Link + estado de carregamento aplicado no próprio <a>. */
-function ItemComEstado({ href, label, ativo }: { href: string; label: string; ativo: boolean }) {
+function ItemComEstado({ href, label, icone, ativo }: { href: string; label: string; icone: NomeIcone; ativo: boolean }) {
+  // aria-label/title: com a barra recolhida o texto some, e o link precisa continuar com nome
   return (
-    <Link href={href} data-ativo={ativo ? '1' : '0'}>
+    <Link href={href} data-ativo={ativo ? '1' : '0'} aria-label={label} title={label}>
+      <Icone nome={icone} />
       <Rotulo label={label} />
     </Link>
   )
@@ -32,7 +35,7 @@ function ItemComEstado({ href, label, ativo }: { href: string; label: string; at
 function Rotulo({ label }: { label: string }) {
   const { pending } = useLinkStatus()
   return (
-    <span data-carregando={pending ? '1' : '0'} style={{ display: 'inline-flex', alignItems: 'center' }}>
+    <span className="nav-rotulo" data-carregando={pending ? '1' : '0'}>
       {label}
       {pending && (
         <span
