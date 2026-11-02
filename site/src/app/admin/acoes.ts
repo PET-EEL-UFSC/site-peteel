@@ -6,7 +6,10 @@ import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { blocosSchema } from '@/lib/content/blocos'
 import { exigirPermissaoAction } from '@/lib/auth/sessao'
-import { emailSchema } from '@/lib/auth/acesso'
+import { emailSchema, slugReservado } from '@/lib/auth/acesso'
+import { lerListaAlunos, slugDeTitulo } from '@/lib/minicursos'
+import { apagarArquivo } from '@/lib/storage'
+import { validarCertificadoNoBlob } from '@/lib/certificado'
 
 export type Resultado = { ok: true; mensagem: string } | { ok: false; erro: string }
 
@@ -104,6 +107,7 @@ export async function criarPagina(formData: FormData): Promise<void> {
   slug = slug.replace(/\s+/g, '-').replace(/[^a-z0-9/-]/g, '')
 
   if (!titulo || slug === '/') throw new Error('título e endereço são obrigatórios')
+  if (slugReservado(slug)) throw new Error(`o endereço ${slug} é reservado pelo sistema; escolha outro`)
 
   const existe = await db.pagina.findUnique({ where: { slug }, select: { id: true } })
   if (existe) throw new Error(`já existe uma página em ${slug}`)
@@ -141,7 +145,7 @@ export type ResultadoPagina = { ok: true; mensagem: string; titulo: string; slug
  */
 export async function atualizarPagina(
   paginaId: string,
-  dados: { titulo: string; slug: string; paiId: string | null; ordem: number; noMenu: boolean }
+  dados: { titulo: string; slug: string; paiId: string | null; ordem: number; noMenu: boolean; minicursoId: string | null }
 ): Promise<ResultadoPagina> {
   try {
     await exigirPermissaoAction('criarPagina')
@@ -159,6 +163,16 @@ export async function atualizarPagina(
   if (!titulo) return { ok: false, erro: 'título é obrigatório' }
 
   const data: Prisma.PaginaUpdateInput = { titulo, ordem: dados.ordem, noMenu: dados.noMenu }
+
+  // Vincular a um minicurso tira a página do site público e a leva pra
+  // área do aluno. Home e mapa são páginas fixas do site aberto: nunca.
+  const minicursoId = dados.minicursoId || null
+  if (minicursoId) {
+    if (atual.fixa) return { ok: false, erro: 'página fixa do site não pode ser restrita a alunos' }
+    const m = await db.minicurso.findUnique({ where: { id: minicursoId }, select: { id: true } })
+    if (!m) return { ok: false, erro: 'minicurso não encontrado' }
+  }
+  data.minicurso = minicursoId ? { connect: { id: minicursoId } } : { disconnect: true }
   let slugFinal = atual.slug
 
   // página fixa (home, mapa do site): endereço e hierarquia ficam travados
@@ -168,6 +182,7 @@ export async function atualizarPagina(
     if (!slug.startsWith('/')) slug = '/' + slug
     slug = slug.replace(/\s+/g, '-').replace(/[^a-z0-9/-]/g, '')
     if (slug === '/') return { ok: false, erro: 'endereço é obrigatório' }
+    if (slugReservado(slug)) return { ok: false, erro: `o endereço ${slug} é reservado pelo sistema; escolha outro` }
 
     if (slug !== atual.slug) {
       const existe = await db.pagina.findUnique({ where: { slug }, select: { id: true } })
@@ -385,6 +400,277 @@ export async function registrarApresentacao(dados: { url: string; chave: string;
     data: { chave: dados.chave, url: dados.url, nome: dados.nome.slice(0, 200), tamanho: dados.tamanho, enviadoPorId: usuario.id },
   })
   return { ok: true, id: ap.id, nome: ap.nome }
+}
+
+// ─────────────────────────── minicursos ───────────────────────────
+
+export type ResultadoLista =
+  | { ok: true; mensagem: string; avisos: string[] }
+  | { ok: false; erro: string }
+
+/**
+ * Apaga quem ficou sem inscrição em nenhum minicurso: a linha de Aluno e a
+ * conta de login (só as de papel ALUNO, nunca uma de admin/editor). Dado
+ * pessoal que ninguém mais usa não fica parado no banco, e apagar a conta
+ * derruba as sessões abertas junto.
+ */
+async function removerAlunosSemInscricao(): Promise<void> {
+  const orfaos = await db.aluno.findMany({ where: { inscricoes: { none: {} } }, select: { id: true, email: true } })
+  if (orfaos.length === 0) return
+  await db.$transaction([
+    db.user.deleteMany({ where: { email: { in: orfaos.map((a) => a.email) }, papel: 'ALUNO' } }),
+    db.aluno.deleteMany({ where: { id: { in: orfaos.map((a) => a.id) } } }),
+  ])
+}
+
+function cargaValida(h: number | null): boolean {
+  return h === null || (Number.isInteger(h) && h >= 1 && h <= 1000)
+}
+
+export async function criarMinicurso(dados: { titulo: string; cargaHoraria: number | null }): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const titulo = dados.titulo.trim()
+  if (titulo.length < 3 || titulo.length > 100) return { ok: false, erro: 'o nome precisa ter de 3 a 100 letras' }
+  if (!cargaValida(dados.cargaHoraria)) return { ok: false, erro: 'carga horária inválida (de 1 a 1000 horas)' }
+
+  const base = slugDeTitulo(titulo) || 'minicurso'
+  let slug = base
+  for (let n = 2; await db.minicurso.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${base}-${n}`
+
+  await db.minicurso.create({ data: { titulo, slug, cargaHoraria: dados.cargaHoraria } })
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: 'Minicurso criado.' }
+}
+
+export async function atualizarMinicurso(
+  id: string,
+  dados: { titulo: string; cargaHoraria: number | null; ativo: boolean }
+): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const titulo = dados.titulo.trim()
+  if (titulo.length < 3 || titulo.length > 100) return { ok: false, erro: 'o nome precisa ter de 3 a 100 letras' }
+  if (!cargaValida(dados.cargaHoraria)) return { ok: false, erro: 'carga horária inválida (de 1 a 1000 horas)' }
+
+  await db.minicurso.update({ where: { id }, data: { titulo, cargaHoraria: dados.cargaHoraria, ativo: dados.ativo } })
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: 'Minicurso atualizado.' }
+}
+
+export async function apagarMinicurso(id: string): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('apagarMinicurso')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  // Sem isso as páginas do minicurso passariam a ser públicas. O banco
+  // também recusa (onDelete Restrict), mas aqui a mensagem diz o que fazer.
+  const paginas = await db.pagina.count({ where: { minicursoId: id } })
+  if (paginas > 0) {
+    return { ok: false, erro: `há ${paginas} página(s) vinculada(s) a este minicurso; apague ou desvincule antes (em Configurações da página)` }
+  }
+
+  const certificados = await db.inscricao.findMany({
+    where: { minicursoId: id, certificadoUrl: { not: null } },
+    select: { certificadoUrl: true },
+  })
+  await db.minicurso.delete({ where: { id } })
+  for (const c of certificados) if (c.certificadoUrl) await apagarArquivo(c.certificadoUrl)
+  await removerAlunosSemInscricao()
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: 'Minicurso apagado.' }
+}
+
+/**
+ * Inscreve uma lista de pessoas ("e-mail, nome, matrícula" por linha).
+ * Quem já existe como aluno mantém nome e matrícula como estão: digitar o
+ * e-mail de alguém aqui não pode reescrever o nome que sai no certificado
+ * de outro minicurso. Tudo em lote (poucas queries), pra lista grande não
+ * demorar no banco remoto.
+ */
+export async function adicionarAlunos(minicursoId: string, texto: string): Promise<ResultadoLista> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const minicurso = await db.minicurso.findUnique({ where: { id: minicursoId }, select: { id: true } })
+  if (!minicurso) return { ok: false, erro: 'minicurso não encontrado' }
+
+  const { alunos, erros } = lerListaAlunos(texto)
+  if (alunos.length === 0) {
+    return { ok: false, erro: erros.length ? erros.slice(0, 5).join('; ') : 'cole pelo menos uma pessoa (e-mail, nome, matrícula)' }
+  }
+
+  const emails = alunos.map((a) => a.email)
+  const existentes = await db.aluno.findMany({ where: { email: { in: emails } } })
+  const porEmail = new Map(existentes.map((a) => [a.email, a]))
+
+  const novos = alunos.filter((a) => !porEmail.has(a.email))
+  if (novos.length) {
+    await db.aluno.createMany({
+      data: novos.map((a) => ({ email: a.email, nome: a.nome, matricula: a.matricula })),
+      skipDuplicates: true,
+    })
+  }
+
+  // reinscrever alguém desativado reativa; matrícula só preenche se estava vazia
+  const reativar = existentes.filter((a) => !a.ativo).map((a) => a.id)
+  if (reativar.length) await db.aluno.updateMany({ where: { id: { in: reativar } }, data: { ativo: true } })
+  for (const a of alunos) {
+    const ex = porEmail.get(a.email)
+    if (ex && !ex.matricula && a.matricula) await db.aluno.update({ where: { id: ex.id }, data: { matricula: a.matricula } })
+  }
+
+  const todos = await db.aluno.findMany({ where: { email: { in: emails } }, select: { id: true } })
+  const jaInscritos = await db.inscricao.findMany({
+    where: { minicursoId, alunoId: { in: todos.map((a) => a.id) } },
+    select: { alunoId: true },
+  })
+  const inscritos = new Set(jaInscritos.map((i) => i.alunoId))
+  const novas = todos.filter((a) => !inscritos.has(a.id))
+  if (novas.length) {
+    await db.inscricao.createMany({
+      data: novas.map((a) => ({ alunoId: a.id, minicursoId })),
+      skipDuplicates: true,
+    })
+  }
+
+  revalidatePath('/admin/minicursos')
+  const ja = alunos.length - novas.length
+  return {
+    ok: true,
+    mensagem: `${novas.length} inscrição(ões) criada(s)${ja ? `, ${ja} já estava(m) inscrita(s)` : ''}.`,
+    avisos: erros,
+  }
+}
+
+export async function removerInscricao(inscricaoId: string): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const insc = await db.inscricao.findUnique({ where: { id: inscricaoId }, select: { certificadoUrl: true } })
+  await db.inscricao.delete({ where: { id: inscricaoId } })
+  if (insc?.certificadoUrl) await apagarArquivo(insc.certificadoUrl)
+  await removerAlunosSemInscricao()
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: 'Inscrição removida.' }
+}
+
+export type ResultadoCertificado = { ok: true; mensagem: string; nome: string } | { ok: false; erro: string }
+
+/**
+ * Guarda o PDF na inscrição e apaga o anterior do storage: certificado tem
+ * nome de aluno, então versão trocada não pode ficar parada num link antigo.
+ */
+async function gravarCertificado(
+  inscricaoId: string,
+  arq: { chave: string; url: string; nome: string }
+): Promise<ResultadoCertificado> {
+  const atual = await db.inscricao.findUnique({ where: { id: inscricaoId }, select: { certificadoUrl: true } })
+  if (!atual) {
+    await apagarArquivo(arq.url)
+    return { ok: false, erro: 'inscrição não encontrada' }
+  }
+
+  await db.inscricao.update({
+    where: { id: inscricaoId },
+    data: { certificadoEm: new Date(), certificadoChave: arq.chave, certificadoUrl: arq.url, certificadoNome: arq.nome.slice(0, 200) },
+  })
+  if (atual.certificadoUrl) await apagarArquivo(atual.certificadoUrl)
+
+  revalidatePath('/admin/minicursos', 'layout')
+  return { ok: true, mensagem: 'Certificado enviado.', nome: arq.nome }
+}
+
+/** Caminho sem Blob (dev): o PDF passa pela Server Action e vai pro disco. */
+export async function enviarCertificado(inscricaoId: string, formData: FormData): Promise<ResultadoCertificado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const arquivo = formData.get('arquivo')
+  if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: 'nenhum arquivo selecionado' }
+
+  const { validarPdf, salvarArquivo } = await import('@/lib/storage')
+  const problema = validarPdf(arquivo)
+  if (problema) return { ok: false, erro: problema }
+  // o tipo vem do navegador; conferir o cabeçalho do arquivo é barato
+  if (Buffer.from(await arquivo.slice(0, 5).arrayBuffer()).toString('latin1') !== '%PDF-') {
+    return { ok: false, erro: 'o arquivo não parece ser um PDF válido' }
+  }
+
+  let salvo
+  try {
+    salvo = await salvarArquivo(arquivo)
+  } catch (e) {
+    console.error('Falha ao salvar certificado no storage:', e)
+    return { ok: false, erro: 'não consegui salvar o arquivo no armazenamento; avisa o time técnico' }
+  }
+  return gravarCertificado(inscricaoId, { chave: salvo.chave, url: salvo.url, nome: arquivo.name })
+}
+
+/**
+ * Caminho com Blob (produção): o navegador já mandou o PDF direto pro Blob
+ * (pra fugir do teto de 4,5 MB de Server Action) e só avisa aqui. Como a
+ * URL vem do cliente, só vale arquivo que a rota de upload de certificado
+ * emitiu (caminho com prefixo certificados/), no nosso Blob e ainda não
+ * usado por outra inscrição. Sem isso, dava pra apontar um certificado pro
+ * arquivo de outro aluno e, ao trocar, apagar o original.
+ */
+export async function registrarCertificado(
+  inscricaoId: string,
+  dados: { url: string; chave: string; nome: string; tamanho: number }
+): Promise<ResultadoCertificado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const problema = validarCertificadoNoBlob(dados)
+  if (problema) return { ok: false, erro: problema }
+
+  const emUso = await db.inscricao.count({ where: { certificadoUrl: dados.url } })
+  if (emUso > 0) return { ok: false, erro: 'este arquivo já está vinculado a outra inscrição' }
+
+  return gravarCertificado(inscricaoId, { chave: dados.chave, url: dados.url, nome: dados.nome })
+}
+
+export async function removerCertificado(inscricaoId: string): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const atual = await db.inscricao.findUnique({ where: { id: inscricaoId }, select: { certificadoUrl: true } })
+  if (!atual) return { ok: false, erro: 'inscrição não encontrada' }
+
+  await db.inscricao.update({
+    where: { id: inscricaoId },
+    data: { certificadoEm: null, certificadoChave: null, certificadoUrl: null, certificadoNome: null },
+  })
+  if (atual.certificadoUrl) await apagarArquivo(atual.certificadoUrl)
+
+  revalidatePath('/admin/minicursos', 'layout')
+  return { ok: true, mensagem: 'Certificado removido.' }
 }
 
 // ─────────────────────────── acessos ───────────────────────────

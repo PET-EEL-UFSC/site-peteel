@@ -19,6 +19,8 @@ type Props = {
   fixa: boolean
   temFilhos: boolean
   raizes: { id: string; titulo: string }[]
+  minicursoId: string | null
+  minicursos: { id: string; titulo: string }[]
   podeGerenciarPagina: boolean
   podeApagarPagina: boolean
   inicial: Blocos
@@ -71,6 +73,8 @@ export function EditorBlocos({
   fixa,
   temFilhos,
   raizes,
+  minicursoId,
+  minicursos,
   podeGerenciarPagina,
   podeApagarPagina,
   inicial,
@@ -140,6 +144,8 @@ export function EditorBlocos({
         fixa={fixa}
         temFilhos={temFilhos}
         raizes={raizes}
+        minicursoId={minicursoId}
+        minicursos={minicursos}
         podeGerenciar={podeGerenciarPagina}
         podeApagar={podeApagarPagina}
         onSalvo={(t, s) => setMeta({ titulo: t, slug: s })}

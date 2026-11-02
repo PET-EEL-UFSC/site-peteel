@@ -5,7 +5,10 @@ import { Acessos } from '../_componentes/Acessos'
 export default async function AcessosPage() {
   const eu = await exigirPermissao('gerenciarAcessos')
 
+  // Alunos de minicurso têm conta (papel ALUNO) mas não são acesso ao painel:
+  // vivem em Minicursos e não entram nesta lista nem nas ações dela.
   const usuarios = await db.user.findMany({
+    where: { papel: { not: 'ALUNO' } },
     select: { id: true, email: true, nome: true, papel: true, ativo: true, gestao: true, primeiroAcesso: true, criadoEm: true },
     orderBy: [{ ativo: 'desc' }, { papel: 'asc' }, { criadoEm: 'asc' }],
   })
@@ -19,11 +22,18 @@ export default async function AcessosPage() {
       </p>
       <Acessos
         meuId={eu.id}
-        usuarios={usuarios.map((u) => ({
-          ...u,
-          criadoEm: u.criadoEm.toISOString(),
-          primeiroAcesso: u.primeiroAcesso ? u.primeiroAcesso.toISOString() : null,
-        }))}
+        usuarios={usuarios.flatMap((u) =>
+          u.papel === 'ALUNO'
+            ? []
+            : [
+                {
+                  ...u,
+                  papel: u.papel,
+                  criadoEm: u.criadoEm.toISOString(),
+                  primeiroAcesso: u.primeiroAcesso ? u.primeiroAcesso.toISOString() : null,
+                },
+              ]
+        )}
       />
     </>
   )

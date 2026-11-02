@@ -1,5 +1,5 @@
-import { writeFile, mkdir } from 'node:fs/promises'
-import { join } from 'node:path'
+import { writeFile, mkdir, unlink } from 'node:fs/promises'
+import { join, basename } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 export type Salvo = { chave: string; url: string }
@@ -63,6 +63,26 @@ export async function salvarArquivo(arquivo: File): Promise<Salvo> {
   await mkdir(dir, { recursive: true })
   await writeFile(join(dir, chave), bytes)
   return { chave, url: `/uploads/${chave}` }
+}
+
+/**
+ * Apaga o arquivo do storage. Serve pra dado pessoal que não pode ficar
+ * parado depois de trocado/removido (ex.: certificado com nome de aluno).
+ * Melhor esforço: se o storage falhar, o registro no banco já foi
+ * atualizado e o erro só vai pro log, em vez de travar a operação.
+ */
+export async function apagarArquivo(url: string): Promise<void> {
+  try {
+    if (/^https?:\/\//.test(url)) {
+      const { del } = await import('@vercel/blob')
+      await del(url)
+    } else if (url.startsWith('/uploads/')) {
+      // basename: o caminho vem do banco, mas nunca deixa sair de public/uploads
+      await unlink(join(process.cwd(), 'public', 'uploads', basename(url)))
+    }
+  } catch (e) {
+    console.error('Falha ao apagar arquivo do storage:', e)
+  }
 }
 
 /**

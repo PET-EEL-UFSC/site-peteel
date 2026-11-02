@@ -13,7 +13,8 @@ function slugDe(partes: string[] | undefined): string {
 
 export async function generateStaticParams() {
   const paginas = await db.pagina.findMany({
-    where: { status: 'PUBLICADA' },
+    // página de minicurso não é gerada no site público: vive em /aluno
+    where: { status: 'PUBLICADA', minicursoId: null },
     select: { slug: true },
   })
   return paginas.map((p) => ({
@@ -25,9 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const pagina = await db.pagina.findUnique({
     where: { slug: slugDe(slug) },
-    select: { titulo: true, descricao: true, status: true },
+    select: { titulo: true, descricao: true, status: true, minicursoId: true },
   })
-  if (!pagina || pagina.status !== 'PUBLICADA') return {}
+  if (!pagina || pagina.status !== 'PUBLICADA' || pagina.minicursoId) return {}
   return { title: pagina.titulo, description: pagina.descricao ?? undefined }
 }
 
@@ -40,7 +41,8 @@ export default async function Pagina({ params }: Props) {
     db.config.findUnique({ where: { id: 1 } }),
   ])
 
-  if (!pagina || pagina.status !== 'PUBLICADA') notFound()
+  // 404 igual ao de página que não existe: não confirma que há conteúdo restrito nesse endereço
+  if (!pagina || pagina.status !== 'PUBLICADA' || pagina.minicursoId) notFound()
 
   const blocos = lerBlocos(pagina.blocos, `página ${caminho}`)
   const dados = await carregarDados(blocos)

@@ -15,14 +15,16 @@ type Props = {
   fixa: boolean
   temFilhos: boolean
   raizes: { id: string; titulo: string }[]
+  minicursoId: string | null
+  minicursos: { id: string; titulo: string }[]
   podeGerenciar: boolean
   podeApagar: boolean
   onSalvo: (titulo: string, slug: string) => void
 }
 
-export function ConfigPagina({ paginaId, titulo, slug, paiId, ordem, noMenu, fixa, temFilhos, raizes, podeGerenciar, podeApagar, onSalvo }: Props) {
+export function ConfigPagina({ paginaId, titulo, slug, paiId, ordem, noMenu, fixa, temFilhos, raizes, minicursoId, minicursos, podeGerenciar, podeApagar, onSalvo }: Props) {
   const router = useRouter()
-  const [form, setForm] = useState({ titulo, slug, paiId: paiId ?? '', ordem, noMenu })
+  const [form, setForm] = useState({ titulo, slug, paiId: paiId ?? '', ordem, noMenu, minicursoId: minicursoId ?? '' })
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null)
   const [pendente, iniciar] = useTransition()
 
@@ -38,6 +40,7 @@ export function ConfigPagina({ paginaId, titulo, slug, paiId, ordem, noMenu, fix
         paiId: form.paiId || null,
         ordem: form.ordem,
         noMenu: form.noMenu,
+        minicursoId: form.minicursoId || null,
       })
       if (r.ok) {
         setMsg({ ok: true, texto: r.mensagem })
@@ -97,6 +100,23 @@ export function ConfigPagina({ paginaId, titulo, slug, paiId, ordem, noMenu, fix
       </label>
 
       <Alternador rotulo="Aparece no menu do site" valor={form.noMenu} onChange={(v) => setForm({ ...form, noMenu: v })} />
+
+      {!fixa && (
+        <>
+          <Selecao
+            rotulo="Quem pode ver"
+            valor={form.minicursoId}
+            opcoes={[['', 'Qualquer pessoa (página pública)'], ...minicursos.map((m): [string, string] => [m.id, `Só alunos do minicurso: ${m.titulo}`])]}
+            onChange={(v) => setForm({ ...form, minicursoId: v })}
+          />
+          {form.minicursoId && (
+            <p className="dica" style={{ marginBottom: 12 }}>
+              Página restrita: sai do menu e do mapa do site e só abre na Área do aluno (/aluno{slug}), para quem está inscrito neste minicurso.
+              Vídeos do YouTube devem ser "não listados". Apresentações enviadas só ficam protegidas depois que a página for salva com elas.
+            </p>
+          )}
+        </>
+      )}
 
       <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
         <button type="button" className="btn" disabled={pendente} onClick={salvar}>

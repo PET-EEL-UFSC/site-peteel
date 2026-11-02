@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
-import { mensagemDeErro } from '@/lib/auth/acesso'
+import { caminhoSeguro, mensagemDeErro } from '@/lib/auth/acesso'
 
 export const metadata = { title: 'Entrar' }
 
@@ -8,11 +8,13 @@ type Props = { searchParams: Promise<{ erro?: string; error?: string; de?: strin
 
 export default async function Entrar({ searchParams }: Props) {
   const params = await searchParams
-  const { de } = params
+  // ?de= vem de um link, então só aceita caminho do próprio site (ver caminhoSeguro)
+  const de = caminhoSeguro(params.de, '/admin')
+  const areaAluno = de.startsWith('/aluno')
   // o Auth.js devolve ?error=, os nossos redirecionamentos usam ?erro=
   const erro = params.erro ?? params.error
   const sessao = await auth()
-  if (sessao?.user && !erro) redirect(de ?? '/admin')
+  if (sessao?.user && !erro) redirect(de)
 
   const problema = mensagemDeErro(erro)
 
@@ -32,9 +34,13 @@ export default async function Entrar({ searchParams }: Props) {
           <img src="/marca/logo-v2.png" alt="PET EEL" style={{ height: 26, width: 'auto', display: 'block' }} />
         </div>
 
-        <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>Painel do site</h1>
+        <h1 style={{ marginTop: 22, fontSize: 34, lineHeight: 1, textTransform: 'uppercase' }}>
+          {areaAluno ? 'Área do aluno' : 'Painel do site'}
+        </h1>
         <p style={{ marginTop: 12, font: '400 15px/1.6 var(--corpo)' }}>
-          Entre com a conta Google que o grupo cadastrou para você.
+          {areaAluno
+            ? 'Entre com a conta Google do mesmo e-mail que você usou na inscrição do minicurso.'
+            : 'Entre com a conta Google que o grupo cadastrou para você.'}
         </p>
 
         {problema && (
@@ -68,7 +74,7 @@ export default async function Entrar({ searchParams }: Props) {
         <form
           action={async () => {
             'use server'
-            await signIn('google', { redirectTo: de ?? '/admin' })
+            await signIn('google', { redirectTo: de })
           }}
         >
           <button
@@ -91,7 +97,9 @@ export default async function Entrar({ searchParams }: Props) {
         </form>
 
         <p style={{ marginTop: 20, font: '400 13px/1.5 var(--corpo)', color: 'rgba(44,43,34,0.6)' }}>
-          Não tem acesso? Um administrador do grupo precisa te adicionar antes do primeiro login.
+          {areaAluno
+            ? 'Não consegue entrar? Confira se é o e-mail da inscrição ou fale com a organização do minicurso.'
+            : 'Não tem acesso? Um administrador do grupo precisa te adicionar antes do primeiro login.'}
         </p>
       </div>
     </main>

@@ -29,7 +29,9 @@ export function lerBlocos(raw: unknown, ondeParaLog: string): Blocos {
 
 export async function carregarArvore(): Promise<NoArvore[]> {
   const paginas = await db.pagina.findMany({
-    where: { status: 'PUBLICADA', noMenu: true },
+    // página de minicurso (minicursoId preenchido) é só da área do aluno:
+    // nunca aparece em menu nem no mapa do site público
+    where: { status: 'PUBLICADA', noMenu: true, minicursoId: null },
     select: { slug: true, titulo: true, paiId: true, id: true, ordem: true },
     orderBy: [{ ordem: 'asc' }, { titulo: 'asc' }],
   })

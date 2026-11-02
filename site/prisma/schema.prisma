@@ -22,6 +22,7 @@ datasource db {
 enum Papel {
   ADMIN  // gerencia pessoas e publica
   EDITOR // edita e salva rascunho
+  ALUNO  // aluno de minicurso: só enxerga a área do aluno, nunca o painel
 }
 
 model User {
@@ -31,7 +32,9 @@ model User {
   imagem        String?
   emailVerified DateTime?
 
-  papel     Papel   @default(EDITOR)
+  // menor privilégio por padrão: quem for criado sem papel explícito não
+  // chega no painel (os convites de admin/editor sempre definem o papel)
+  papel     Papel   @default(ALUNO)
   ativo     Boolean @default(true) // desliga o acesso sem apagar o histórico
   gestao    String? // "2026.1" — de qual gestão a pessoa é, para a lista do admin
 
@@ -108,6 +111,13 @@ model Pagina {
   blocos   Json  @default("[]") // o que está no ar
   rascunho Json? // edição em andamento; publicar copia para `blocos`
 
+  // Preenchido = página só pra alunos matriculados nesse minicurso: some do
+  // site público (menu, mapa, rota) e só abre em /aluno/... com login.
+  minicursoId String?
+  // Restrict, não SetNull: apagar o minicurso soltaria a página restrita
+  // pro site público. Primeiro desvincula (ou apaga) as páginas.
+  minicurso   Minicurso? @relation(fields: [minicursoId], references: [id], onDelete: Restrict)
+
   // Hierarquia do menu — "Projetos internos" é filho de "Pesquisa"
   paiId  String?
   pai    Pagina?  @relation("Hierarquia", fields: [paiId], references: [id], onDelete: SetNull)
@@ -125,6 +135,7 @@ model Pagina {
 
   @@index([status])
   @@index([paiId, ordem])
+  @@index([minicursoId])
 }
 
 // Histórico. O grupo troca de gestão todo ano; alguém vai apagar um
@@ -203,6 +214,59 @@ model Apresentacao {
   criadoEm DateTime @default(now())
 
   @@index([criadoEm])
+}
+
+// ─────────────────────────── Minicursos ───────────────────────────
+// Dados de aluno (e-mail, matrícula) são pessoais e NUNCA entram em query
+// pública. Por isso tabela própria, separada de Petiano (que alimenta o
+// site aberto) e de User (que guarda o acesso ao painel).
+
+model Minicurso {
+  id           String  @id @default(cuid())
+  slug         String  @unique
+  titulo       String
+  cargaHoraria Int? // horas, aparece no certificado
+  ativo        Boolean @default(true) // desligado: as aulas somem da área do aluno
+
+  criadoEm DateTime @default(now())
+
+  paginas    Pagina[]
+  inscricoes Inscricao[]
+}
+
+// Quem pode entrar na área do aluno. O e-mail é o do Google que a pessoa
+// vai usar: a lista é o portão, igual ao convite do painel.
+model Aluno {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  nome      String
+  matricula String? // opcional; só o admin e o próprio aluno enxergam
+  ativo     Boolean @default(true)
+
+  criadoEm DateTime @default(now())
+
+  inscricoes Inscricao[]
+}
+
+model Inscricao {
+  id          String    @id @default(cuid())
+  alunoId     String
+  aluno       Aluno     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  minicursoId String
+  minicurso   Minicurso @relation(fields: [minicursoId], references: [id], onDelete: Cascade)
+
+  // Certificado em PDF, feito e assinado pelo grupo e enviado pelo painel.
+  // Tem nome do aluno, então só sai pelo servidor, depois de conferir de
+  // quem é: `certificadoUrl` nunca vai pro navegador.
+  certificadoEm    DateTime? // quando o PDF foi enviado; preenchido = aluno já pode baixar
+  certificadoChave String? // caminho no storage (Blob/local)
+  certificadoUrl   String?
+  certificadoNome  String? // nome original do arquivo, só pra conferência no painel
+
+  criadoEm DateTime @default(now())
+
+  @@unique([alunoId, minicursoId])
+  @@index([minicursoId])
 }
 
 // Aparece em toda página (rodapé, contato, redes). Linha única.
