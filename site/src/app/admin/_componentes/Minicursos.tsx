@@ -9,10 +9,21 @@ import {
   apagarMinicurso,
   adicionarAlunos,
   removerInscricao,
+  criarAula,
+  moverAula,
 } from '../acoes'
 
 type Inscrito = { id: string; nome: string; email: string; matricula: string | null; certificado: boolean }
-type M = { id: string; titulo: string; cargaHoraria: number | null; ativo: boolean; paginas: number; inscricoes: Inscrito[] }
+type Aula = { id: string; titulo: string; publicada: boolean }
+type M = {
+  id: string
+  titulo: string
+  descricao: string
+  cargaHoraria: number | null
+  ativo: boolean
+  aulas: Aula[]
+  inscricoes: Inscrito[]
+}
 
 type Msg = { ok: boolean; texto: string } | null
 
@@ -68,6 +79,8 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
   const [titulo, setTitulo] = useState(m.titulo)
   const [carga, setCarga] = useState(m.cargaHoraria?.toString() ?? '')
   const [ativo, setAtivo] = useState(m.ativo)
+  const [descricao, setDescricao] = useState(m.descricao)
+  const [novaAula, setNovaAula] = useState('')
   const [lista, setLista] = useState('')
   const [msg, setMsg] = useState<Msg>(null)
   const [avisos, setAvisos] = useState<string[]>([])
@@ -123,16 +136,75 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
           type="button"
           className="btn btn-claro"
           disabled={pendente}
-          onClick={() => agir(() => atualizarMinicurso(m.id, { titulo, cargaHoraria: horas(carga), ativo }))}
+          onClick={() => agir(() => atualizarMinicurso(m.id, { titulo, descricao, cargaHoraria: horas(carga), ativo }))}
         >
           Salvar
         </button>
       </div>
 
-      <p className="dica" style={{ marginBottom: 14 }}>
-        {m.paginas === 0
-          ? 'Nenhuma página vinculada ainda. Crie uma página e, em Configurações da página, escolha "Só alunos do minicurso".'
-          : `${m.paginas} página(s) vinculada(s) a este minicurso.`}
+      <label className="campo">
+        <span>Descrição (opcional)</span>
+        <textarea
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          rows={3}
+          maxLength={1500}
+          placeholder="Ex: Minicurso de introdução à IA. Código das aulas: https://github.com/pet-eel-ufsc/minicurso-ia"
+        />
+        <p className="dica">
+          Aparece pro aluno no card do minicurso. Endereços começando com https:// viram links clicáveis. Salve com o botão &quot;Salvar&quot; acima.
+        </p>
+      </label>
+
+      <h3 style={{ fontSize: 15, textTransform: 'uppercase', margin: '22px 0 8px' }}>Aulas</h3>
+      {m.aulas.length === 0 ? (
+        <p className="dica" style={{ marginBottom: 10 }}>Nenhuma aula ainda. Crie a primeira abaixo.</p>
+      ) : (
+        <table className="tabela" style={{ marginBottom: 12 }}>
+          <tbody>
+            {m.aulas.map((a, i) => (
+              <tr key={a.id}>
+                <td style={{ width: 84, whiteSpace: 'nowrap' }}>
+                  <button type="button" className="mini" title="Subir" disabled={pendente || i === 0} onClick={() => agir(() => moverAula(a.id, -1))}>↑</button>{' '}
+                  <button type="button" className="mini" title="Descer" disabled={pendente || i === m.aulas.length - 1} onClick={() => agir(() => moverAula(a.id, 1))}>↓</button>
+                </td>
+                <td>
+                  {a.titulo}{' '}
+                  <span className="tag" style={{ background: a.publicada ? 'var(--amarelo)' : 'rgba(44,43,34,0.12)' }}>
+                    {a.publicada ? 'publicada' : 'rascunho'}
+                  </span>
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  <Link href={`/admin/paginas/${a.id}`} className="btn btn-claro">Editar</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <label className="campo" style={{ flex: '1 1 260px', margin: 0 }}>
+          <span>Nova aula</span>
+          <input type="text" value={novaAula} onChange={(e) => setNovaAula(e.target.value)} placeholder="Ex: Aula 1: O que é IA?" maxLength={100} />
+        </label>
+        <button
+          type="button"
+          className="btn"
+          disabled={pendente || novaAula.trim().length < 2}
+          onClick={() =>
+            iniciar(async () => {
+              const r = await criarAula(m.id, novaAula)
+              if (r.ok) router.push(`/admin/paginas/${r.id}`)
+              else setMsg({ ok: false, texto: r.erro })
+            })
+          }
+        >
+          {pendente ? 'Criando…' : 'Criar aula e editar'}
+        </button>
+      </div>
+      <p className="dica" style={{ margin: '8px 0 22px' }}>
+        Cada aula é uma página só pra alunos deste minicurso: no editor você adiciona vídeo (YouTube), apresentação em HTML, botões com link
+        (como o repositório do GitHub) e mais. O aluno só vê a aula depois que você clicar em Publicar.
       </p>
 
       <label className="campo">

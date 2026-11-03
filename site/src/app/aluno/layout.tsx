@@ -37,6 +37,9 @@ export default async function AlunoLayout({ children }: { children: React.ReactN
           </Link>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+            <Link href="/aluno" style={{ font: '700 12px var(--condensada)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--amarelo)' }}>
+              Minhas aulas
+            </Link>
             <Link href="/" style={{ font: '400 13px var(--corpo)', color: 'rgba(249,249,249,0.75)' }}>
               Site do PET EEL
             </Link>

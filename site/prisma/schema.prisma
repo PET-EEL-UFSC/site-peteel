@@ -225,7 +225,8 @@ model Minicurso {
   id           String  @id @default(cuid())
   slug         String  @unique
   titulo       String
-  cargaHoraria Int? // horas, aparece no certificado
+  descricao    String? // texto de apresentação, mostrado ao aluno (links http(s) viram clicáveis)
+  cargaHoraria Int? // horas, mostrado ao aluno
   ativo        Boolean @default(true) // desligado: as aulas somem da área do aluno
 
   criadoEm DateTime @default(now())

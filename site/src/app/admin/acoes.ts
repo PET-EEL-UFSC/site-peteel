@@ -6,8 +6,8 @@ import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { blocosSchema } from '@/lib/content/blocos'
 import { exigirPermissaoAction } from '@/lib/auth/sessao'
-import { emailSchema, slugReservado } from '@/lib/auth/acesso'
-import { lerListaAlunos, slugDeTitulo } from '@/lib/minicursos'
+import { emailSchema, pode, slugReservado } from '@/lib/auth/acesso'
+import { blocosIniciaisDeAula, enderecoDeAula, lerListaAlunos, slugDeTitulo } from '@/lib/minicursos'
 import { apagarArquivo } from '@/lib/storage'
 import { validarCertificadoNoBlob } from '@/lib/certificado'
 
@@ -449,7 +449,7 @@ export async function criarMinicurso(dados: { titulo: string; cargaHoraria: numb
 
 export async function atualizarMinicurso(
   id: string,
-  dados: { titulo: string; cargaHoraria: number | null; ativo: boolean }
+  dados: { titulo: string; descricao: string; cargaHoraria: number | null; ativo: boolean }
 ): Promise<Resultado> {
   try {
     await exigirPermissaoAction('gerenciarMinicursos')
@@ -461,9 +461,83 @@ export async function atualizarMinicurso(
   if (titulo.length < 3 || titulo.length > 100) return { ok: false, erro: 'o nome precisa ter de 3 a 100 letras' }
   if (!cargaValida(dados.cargaHoraria)) return { ok: false, erro: 'carga horária inválida (de 1 a 1000 horas)' }
 
-  await db.minicurso.update({ where: { id }, data: { titulo, cargaHoraria: dados.cargaHoraria, ativo: dados.ativo } })
+  const descricao = dados.descricao.trim()
+  if (descricao.length > 1500) return { ok: false, erro: 'a descrição passa de 1500 letras' }
+
+  await db.minicurso.update({
+    where: { id },
+    data: { titulo, descricao: descricao || null, cargaHoraria: dados.cargaHoraria, ativo: dados.ativo },
+  })
   revalidatePath('/admin/minicursos')
   return { ok: true, mensagem: 'Minicurso atualizado.' }
+}
+
+export type ResultadoAula = { ok: true; id: string } | { ok: false; erro: string }
+
+/**
+ * Cria uma aula: uma página já vinculada ao minicurso (restrita a alunos
+ * desde o primeiro instante, como rascunho) com um começo pronto. O editor
+ * de blocos de sempre cuida do resto: vídeo, apresentação, botões com link
+ * (ex.: repositório no GitHub), cards etc.
+ */
+export async function criarAula(minicursoId: string, tituloBruto: string): Promise<ResultadoAula> {
+  let eu
+  try {
+    eu = await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+  if (!pode(eu.papel, 'criarPagina')) return { ok: false, erro: 'sem permissão para criar páginas' }
+
+  const titulo = tituloBruto.trim()
+  if (titulo.length < 2 || titulo.length > 100) return { ok: false, erro: 'o nome da aula precisa ter de 2 a 100 letras' }
+
+  const m = await db.minicurso.findUnique({ where: { id: minicursoId }, select: { slug: true, titulo: true } })
+  if (!m) return { ok: false, erro: 'minicurso não encontrado' }
+
+  const base = enderecoDeAula(m.slug, titulo)
+  let slug = base
+  for (let n = 2; await db.pagina.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${base}-${n}`
+
+  const { _max } = await db.pagina.aggregate({ where: { minicursoId }, _max: { ordem: true } })
+  const blocos = blocosIniciaisDeAula(m.titulo, titulo)
+
+  const pagina = await db.pagina.create({
+    data: { slug, titulo, minicursoId, status: 'RASCUNHO', noMenu: false, ordem: (_max.ordem ?? -1) + 1, blocos },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/minicursos')
+  return { ok: true, id: pagina.id }
+}
+
+/** Sobe ou desce uma aula na ordem em que o aluno vê. */
+export async function moverAula(paginaId: string, direcao: number): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+  if (direcao !== -1 && direcao !== 1) return { ok: false, erro: 'direção inválida' }
+
+  const p = await db.pagina.findUnique({ where: { id: paginaId }, select: { minicursoId: true } })
+  if (!p?.minicursoId) return { ok: false, erro: 'esta página não é uma aula de minicurso' }
+
+  const aulas = await db.pagina.findMany({
+    where: { minicursoId: p.minicursoId },
+    orderBy: [{ ordem: 'asc' }, { titulo: 'asc' }],
+    select: { id: true },
+  })
+  const i = aulas.findIndex((a) => a.id === paginaId)
+  const j = i + direcao
+  if (i < 0 || j < 0 || j >= aulas.length) return { ok: true, mensagem: '' }
+
+  ;[aulas[i], aulas[j]] = [aulas[j], aulas[i]]
+  // renumera a lista inteira: aulas criadas antes podem ter a mesma ordem (0) e só trocar dois valores não resolveria
+  await db.$transaction(aulas.map((a, k) => db.pagina.update({ where: { id: a.id }, data: { ordem: k } })))
+
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: 'Ordem atualizada.' }
 }
 
 export async function apagarMinicurso(id: string): Promise<Resultado> {

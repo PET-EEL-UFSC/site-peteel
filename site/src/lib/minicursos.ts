@@ -1,4 +1,5 @@
-import { emailSchema } from '@/lib/auth/acesso'
+import { emailSchema, slugReservado } from '@/lib/auth/acesso'
+import { blocosSchema, type Blocos } from '@/lib/content/blocos'
 
 export function slugDeTitulo(titulo: string): string {
   return titulo
@@ -8,6 +9,41 @@ export function slugDeTitulo(titulo: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 60)
+}
+
+/**
+ * Endereço de uma aula: /<minicurso>/<aula>. Um minicurso chamado "Aluno" ou
+ * "Admin" cairia num endereço reservado do sistema (e a página nunca abriria),
+ * então ganha um prefixo.
+ */
+export function enderecoDeAula(slugDoMinicurso: string, tituloDaAula: string): string {
+  const raiz = slugReservado('/' + slugDoMinicurso) ? `curso-${slugDoMinicurso}` : slugDoMinicurso
+  return `/${raiz}/${slugDeTitulo(tituloDaAula) || 'aula'}`
+}
+
+/** Começo de uma aula nova: cabeçalho + uma faixa com instruções pra quem for editar. Já validado pelo schema. */
+export function blocosIniciaisDeAula(tituloDoMinicurso: string, tituloDaAula: string): Blocos {
+  return blocosSchema.parse([
+    { id: crypto.randomUUID(), tipo: 'cabecalho', migalha: tituloDoMinicurso, titulo: tituloDaAula, fundo: 'amarelo', decor: null },
+    {
+      id: crypto.randomUUID(),
+      tipo: 'faixa',
+      fundo: 'offwhite',
+      layout: '1-largo',
+      alinhamento: 'start',
+      espacamento: 'normal',
+      decor: null,
+      quadrantes: [
+        [
+          { tipo: 'titulo', texto: 'Material da aula', tamanho: 'm' },
+          {
+            tipo: 'paragrafo',
+            texto: 'Escreva aqui o resumo da aula. Em "Adicionar conteúdo" dá pra incluir vídeo, apresentação, botões com link (ex.: repositório no GitHub) e mais.',
+          },
+        ],
+      ],
+    },
+  ])
 }
 
 export type AlunoLido = { email: string; nome: string; matricula: string | null }

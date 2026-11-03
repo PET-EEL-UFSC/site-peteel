@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import { TextoComLinks } from './TextoComLinks'
 
 export type MinicursoDoAluno = {
   inscricaoId: string
   titulo: string
+  descricao: string | null
   cargaHoraria: number | null
   certificadoLiberado: boolean
   aulas: { slug: string; titulo: string }[]
@@ -31,6 +33,12 @@ export function PainelAluno({ nome, minicursos }: { nome: string; minicursos: Mi
             {m.cargaHoraria && (
               <p style={{ marginTop: 6, font: `700 11px/1 ${cond}`, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(44,43,34,0.6)' }}>
                 {m.cargaHoraria} horas
+              </p>
+            )}
+
+            {m.descricao && (
+              <p style={{ marginTop: 14, maxWidth: '70ch', whiteSpace: 'pre-line', font: '400 15.5px/1.6 var(--corpo)' }}>
+                <TextoComLinks texto={m.descricao} />
               </p>
             )}
 

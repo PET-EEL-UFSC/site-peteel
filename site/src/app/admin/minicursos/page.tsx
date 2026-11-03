@@ -11,9 +11,13 @@ export default async function MinicursosPage() {
     select: {
       id: true,
       titulo: true,
+      descricao: true,
       cargaHoraria: true,
       ativo: true,
-      _count: { select: { paginas: true } },
+      paginas: {
+        orderBy: [{ ordem: 'asc' }, { titulo: 'asc' }],
+        select: { id: true, titulo: true, status: true },
+      },
       inscricoes: {
         orderBy: { aluno: { nome: 'asc' } },
         select: { id: true, certificadoEm: true, aluno: { select: { nome: true, email: true, matricula: true } } },
@@ -26,7 +30,8 @@ export default async function MinicursosPage() {
       <h1 style={{ fontSize: 34, lineHeight: 1, textTransform: 'uppercase', marginBottom: 6 }}>Minicursos</h1>
       <p style={{ font: '400 14px/1.6 var(--corpo)', color: 'rgba(44,43,34,0.65)', marginBottom: 22, maxWidth: '68ch' }}>
         Quem estiver inscrito entra na Área do aluno com a conta Google do e-mail cadastrado aqui e vê as aulas do minicurso. As aulas
-        são páginas comuns: em <strong>Configurações da página</strong>, escolha &quot;Só alunos do minicurso&quot;. Os dados dos alunos
+        são páginas feitas no editor de blocos (vídeo, apresentação, botões com link e mais), criadas em <strong>Aulas</strong>, dentro de cada
+        minicurso. Os dados dos alunos
         (e-mail, matrícula) só aparecem nesta tela e pra própria pessoa, nunca no site público. Os certificados (PDF assinado) são enviados em{' '}
         <strong>Enviar certificados</strong>, dentro de cada minicurso.
       </p>
@@ -35,9 +40,10 @@ export default async function MinicursosPage() {
         minicursos={minicursos.map((m) => ({
           id: m.id,
           titulo: m.titulo,
+          descricao: m.descricao ?? '',
           cargaHoraria: m.cargaHoraria,
           ativo: m.ativo,
-          paginas: m._count.paginas,
+          aulas: m.paginas.map((a) => ({ id: a.id, titulo: a.titulo, publicada: a.status === 'PUBLICADA' })),
           inscricoes: m.inscricoes.map((i) => ({
             id: i.id,
             nome: i.aluno.nome,

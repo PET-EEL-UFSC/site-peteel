@@ -26,6 +26,7 @@ export default async function AreaDoAluno({ params }: Props) {
         minicurso: {
           select: {
             titulo: true,
+            descricao: true,
             cargaHoraria: true,
             paginas: {
               where: { status: 'PUBLICADA' },
@@ -43,6 +44,7 @@ export default async function AreaDoAluno({ params }: Props) {
         minicursos={inscricoes.map((i) => ({
           inscricaoId: i.id,
           titulo: i.minicurso.titulo,
+          descricao: i.minicurso.descricao,
           cargaHoraria: i.minicurso.cargaHoraria,
           certificadoLiberado: i.certificadoEm !== null,
           aulas: i.minicurso.paginas,
