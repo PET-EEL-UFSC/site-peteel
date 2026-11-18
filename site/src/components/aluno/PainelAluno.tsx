@@ -70,7 +70,7 @@ export function PainelAluno({ nome, minicursos }: { nome: string; minicursos: Mi
               </a>
             ) : (
               <p style={{ marginTop: 8, font: '400 14.5px/1.55 var(--corpo)', color: 'rgba(44,43,34,0.65)' }}>
-                Disponível aqui quando a organização enviar, ao fim do minicurso.
+                Disponível aqui quando a organização liberar, ao fim do minicurso.
               </p>
             )}
           </article>

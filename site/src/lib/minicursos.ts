@@ -17,8 +17,28 @@ export function slugDeTitulo(titulo: string): string {
  * então ganha um prefixo.
  */
 export function enderecoDeAula(slugDoMinicurso: string, tituloDaAula: string): string {
+  return enderecoComSegmento(slugDoMinicurso, slugDeTitulo(tituloDaAula) || 'aula')
+}
+
+/** Igual a enderecoDeAula, mas com o último pedaço do endereço já pronto (usado ao duplicar um minicurso). */
+export function enderecoComSegmento(slugDoMinicurso: string, segmento: string): string {
   const raiz = slugReservado('/' + slugDoMinicurso) ? `curso-${slugDoMinicurso}` : slugDoMinicurso
-  return `/${raiz}/${slugDeTitulo(tituloDaAula) || 'aula'}`
+  return `/${raiz}/${segmento}`
+}
+
+/**
+ * Prepara o conteúdo de uma aula pra ir pro minicurso duplicado: no
+ * cabeçalho, a "migalha" que mostrava o nome do minicurso antigo passa a
+ * mostrar o novo. O resto é copiado como está (ids de bloco só precisam ser
+ * únicos dentro de cada página).
+ */
+export function copiarBlocosParaMinicurso(blocos: unknown, tituloAntigo: string, tituloNovo: string): unknown {
+  if (!Array.isArray(blocos)) return []
+  return blocos.map((b) =>
+    b && typeof b === 'object' && (b as { tipo?: unknown }).tipo === 'cabecalho' && (b as { migalha?: unknown }).migalha === tituloAntigo
+      ? { ...b, migalha: tituloNovo }
+      : b
+  )
 }
 
 /** Começo de uma aula nova: cabeçalho + uma faixa com instruções pra quem for editar. Já validado pelo schema. */

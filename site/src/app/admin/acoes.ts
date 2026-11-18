@@ -7,7 +7,15 @@ import { db } from '@/lib/db'
 import { blocosSchema } from '@/lib/content/blocos'
 import { exigirPermissaoAction } from '@/lib/auth/sessao'
 import { emailSchema, pode, slugReservado } from '@/lib/auth/acesso'
-import { blocosIniciaisDeAula, enderecoDeAula, lerListaAlunos, slugDeTitulo } from '@/lib/minicursos'
+import {
+  blocosIniciaisDeAula,
+  copiarBlocosParaMinicurso,
+  enderecoDeAula,
+  enderecoComSegmento,
+  lerListaAlunos,
+  slugDeTitulo,
+  type AlunoLido,
+} from '@/lib/minicursos'
 import { apagarArquivo } from '@/lib/storage'
 import { validarCertificadoNoBlob } from '@/lib/certificado'
 
@@ -449,7 +457,14 @@ export async function criarMinicurso(dados: { titulo: string; cargaHoraria: numb
 
 export async function atualizarMinicurso(
   id: string,
-  dados: { titulo: string; descricao: string; cargaHoraria: number | null; ativo: boolean }
+  dados: {
+    titulo: string
+    descricao: string
+    cargaHoraria: number | null
+    ativo: boolean
+    inscricoesAbertas: boolean
+    modeloCertificadoId: string | null
+  }
 ): Promise<Resultado> {
   try {
     await exigirPermissaoAction('gerenciarMinicursos')
@@ -464,10 +479,23 @@ export async function atualizarMinicurso(
   const descricao = dados.descricao.trim()
   if (descricao.length > 1500) return { ok: false, erro: 'a descrição passa de 1500 letras' }
 
+  if (dados.modeloCertificadoId) {
+    const modelo = await db.modeloCertificado.findUnique({ where: { id: dados.modeloCertificadoId }, select: { id: true } })
+    if (!modelo) return { ok: false, erro: 'modelo de certificado não encontrado' }
+  }
+
   await db.minicurso.update({
     where: { id },
-    data: { titulo, descricao: descricao || null, cargaHoraria: dados.cargaHoraria, ativo: dados.ativo },
+    data: {
+      titulo,
+      descricao: descricao || null,
+      cargaHoraria: dados.cargaHoraria,
+      ativo: dados.ativo,
+      inscricoesAbertas: dados.inscricoesAbertas,
+      modeloCertificadoId: dados.modeloCertificadoId,
+    },
   })
+  revalidatePath('/inscricao', 'layout')
   revalidatePath('/admin/minicursos')
   return { ok: true, mensagem: 'Minicurso atualizado.' }
 }
@@ -540,6 +568,121 @@ export async function moverAula(paginaId: string, direcao: number): Promise<Resu
   return { ok: true, mensagem: 'Ordem atualizada.' }
 }
 
+/**
+ * Duplica um minicurso pra uma nova turma ou pra revisar o conteúdo: copia
+ * descrição, carga, modelo de certificado, ministrantes e as aulas (como
+ * rascunho, com o conteúdo mais recente de cada uma). Não leva inscritos,
+ * certificados, presenças nem encontros, e nasce com as inscrições fechadas.
+ */
+export async function duplicarMinicurso(id: string): Promise<Resultado> {
+  let eu
+  try {
+    eu = await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+  if (!pode(eu.papel, 'criarPagina')) return { ok: false, erro: 'sem permissão para criar páginas' }
+
+  const origem = await db.minicurso.findUnique({
+    where: { id },
+    select: {
+      titulo: true,
+      descricao: true,
+      cargaHoraria: true,
+      modeloCertificadoId: true,
+      ministrantes: { select: { userId: true } },
+      paginas: {
+        orderBy: [{ ordem: 'asc' }, { titulo: 'asc' }],
+        select: { titulo: true, slug: true, descricao: true, ordem: true, blocos: true, rascunho: true },
+      },
+    },
+  })
+  if (!origem) return { ok: false, erro: 'minicurso não encontrado' }
+
+  const titulo = `${origem.titulo.slice(0, 90)} (cópia)`
+  const base = slugDeTitulo(titulo) || 'minicurso'
+  let slug = base
+  for (let n = 2; await db.minicurso.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${base}-${n}`
+
+  // endereços das aulas copiadas: confere um a um (também entre si) antes de gravar
+  const usados = new Set<string>()
+  const aulas: { slug: string; origem: (typeof origem.paginas)[number] }[] = []
+  for (const p of origem.paginas) {
+    const ultimo = p.slug.split('/').filter(Boolean).pop() ?? 'aula'
+    const base = enderecoComSegmento(slug, ultimo)
+    let endereco = base
+    for (let n = 2; usados.has(endereco) || (await db.pagina.findUnique({ where: { slug: endereco }, select: { id: true } })); n++) {
+      endereco = `${base}-${n}`
+    }
+    usados.add(endereco)
+    aulas.push({ slug: endereco, origem: p })
+  }
+
+  // um único create aninhado: o Prisma grava minicurso e aulas juntos, tudo ou nada
+  await db.minicurso.create({
+    data: {
+      titulo,
+      slug,
+      descricao: origem.descricao,
+      cargaHoraria: origem.cargaHoraria,
+      modeloCertificadoId: origem.modeloCertificadoId,
+      ministrantes: { create: origem.ministrantes.map((m) => ({ userId: m.userId })) },
+      paginas: {
+        create: aulas.map(({ slug: endereco, origem: p }) => ({
+          slug: endereco,
+          titulo: p.titulo,
+          descricao: p.descricao,
+          status: 'RASCUNHO' as const,
+          noMenu: false,
+          ordem: p.ordem,
+          // o que o editor mostra hoje: o rascunho em andamento, senão o publicado
+          blocos: copiarBlocosParaMinicurso(p.rascunho ?? p.blocos, origem.titulo, titulo) as Prisma.InputJsonValue,
+        })),
+      },
+    },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: `Criado "${titulo}" com ${origem.paginas.length} aula(s) como rascunho. Revise e publique quando estiver pronto.` }
+}
+
+/** Aprova pedidos do formulário público: vira aluno inscrito e o pedido é apagado. `ids` nulo = todos os pendentes. */
+export async function aprovarPreInscricoes(minicursoId: string, ids: string[] | null): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const pendentes = await db.preInscricao.findMany({
+    where: { minicursoId, ...(ids ? { id: { in: ids } } : {}) },
+    select: { id: true, email: true, nome: true, matricula: true },
+  })
+  if (pendentes.length === 0) return { ok: false, erro: 'nenhum pedido pendente' }
+
+  const { novas } = await inscreverAlunos(
+    minicursoId,
+    pendentes.map((p) => ({ email: p.email, nome: p.nome, matricula: p.matricula }))
+  )
+  await db.preInscricao.deleteMany({ where: { id: { in: pendentes.map((p) => p.id) } } })
+
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: `${pendentes.length} pedido(s) aprovado(s) (${novas} inscrição(ões) nova(s)). As pessoas já podem entrar na Área do aluno.` }
+}
+
+export async function recusarPreInscricoes(minicursoId: string, ids: string[]): Promise<Resultado> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const r = await db.preInscricao.deleteMany({ where: { minicursoId, id: { in: ids } } })
+  revalidatePath('/admin/minicursos')
+  return { ok: true, mensagem: `${r.count} pedido(s) recusado(s) e apagado(s).` }
+}
+
 export async function apagarMinicurso(id: string): Promise<Resultado> {
   try {
     await exigirPermissaoAction('apagarMinicurso')
@@ -566,27 +709,13 @@ export async function apagarMinicurso(id: string): Promise<Resultado> {
 }
 
 /**
- * Inscreve uma lista de pessoas ("e-mail, nome, matrícula" por linha).
+ * Cria (ou reaproveita) o aluno de cada pessoa e inscreve no minicurso.
  * Quem já existe como aluno mantém nome e matrícula como estão: digitar o
  * e-mail de alguém aqui não pode reescrever o nome que sai no certificado
  * de outro minicurso. Tudo em lote (poucas queries), pra lista grande não
  * demorar no banco remoto.
  */
-export async function adicionarAlunos(minicursoId: string, texto: string): Promise<ResultadoLista> {
-  try {
-    await exigirPermissaoAction('gerenciarMinicursos')
-  } catch (e) {
-    return { ok: false, erro: (e as Error).message }
-  }
-
-  const minicurso = await db.minicurso.findUnique({ where: { id: minicursoId }, select: { id: true } })
-  if (!minicurso) return { ok: false, erro: 'minicurso não encontrado' }
-
-  const { alunos, erros } = lerListaAlunos(texto)
-  if (alunos.length === 0) {
-    return { ok: false, erro: erros.length ? erros.slice(0, 5).join('; ') : 'cole pelo menos uma pessoa (e-mail, nome, matrícula)' }
-  }
-
+async function inscreverAlunos(minicursoId: string, alunos: AlunoLido[]): Promise<{ novas: number; ja: number }> {
   const emails = alunos.map((a) => a.email)
   const existentes = await db.aluno.findMany({ where: { email: { in: emails } } })
   const porEmail = new Map(existentes.map((a) => [a.email, a]))
@@ -621,11 +750,37 @@ export async function adicionarAlunos(minicursoId: string, texto: string): Promi
     })
   }
 
+  return { novas: novas.length, ja: alunos.length - novas.length }
+}
+
+/**
+ * Inscreve uma lista de pessoas ("e-mail, nome, matrícula" por linha).
+ * Quem já existe como aluno mantém nome e matrícula como estão: digitar o
+ * e-mail de alguém aqui não pode reescrever o nome que sai no certificado
+ * de outro minicurso. Tudo em lote (poucas queries), pra lista grande não
+ * demorar no banco remoto.
+ */
+export async function adicionarAlunos(minicursoId: string, texto: string): Promise<ResultadoLista> {
+  try {
+    await exigirPermissaoAction('gerenciarMinicursos')
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message }
+  }
+
+  const minicurso = await db.minicurso.findUnique({ where: { id: minicursoId }, select: { id: true } })
+  if (!minicurso) return { ok: false, erro: 'minicurso não encontrado' }
+
+  const { alunos, erros } = lerListaAlunos(texto)
+  if (alunos.length === 0) {
+    return { ok: false, erro: erros.length ? erros.slice(0, 5).join('; ') : 'cole pelo menos uma pessoa (e-mail, nome, matrícula)' }
+  }
+
+  const { novas, ja } = await inscreverAlunos(minicursoId, alunos)
+
   revalidatePath('/admin/minicursos')
-  const ja = alunos.length - novas.length
   return {
     ok: true,
-    mensagem: `${novas.length} inscrição(ões) criada(s)${ja ? `, ${ja} já estava(m) inscrita(s)` : ''}.`,
+    mensagem: `${novas} inscrição(ões) criada(s)${ja ? `, ${ja} já estava(m) inscrita(s)` : ''}.`,
     avisos: erros,
   }
 }
@@ -977,6 +1132,11 @@ export async function apagarImagem(id: string): Promise<Resultado> {
 
   const usada = await db.petiano.count({ where: { fotoId: id } })
   if (usada > 0) return { ok: false, erro: 'esta imagem é a foto de um petiano' }
+
+  const modelos = await db.modeloCertificado.findMany({ where: { fundoMidiaId: id }, select: { nome: true }, take: 5 })
+  if (modelos.length > 0) {
+    return { ok: false, erro: `esta imagem é o fundo de modelos de certificado: ${modelos.map((m) => m.nome).join(', ')}` }
+  }
 
   await db.midia.delete({ where: { id } })
   revalidatePath('/admin/midia')

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { alunoDaSessao } from '@/lib/auth/sessao'
-import { responderCertificado } from '@/lib/certificado'
+import { entregarCertificado, SELECIONAR_PARA_CERTIFICADO } from '@/lib/certificado'
 
 const NEGADO = { 'Cache-Control': 'private, no-store' }
 
@@ -17,10 +17,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ insc
   if (!aluno) return new Response('Faça login para baixar o certificado.', { status: 401, headers: NEGADO })
 
   const insc = await db.inscricao.findFirst({
-    where: { id: inscricaoId, alunoId: aluno.id, certificadoUrl: { not: null }, minicurso: { ativo: true } },
-    select: { certificadoUrl: true, minicurso: { select: { slug: true } } },
+    where: { id: inscricaoId, alunoId: aluno.id, certificadoEm: { not: null }, minicurso: { ativo: true } },
+    select: SELECIONAR_PARA_CERTIFICADO,
   })
-  if (!insc?.certificadoUrl) return new Response('Certificado não encontrado.', { status: 404, headers: NEGADO })
+  if (!insc) return new Response('Certificado não encontrado.', { status: 404, headers: NEGADO })
 
-  return responderCertificado(insc.certificadoUrl, request.url, `certificado-${insc.minicurso.slug}.pdf`, 'attachment')
+  // o nome vem da conta do aluno logado, nunca de parâmetro da requisição
+  return entregarCertificado(insc, aluno.nome, request.url, 'attachment')
 }

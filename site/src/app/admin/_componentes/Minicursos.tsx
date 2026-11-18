@@ -11,12 +11,23 @@ import {
   removerInscricao,
   criarAula,
   moverAula,
+  duplicarMinicurso,
+  aprovarPreInscricoes,
+  recusarPreInscricoes,
 } from '../acoes'
+import { definirMinistrantes } from '../acoes-presenca'
 
 type Inscrito = { id: string; nome: string; email: string; matricula: string | null; certificado: boolean }
 type Aula = { id: string; titulo: string; publicada: boolean }
+type Pendente = { id: string; nome: string; email: string; matricula: string | null }
+type Opcao = { id: string; nome: string }
 type M = {
   id: string
+  slug: string
+  inscricoesAbertas: boolean
+  modeloCertificadoId: string | null
+  ministrantes: string[]
+  pendentes: Pendente[]
   titulo: string
   descricao: string
   cargaHoraria: number | null
@@ -74,12 +85,16 @@ function NovoMinicurso() {
   )
 }
 
-function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
+function CartaoMinicurso({ m, podeApagar, modelos, pessoas }: { m: M; podeApagar: boolean; modelos: Opcao[]; pessoas: Opcao[] }) {
   const router = useRouter()
   const [titulo, setTitulo] = useState(m.titulo)
   const [carga, setCarga] = useState(m.cargaHoraria?.toString() ?? '')
   const [ativo, setAtivo] = useState(m.ativo)
   const [descricao, setDescricao] = useState(m.descricao)
+  const [abertas, setAbertas] = useState(m.inscricoesAbertas)
+  const [modeloId, setModeloId] = useState(m.modeloCertificadoId ?? '')
+  const [ministrantes, setMinistrantes] = useState<string[]>(m.ministrantes)
+  const [selecionados, setSelecionados] = useState<string[]>([])
   const [novaAula, setNovaAula] = useState('')
   const [lista, setLista] = useState('')
   const [msg, setMsg] = useState<Msg>(null)
@@ -107,6 +122,8 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
           {m.inscricoes.length} inscrito(s) · {enviados} certificado(s) enviado(s)
         </span>
         {!m.ativo && <span className="tag" style={{ marginLeft: 8 }}>inativo</span>}
+        {m.inscricoesAbertas && <span className="tag" style={{ marginLeft: 8, background: 'var(--amarelo)' }}>inscrições abertas</span>}
+        {m.pendentes.length > 0 && <span className="tag" style={{ marginLeft: 8, background: 'var(--laranja)' }}>{m.pendentes.length} pedido(s)</span>}
       </summary>
 
       {msg && <p className={msg.ok ? 'aviso-ok' : 'aviso-erro'}>{msg.texto}</p>}
@@ -136,11 +153,53 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
           type="button"
           className="btn btn-claro"
           disabled={pendente}
-          onClick={() => agir(() => atualizarMinicurso(m.id, { titulo, descricao, cargaHoraria: horas(carga), ativo }))}
+          onClick={() =>
+            agir(() =>
+              atualizarMinicurso(m.id, {
+                titulo,
+                descricao,
+                cargaHoraria: horas(carga),
+                ativo,
+                inscricoesAbertas: abertas,
+                modeloCertificadoId: modeloId || null,
+              })
+            )
+          }
         >
           Salvar
         </button>
       </div>
+
+      <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'flex-end', margin: '0 0 14px' }}>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', paddingBottom: 8 }}>
+          <input type="checkbox" checked={abertas} onChange={(e) => setAbertas(e.target.checked)} />
+          <span style={{ font: '400 14px var(--corpo)' }}>Inscrições abertas no site</span>
+        </label>
+        <label className="campo" style={{ margin: 0, minWidth: 240 }}>
+          <span>Modelo do certificado</span>
+          <select value={modeloId} onChange={(e) => setModeloId(e.target.value)}>
+            <option value="">Padrão do site</option>
+            {modelos.map((o) => (
+              <option key={o.id} value={o.id}>{o.nome}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {m.inscricoesAbertas && (
+        <p className="dica" style={{ marginBottom: 14 }}>
+          Link do formulário de inscrição: <strong>/inscricao/{m.slug}</strong>{' '}
+          <button
+            type="button"
+            className="mini"
+            style={{ margin: '0 8px' }}
+            onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/inscricao/${m.slug}`).then(() => setMsg({ ok: true, texto: 'Link copiado.' }))}
+          >
+            copiar
+          </button>
+          <br />
+          A lista de todos os minicursos abertos fica em /inscricao. Clique em Salvar acima pra aplicar as mudanças desta área.
+        </p>
+      )}
 
       <label className="campo">
         <span>Descrição (opcional)</span>
@@ -205,6 +264,83 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
       <p className="dica" style={{ margin: '8px 0 22px' }}>
         Cada aula é uma página só pra alunos deste minicurso: no editor você adiciona vídeo (YouTube), apresentação em HTML, botões com link
         (como o repositório do GitHub) e mais. O aluno só vê a aula depois que você clicar em Publicar.
+      </p>
+
+      {m.pendentes.length > 0 && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', margin: '6px 0 8px' }}>
+            <h3 style={{ fontSize: 15, textTransform: 'uppercase', margin: 0 }}>Pedidos de inscrição ({m.pendentes.length})</h3>
+            <button
+              type="button"
+              className="btn"
+              disabled={pendente}
+              onClick={() => agir(() => aprovarPreInscricoes(m.id, selecionados.length ? selecionados : null))}
+            >
+              {selecionados.length ? `Aprovar ${selecionados.length} selecionado(s)` : 'Aprovar todos'}
+            </button>
+            {selecionados.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-perigo"
+                disabled={pendente}
+                onClick={() => {
+                  if (confirm(`Recusar ${selecionados.length} pedido(s)? Os dados são apagados.`)) agir(() => recusarPreInscricoes(m.id, selecionados), () => setSelecionados([]))
+                }}
+              >
+                Recusar selecionados
+              </button>
+            )}
+          </div>
+          <table className="tabela" style={{ marginBottom: 20 }}>
+            <thead>
+              <tr><th></th><th>Nome</th><th>E-mail</th><th>Matrícula</th></tr>
+            </thead>
+            <tbody>
+              {m.pendentes.map((p) => (
+                <tr key={p.id}>
+                  <td style={{ width: 36 }}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Selecionar ${p.nome}`}
+                      checked={selecionados.includes(p.id)}
+                      onChange={(e) => setSelecionados((a) => (e.target.checked ? [...a, p.id] : a.filter((x) => x !== p.id)))}
+                    />
+                  </td>
+                  <td>{p.nome}</td>
+                  <td style={{ font: '400 13px var(--corpo)' }}>{p.email}</td>
+                  <td style={{ font: '400 13px var(--corpo)' }}>{p.matricula ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      <h3 style={{ fontSize: 15, textTransform: 'uppercase', margin: '6px 0 8px' }}>Ministrantes e presença</h3>
+      {pessoas.length === 0 ? (
+        <p className="dica">Nenhuma pessoa do grupo disponível.</p>
+      ) : (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', marginBottom: 10 }}>
+          {pessoas.map((o) => (
+            <label key={o.id} style={{ display: 'flex', gap: 6, alignItems: 'center', font: '400 14px var(--corpo)' }}>
+              <input
+                type="checkbox"
+                checked={ministrantes.includes(o.id)}
+                onChange={(e) => setMinistrantes((a) => (e.target.checked ? [...a, o.id] : a.filter((x) => x !== o.id)))}
+              />
+              {o.nome}
+            </label>
+          ))}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <button type="button" className="btn btn-claro" disabled={pendente} onClick={() => agir(() => definirMinistrantes(m.id, ministrantes))}>
+          Salvar ministrantes
+        </button>
+        <Link href={`/admin/presenca/${m.id}`} className="btn btn-claro">Abrir presença</Link>
+      </div>
+      <p className="dica" style={{ margin: '0 0 22px' }}>
+        Ministrantes (pessoas do grupo) marcam a presença dos alunos em Presença. Administradores acessam qualquer turma.
       </p>
 
       <label className="campo">
@@ -276,8 +412,20 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
         </>
       )}
 
-      {podeApagar && (
-        <div style={{ marginTop: 22, paddingTop: 14, borderTop: '1px solid rgba(44,43,34,0.12)' }}>
+      <div style={{ marginTop: 22, paddingTop: 14, borderTop: '1px solid rgba(44,43,34,0.12)', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="btn btn-claro"
+          disabled={pendente}
+          onClick={() => {
+            if (confirm(`Duplicar "${m.titulo}"? A cópia leva as aulas (como rascunho), mas não leva inscritos, certificados nem presenças.`)) {
+              agir(() => duplicarMinicurso(m.id))
+            }
+          }}
+        >
+          Duplicar minicurso
+        </button>
+        {podeApagar && (
           <button
             type="button"
             className="btn btn-perigo"
@@ -290,19 +438,29 @@ function CartaoMinicurso({ m, podeApagar }: { m: M; podeApagar: boolean }) {
           >
             Apagar minicurso
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </details>
   )
 }
 
-export function Minicursos({ minicursos, podeApagar }: { minicursos: M[]; podeApagar: boolean }) {
+export function Minicursos({
+  minicursos,
+  podeApagar,
+  modelos,
+  pessoas,
+}: {
+  minicursos: M[]
+  podeApagar: boolean
+  modelos: Opcao[]
+  pessoas: Opcao[]
+}) {
   return (
     <>
       <NovoMinicurso />
       {minicursos.length === 0 && <p className="dica">Nenhum minicurso criado ainda.</p>}
       {minicursos.map((m) => (
-        <CartaoMinicurso key={m.id} m={m} podeApagar={podeApagar} />
+        <CartaoMinicurso key={m.id} m={m} podeApagar={podeApagar} modelos={modelos} pessoas={pessoas} />
       ))}
     </>
   )

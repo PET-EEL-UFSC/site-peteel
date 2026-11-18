@@ -4,18 +4,29 @@ import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { enviarCertificado, registrarCertificado, removerCertificado } from '../acoes'
+import { liberarCertificado, bloquearCertificado, liberarCertificados } from '../acoes-certificados'
+import { percentualDePresenca } from '@/lib/presenca'
 
 /** Mesma razão de existir do equivalente em EnvioApresentacao: contornar o teto de 4,5 MB de Server Action da Vercel. */
 const USA_BLOB = process.env.NEXT_PUBLIC_STORAGE === 'blob'
 const TAMANHO_MAX = 8 * 1024 * 1024
 
-type Linha = { id: string; nome: string; email: string; arquivo: string | null }
+type Estado = 'pendente' | 'gerado' | 'enviado'
+type Linha = { id: string; nome: string; email: string; estado: Estado; arquivo: string | null; presencas: number }
+type Msg = { ok: boolean; texto: string } | null
 
-function LinhaCertificado({ l }: { l: Linha }) {
+function LinhaCertificado({ l, encontros }: { l: Linha; encontros: number }) {
   const router = useRouter()
   const input = useRef<HTMLInputElement>(null)
-  const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null)
+  const [msg, setMsg] = useState<Msg>(null)
   const [pendente, iniciar] = useTransition()
+
+  const agir = (fn: () => Promise<{ ok: boolean; mensagem?: string; erro?: string }>) =>
+    iniciar(async () => {
+      const r = await fn()
+      setMsg(r.ok ? null : { ok: false, texto: r.erro ?? 'não consegui concluir' })
+      if (r.ok) router.refresh()
+    })
 
   const enviar = (arquivo: File) => {
     if (!/\.pdf$/i.test(arquivo.name)) return setMsg({ ok: false, texto: 'Envie um arquivo .pdf.' })
@@ -40,7 +51,7 @@ function LinhaCertificado({ l }: { l: Linha }) {
           fd.set('arquivo', arquivo)
           r = await enviarCertificado(l.id, fd)
         }
-        setMsg(r.ok ? { ok: true, texto: 'Enviado.' } : { ok: false, texto: r.erro })
+        setMsg(r.ok ? null : { ok: false, texto: r.erro })
         if (r.ok) router.refresh()
       } catch (e) {
         setMsg({ ok: false, texto: (e as Error).message || 'não consegui enviar o arquivo' })
@@ -50,80 +61,146 @@ function LinhaCertificado({ l }: { l: Linha }) {
     })
   }
 
+  const abrir = (
+    <a href={`/api/admin/certificado/${l.id}`} target="_blank" rel="noopener noreferrer" className="btn btn-claro">
+      Abrir
+    </a>
+  )
+  const seletor = (rotulo: string) => (
+    <label className="btn btn-claro" style={{ cursor: pendente ? 'wait' : 'pointer', display: 'inline-block' }}>
+      {pendente ? 'Enviando…' : rotulo}
+      <input
+        ref={input}
+        type="file"
+        accept="application/pdf,.pdf"
+        disabled={pendente}
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const arquivo = e.target.files?.[0]
+          if (arquivo) enviar(arquivo)
+        }}
+      />
+    </label>
+  )
+
   return (
     <tr>
       <td>
         {l.nome}
         <div style={{ font: '400 12.5px var(--corpo)', color: 'rgba(44,43,34,0.6)' }}>{l.email}</div>
       </td>
+      <td style={{ font: '400 13px var(--corpo)', whiteSpace: 'nowrap' }}>
+        {encontros > 0 ? `${l.presencas}/${encontros} (${percentualDePresenca(l.presencas, encontros)}%)` : '—'}
+      </td>
       <td style={{ font: '400 13px var(--corpo)' }}>
-        {l.arquivo ? (
+        {l.estado === 'pendente' && <span style={{ color: 'rgba(44,43,34,0.6)' }}>pendente</span>}
+        {l.estado === 'gerado' && <span className="tag" style={{ background: 'var(--amarelo)' }}>liberado</span>}
+        {l.estado === 'enviado' && (
           <>
-            <span className="tag" style={{ background: 'var(--amarelo)' }}>enviado</span>{' '}
-            <a href={`/api/admin/certificado/${l.id}`} target="_blank" rel="noopener noreferrer">{l.arquivo}</a>
+            <span className="tag" style={{ background: 'var(--amarelo)' }}>PDF próprio</span> {l.arquivo}
           </>
-        ) : (
-          <span style={{ color: 'rgba(44,43,34,0.6)' }}>pendente</span>
         )}
         {msg && <p className={msg.ok ? 'aviso-ok' : 'aviso-erro'} style={{ marginTop: 6 }}>{msg.texto}</p>}
       </td>
-      <td style={{ whiteSpace: 'nowrap' }}>
-        <label className="btn btn-claro" style={{ cursor: pendente ? 'wait' : 'pointer', display: 'inline-block' }}>
-          {pendente ? 'Enviando…' : l.arquivo ? 'Trocar PDF' : 'Enviar PDF'}
-          <input
-            ref={input}
-            type="file"
-            accept="application/pdf,.pdf"
-            disabled={pendente}
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              const arquivo = e.target.files?.[0]
-              if (arquivo) enviar(arquivo)
-            }}
-          />
-        </label>
-        {l.arquivo && (
-          <button
-            type="button"
-            className="btn btn-perigo"
-            style={{ marginLeft: 8 }}
-            disabled={pendente}
-            onClick={() => {
-              if (!confirm(`Remover o certificado de ${l.nome}? O arquivo é apagado.`)) return
-              iniciar(async () => {
-                const r = await removerCertificado(l.id)
-                setMsg({ ok: r.ok, texto: r.ok ? r.mensagem : r.erro })
-                if (r.ok) router.refresh()
-              })
-            }}
-          >
-            Remover
-          </button>
+      <td style={{ whiteSpace: 'nowrap', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {l.estado === 'pendente' && (
+          <>
+            <button type="button" className="btn" disabled={pendente} onClick={() => agir(() => liberarCertificado(l.id))}>Liberar</button>
+            {seletor('Enviar PDF próprio')}
+          </>
+        )}
+        {l.estado === 'gerado' && (
+          <>
+            {abrir}
+            <button type="button" className="btn btn-claro" disabled={pendente} onClick={() => agir(() => bloquearCertificado(l.id))}>Bloquear</button>
+            {seletor('Enviar PDF próprio')}
+          </>
+        )}
+        {l.estado === 'enviado' && (
+          <>
+            {abrir}
+            {seletor('Trocar PDF')}
+            <button
+              type="button"
+              className="btn btn-perigo"
+              disabled={pendente}
+              onClick={() => {
+                if (confirm(`Remover o PDF de ${l.nome}? O arquivo é apagado e o certificado volta a ficar pendente.`)) agir(() => removerCertificado(l.id))
+              }}
+            >
+              Remover PDF
+            </button>
+          </>
         )}
       </td>
     </tr>
   )
 }
 
-export function CertificadosMinicurso({ inscricoes }: { inscricoes: Linha[] }) {
-  const enviados = inscricoes.filter((i) => i.arquivo).length
+export function CertificadosMinicurso({ minicursoId, encontros, inscricoes }: { minicursoId: string; encontros: number; inscricoes: Linha[] }) {
+  const router = useRouter()
+  const [minimo, setMinimo] = useState('75')
+  const [msg, setMsg] = useState<Msg>(null)
+  const [pendente, iniciar] = useTransition()
+
+  const liberados = inscricoes.filter((i) => i.estado !== 'pendente').length
+  const faltam = inscricoes.length - liberados
 
   if (inscricoes.length === 0) return <p className="dica">Este minicurso ainda não tem inscritos.</p>
 
+  const emLote = (minimoPercentual: number | null) =>
+    iniciar(async () => {
+      const r = await liberarCertificados(minicursoId, minimoPercentual)
+      setMsg({ ok: r.ok, texto: (r.ok ? r.mensagem : r.erro) ?? '' })
+      if (r.ok) router.refresh()
+    })
+
   return (
     <>
-      <p className="dica" style={{ marginBottom: 10 }}>{enviados} de {inscricoes.length} certificado(s) enviado(s).</p>
+      <div className="cartao" style={{ padding: 16, marginBottom: 16, display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <button
+          type="button"
+          className="btn"
+          disabled={pendente || faltam === 0}
+          onClick={() => {
+            if (confirm(`Liberar o certificado dos ${faltam} alunos que ainda estão pendentes?`)) emLote(null)
+          }}
+        >
+          Liberar todos os pendentes
+        </button>
+        <label className="campo" style={{ margin: 0 }}>
+          <span>Frequência mínima (%)</span>
+          <input type="number" min={1} max={100} value={minimo} onChange={(e) => setMinimo(e.target.value)} style={{ width: 90 }} />
+        </label>
+        <button
+          type="button"
+          className="btn btn-claro"
+          disabled={pendente || faltam === 0 || encontros === 0}
+          title={encontros === 0 ? 'Registre os encontros e as presenças primeiro' : undefined}
+          onClick={() => emLote(parseInt(minimo, 10) || 0)}
+        >
+          Liberar quem atingiu a frequência
+        </button>
+        <p className="dica" style={{ margin: 0, flex: '1 1 260px' }}>
+          {encontros === 0
+            ? 'Sem encontros registrados, a frequência não pode ser usada. Marque a presença em Presença.'
+            : `${encontros} encontro(s) registrado(s). ${liberados} de ${inscricoes.length} certificado(s) liberado(s).`}
+        </p>
+      </div>
+      {msg && <p className={msg.ok ? 'aviso-ok' : 'aviso-erro'} style={{ marginBottom: 12 }}>{msg.texto}</p>}
+
       <table className="tabela">
         <thead>
           <tr>
             <th>Aluno</th>
+            <th>Frequência</th>
             <th>Certificado</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {inscricoes.map((l) => (
-            <LinhaCertificado key={l.id} l={l} />
+            <LinhaCertificado key={l.id} l={l} encontros={encontros} />
           ))}
         </tbody>
       </table>

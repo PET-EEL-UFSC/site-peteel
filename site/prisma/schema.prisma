@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   // Neon (e qualquer Postgres com pooler): a aplicação usa a URL pooled,
   // as migrações precisam de conexão direta — pooler não roda DDL.
   url       = env("DATABASE_URL")
@@ -20,9 +20,9 @@ datasource db {
 // e-mail que não exista aqui.
 
 enum Papel {
-  ADMIN  // gerencia pessoas e publica
+  ADMIN // gerencia pessoas e publica
   EDITOR // edita e salva rascunho
-  ALUNO  // aluno de minicurso: só enxerga a área do aluno, nunca o painel
+  ALUNO // aluno de minicurso: só enxerga a área do aluno, nunca o painel
 }
 
 model User {
@@ -34,9 +34,9 @@ model User {
 
   // menor privilégio por padrão: quem for criado sem papel explícito não
   // chega no painel (os convites de admin/editor sempre definem o papel)
-  papel     Papel   @default(ALUNO)
-  ativo     Boolean @default(true) // desliga o acesso sem apagar o histórico
-  gestao    String? // "2026.1" — de qual gestão a pessoa é, para a lista do admin
+  papel  Papel   @default(ALUNO)
+  ativo  Boolean @default(true) // desliga o acesso sem apagar o histórico
+  gestao String? // "2026.1" — de qual gestão a pessoa é, para a lista do admin
 
   convidadoPorId String?
   convidadoPor   User?   @relation("Convites", fields: [convidadoPorId], references: [id], onDelete: SetNull)
@@ -45,12 +45,13 @@ model User {
   primeiroAcesso DateTime?
   criadoEm       DateTime  @default(now())
 
-  accounts Account[]
-  sessions Session[]
-  revisoes PaginaRevisao[]
-  midias   Midia[]
-  documentos Documento[]
+  accounts      Account[]
+  sessions      Session[]
+  revisoes      PaginaRevisao[]
+  midias        Midia[]
+  documentos    Documento[]
   apresentacoes Apresentacao[]
+  ministra      MinicursoMinistrante[]
 
   @@index([ativo])
 }
@@ -172,7 +173,8 @@ model Midia {
 
   criadoEm DateTime @default(now())
 
-  petianos Petiano[]
+  petianos           Petiano[]
+  modelosCertificado ModeloCertificado[]
 
   @@index([criadoEm])
 }
@@ -229,10 +231,21 @@ model Minicurso {
   cargaHoraria Int? // horas, mostrado ao aluno
   ativo        Boolean @default(true) // desligado: as aulas somem da área do aluno
 
+  // Formulário público de inscrição (/inscricao/<slug>). Fechado por padrão:
+  // só abre quando alguém liga de propósito.
+  inscricoesAbertas Boolean @default(false)
+
+  // Modelo visual do certificado gerado. Vazio = modelo padrão do site.
+  modeloCertificadoId String?
+  modeloCertificado   ModeloCertificado? @relation(fields: [modeloCertificadoId], references: [id], onDelete: SetNull)
+
   criadoEm DateTime @default(now())
 
-  paginas    Pagina[]
-  inscricoes Inscricao[]
+  paginas       Pagina[]
+  inscricoes    Inscricao[]
+  preInscricoes PreInscricao[]
+  encontros     Encontro[]
+  ministrantes  MinicursoMinistrante[]
 }
 
 // Quem pode entrar na área do aluno. O e-mail é o do Google que a pessoa
@@ -256,18 +269,96 @@ model Inscricao {
   minicursoId String
   minicurso   Minicurso @relation(fields: [minicursoId], references: [id], onDelete: Cascade)
 
-  // Certificado em PDF, feito e assinado pelo grupo e enviado pelo painel.
-  // Tem nome do aluno, então só sai pelo servidor, depois de conferir de
-  // quem é: `certificadoUrl` nunca vai pro navegador.
-  certificadoEm    DateTime? // quando o PDF foi enviado; preenchido = aluno já pode baixar
-  certificadoChave String? // caminho no storage (Blob/local)
+  // Certificado liberado: `certificadoEm` preenchido = o aluno já pode baixar.
+  // Se há um PDF enviado à mão (certificadoUrl), é ele que sai; senão o site
+  // gera o PDF na hora, pelo modelo do minicurso. Tem nome do aluno, então só
+  // sai pelo servidor, depois de conferir de quem é: `certificadoUrl` nunca
+  // vai pro navegador.
+  certificadoEm    DateTime? // quando foi liberado (ou enviado)
+  certificadoChave String? // caminho no storage (Blob/local), só no PDF enviado
   certificadoUrl   String?
   certificadoNome  String? // nome original do arquivo, só pra conferência no painel
 
   criadoEm DateTime @default(now())
 
+  presencas Presenca[]
+
   @@unique([alunoId, minicursoId])
   @@index([minicursoId])
+}
+
+// Pedido feito no formulário público, esperando aprovação de quem organiza.
+// Só vira Aluno/Inscricao quando aprovado, e é apagado em seguida (recusado
+// também): dado pessoal de quem não entrou não fica parado no banco.
+model PreInscricao {
+  id          String    @id @default(cuid())
+  minicursoId String
+  minicurso   Minicurso @relation(fields: [minicursoId], references: [id], onDelete: Cascade)
+
+  email     String
+  nome      String
+  matricula String?
+
+  criadoEm DateTime @default(now())
+
+  @@unique([minicursoId, email])
+  @@index([minicursoId, criadoEm])
+}
+
+// Modelo visual do certificado: imagem de fundo (da biblioteca de Imagens,
+// PNG ou JPG em A4 paisagem) + caixas de texto com posição, tamanho e cor.
+model ModeloCertificado {
+  id   String @id @default(cuid())
+  nome String
+
+  // Restrict: apagar a imagem da biblioteca deixaria o modelo sem fundo sem aviso
+  fundoMidiaId String?
+  fundoMidia   Midia?  @relation(fields: [fundoMidiaId], references: [id], onDelete: Restrict)
+
+  caixas Json // lista validada por caixasSchema (src/lib/certificado-modelo.ts)
+
+  criadoEm DateTime @default(now())
+
+  minicursos Minicurso[]
+}
+
+// Ministrante: pessoa do grupo (User ADMIN/EDITOR) que dá o minicurso e
+// marca a presença dos alunos.
+model MinicursoMinistrante {
+  minicursoId String
+  minicurso   Minicurso @relation(fields: [minicursoId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([minicursoId, userId])
+  @@index([userId])
+}
+
+// Um encontro (dia de aula) do minicurso.
+model Encontro {
+  id          String    @id @default(cuid())
+  minicursoId String
+  minicurso   Minicurso @relation(fields: [minicursoId], references: [id], onDelete: Cascade)
+
+  data   DateTime @db.Date
+  titulo String?
+
+  criadoEm DateTime @default(now())
+
+  presencas Presenca[]
+
+  @@index([minicursoId, data])
+}
+
+// Existir a linha = o aluno esteve presente naquele encontro.
+model Presenca {
+  encontroId  String
+  encontro    Encontro  @relation(fields: [encontroId], references: [id], onDelete: Cascade)
+  inscricaoId String
+  inscricao   Inscricao @relation(fields: [inscricaoId], references: [id], onDelete: Cascade)
+
+  @@id([encontroId, inscricaoId])
+  @@index([inscricaoId])
 }
 
 // Aparece em toda página (rodapé, contato, redes). Linha única.
@@ -287,9 +378,9 @@ model Config {
   spotify   String?
 
   // Faixa de aviso no topo ("Sexta, 12h10 — seminário semanal")
-  avisoTexto  String?
-  avisoLink   String?
-  avisoAtivo  Boolean @default(false)
+  avisoTexto String?
+  avisoLink  String?
+  avisoAtivo Boolean @default(false)
 
   atualizadoEm DateTime @updatedAt
 }
@@ -300,11 +391,11 @@ model Config {
 // Ex-PETianos: quem saiu tem `saiuEm` preenchido.
 
 model Petiano {
-  id     String  @id @default(cuid())
-  nome   String
-  cargo  String  // "Coord. de Pesquisa", "Docente EEL"
-  tutor  Boolean @default(false)
-  bio    String?
+  id    String  @id @default(cuid())
+  nome  String
+  cargo String // "Coord. de Pesquisa", "Docente EEL"
+  tutor Boolean @default(false)
+  bio   String?
 
   fotoId String?
   foto   Midia?  @relation(fields: [fotoId], references: [id], onDelete: SetNull)
@@ -316,9 +407,9 @@ model Petiano {
   saiuEm   DateTime? // preenchido = ex-petiano
   destino  String? // "Mestrado UFSC", "Engenheira na WEG" — só para egressos
 
-  lattes    String?
-  linkedin  String?
-  email     String?
+  lattes   String?
+  linkedin String?
+  email    String?
 
   ordem    Int      @default(0)
   criadoEm DateTime @default(now())

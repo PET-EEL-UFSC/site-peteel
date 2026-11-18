@@ -73,7 +73,7 @@ export function caminhoSeguro(de: string | null | undefined, padrao: string): st
 }
 
 /** Primeiros segmentos que pertencem a rotas do sistema: página pública não pode ocupá-los. */
-const SEGMENTOS_RESERVADOS = ['aluno', 'admin', 'api', 'entrar', 'previa', 'apresentacao', 'marca', 'uploads']
+const SEGMENTOS_RESERVADOS = ['aluno', 'admin', 'api', 'entrar', 'previa', 'apresentacao', 'inscricao', 'marca', 'uploads']
 
 export function slugReservado(slug: string): boolean {
   const primeiro = slug.replace(/^\//, '').split('/')[0]
@@ -162,6 +162,10 @@ export const PERMISSOES = {
   // dos petianos (quem organiza o minicurso precisa operar sem depender do
   // admin); pra restringir só aos admins, troque a lista abaixo.
   gerenciarMinicursos: ['ADMIN', 'EDITOR'],
+
+  // presença é de quem ministra: além desta permissão, as ações conferem se a
+  // pessoa é ministrante daquele minicurso (admin vale pra todos)
+  registrarPresenca: ['ADMIN', 'EDITOR'],
 
   // a lista de petianos é conteúdo do site: quem entra no grupo em março
   // precisa aparecer na página sem depender do admin
