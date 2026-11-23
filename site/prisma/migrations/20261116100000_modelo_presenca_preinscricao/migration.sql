@@ -90,14 +90,3 @@ ALTER TABLE "Presenca" ADD CONSTRAINT "Presenca_encontroId_fkey" FOREIGN KEY ("e
 
 -- AddForeignKey
 ALTER TABLE "Presenca" ADD CONSTRAINT "Presenca_inscricaoId_fkey" FOREIGN KEY ("inscricaoId") REFERENCES "Inscricao"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-┌─────────────────────────────────────────────────────────┐
-│  Update available 6.19.3 -> 8.0.0-rc.33                 │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘
-
