@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
 import { caminhoSeguro, mensagemDeErro } from '@/lib/auth/acesso'
 
-export const metadata = { title: 'Entrar' }
+export const metadata = { title: 'Entrar', robots: { index: false, follow: false } }
 
 type Props = { searchParams: Promise<{ erro?: string; error?: string; de?: string }> }
 

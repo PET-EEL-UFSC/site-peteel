@@ -16,7 +16,7 @@ async function buscar(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const m = await buscar(slug)
-  return { title: m ? `Inscrição: ${m.titulo}` : 'Inscrição' }
+  return { title: m ? `Inscrição: ${m.titulo}` : 'Inscrição', alternates: { canonical: `/inscricao/${slug}` } }
 }
 
 export default async function Inscricao({ params }: Props) {

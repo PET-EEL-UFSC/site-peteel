@@ -78,7 +78,7 @@ git push -u origin main
 | `DATABASE_URL` | a pooled do passo 1 |
 | `DIRECT_URL` | a direta do passo 1 |
 | `AUTH_SECRET` | o do passo 2 |
-| `NEXTAUTH_URL` | `https://SEU-PROJETO.vercel.app` (ajuste depois se usar domínio próprio) |
+| `NEXTAUTH_URL` | `https://SEU-PROJETO.vercel.app` (ou o domínio próprio, ver "Domínio próprio") |
 | `ADMIN_INICIAL` | o Gmail do primeiro administrador |
 | `STORAGE` | `blob` |
 | `NEXT_PUBLIC_STORAGE` | `blob` — sem essa, upload de foto/currículo acima de uns 4 MB quebra (teto de corpo de requisição da Vercel) |
@@ -158,14 +158,65 @@ Google funcionando não há motivo para o código continuar existindo.
 
 ---
 
-## Domínio da UFSC
+## Domínio próprio (peteel.com.br)
+
+O site está em `www.peteel.com.br`. Para repetir ou trocar de domínio:
+
+1. **Vercel → Settings → Domains → Add**: adicione o domínio com `www` e o
+   sem `www` (a Vercel redireciona um para o outro).
+2. No provedor do domínio (GoDaddy), em **DNS**, crie o que a Vercel
+   mostrar na tela de Domains. No nosso caso:
+
+   | Tipo | Nome | Valor |
+   | --- | --- | --- |
+   | A | `@` | `216.198.79.1` |
+   | CNAME | `www` | o valor que a Vercel mostra (termina em `vercel-dns-017.com.`) |
+
+   Apague registros antigos de `@` e `www` que conflitem (o A e o CNAME do
+   estacionamento do provedor). A propagação leva de minutos a algumas horas.
+3. Atualize:
+   - `NEXTAUTH_URL` na Vercel para `https://www.peteel.com.br` (e faça redeploy)
+   - no Google Cloud, **Origens JavaScript** com `https://www.peteel.com.br` e
+     **URIs de redirecionamento** com `https://www.peteel.com.br/api/auth/callback/google`
+
+O `NEXTAUTH_URL` também define o endereço canônico, o `sitemap.xml` e o
+`robots.txt` (`src/lib/site-url.ts`). Se faltar, vale
+`https://www.peteel.com.br`.
 
 Se o PET conseguir algo como `peteel.ufsc.br`, peça à TI um **CNAME**
-apontando para `cname.vercel-dns.com`, adicione o domínio em
-Vercel → Settings → Domains, e depois atualize:
+apontando para o valor que a Vercel indicar e repita os passos 1 e 3.
 
-- `NEXTAUTH_URL` para o novo endereço
-- as duas listas no Google Cloud (origens e redirecionamento)
+## Buscadores
+
+- `/sitemap.xml` lista as páginas publicadas e as inscrições abertas; fica
+  sempre atualizado com o painel.
+- `/robots.txt` barra `/admin`, `/aluno`, `/api`, `/entrar`, `/previa` e
+  `/apresentacao`, que também têm `noindex`. Páginas de minicurso nunca entram.
+- Opcional: cadastre o site no **Google Search Console** e envie o
+  `sitemap.xml` para acelerar a indexação.
+
+## Migrations e erros de deploy
+
+O build roda `prisma migrate deploy`. Ao criar uma migration:
+
+- Gere o SQL e **abra o arquivo** antes de subir: avisos do Prisma (como
+  "Update available…") já foram parar dentro dele e quebraram o deploy.
+- Se uma migration falhar na Vercel, o banco a guarda como falha e **todos
+  os deploys seguintes** param com `P3009`. Depois de corrigir o arquivo,
+  limpe a marca com a URL **direta** do banco (sem `-pooler`):
+
+  ```powershell
+  $env:DATABASE_URL = "<URL direta>"
+  $env:DIRECT_URL = $env:DATABASE_URL
+  npx prisma migrate resolve --rolled-back NOME_DA_MIGRATION
+  ```
+
+  e faça um novo deploy.
+- Na Vercel, `DATABASE_URL` (pooled, com
+  `&pgbouncer=true&connection_limit=5&pool_timeout=20`) e `DIRECT_URL`
+  (direta) são variáveis do tipo *Secret*: não dá para ver, só substituir.
+  Ao trocar a senha do banco, atualize as duas e faça redeploy.
+- O log completo do build sai com `npx vercel inspect <id-do-deploy> --logs`.
 
 ## Passar o site para a próxima gestão
 

@@ -6,7 +6,7 @@ import { pode } from '@/lib/auth/acesso'
 import { signOut } from '@/auth'
 import './admin.css'
 
-export const metadata = { title: 'Painel' }
+export const metadata = { title: 'Painel', robots: { index: false, follow: false } }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const u = await exigirUsuario()

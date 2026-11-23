@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { titulo: true, descricao: true, status: true, minicursoId: true },
   })
   if (!pagina || pagina.status !== 'PUBLICADA' || pagina.minicursoId) return {}
-  return { title: pagina.titulo, description: pagina.descricao ?? undefined }
+  return { title: pagina.titulo, description: pagina.descricao ?? undefined, alternates: { canonical: slugDe(slug) } }
 }
 
 export default async function Pagina({ params }: Props) {

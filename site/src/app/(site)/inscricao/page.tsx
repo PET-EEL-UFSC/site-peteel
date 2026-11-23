@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { db } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Inscrições em minicursos' }
+export const metadata = { title: 'Inscrições em minicursos', alternates: { canonical: '/inscricao' } }
 
 export default async function Inscricoes() {
   // só título e carga horária dos minicursos com inscrição aberta
