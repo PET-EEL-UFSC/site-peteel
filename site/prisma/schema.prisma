@@ -400,6 +400,13 @@ model Petiano {
   fotoId String?
   foto   Midia?  @relation(fields: [fotoId], references: [id], onDelete: SetNull)
 
+  // Enquadramento da foto dentro do card: o ponto da imagem (em %) que fica
+  // alinhado ao mesmo ponto do quadro, e o zoom (100 = sem zoom, até 300).
+  // Os padrões reproduzem o corte de sempre (centralizado, sem zoom).
+  fotoX    Float @default(50)
+  fotoY    Float @default(50)
+  fotoZoom Int   @default(100)
+
   curriculoId String?
   curriculo   Documento? @relation(fields: [curriculoId], references: [id], onDelete: SetNull)
 

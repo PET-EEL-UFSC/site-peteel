@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import type { FotoRef } from '@/lib/content/elementos'
 
-export type OpcaoMidia = { id: string; url: string; alt: string }
+export type OpcaoMidia = { id: string; url: string; alt: string; largura?: number; altura?: number }
 
 export function EscolhaFoto({ rotulo, valor, midias, onChange }: { rotulo: string; valor: FotoRef; midias: OpcaoMidia[]; onChange: (v: FotoRef) => void }) {
   const atual = valor.midiaId ? midias.find((m) => m.id === valor.midiaId) : undefined

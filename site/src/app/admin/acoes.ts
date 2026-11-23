@@ -7,6 +7,7 @@ import { db } from '@/lib/db'
 import { blocosSchema } from '@/lib/content/blocos'
 import { exigirPermissaoAction } from '@/lib/auth/sessao'
 import { emailSchema, pode, slugReservado } from '@/lib/auth/acesso'
+import { normalizarFoco } from '@/lib/enquadramento'
 import {
   blocosIniciaisDeAula,
   copiarBlocosParaMinicurso,
@@ -260,6 +261,11 @@ export async function salvarPetiano(formData: FormData): Promise<void> {
     tutor: formData.get('tutor') === 'on',
     bio: String(formData.get('bio') ?? '').trim() || null,
     fotoId: String(formData.get('fotoId') ?? '') || null,
+    // enquadramento da foto: valores fora do intervalo (ou lixo) viram o limite/padrão
+    ...(() => {
+      const f = normalizarFoco({ x: formData.get('fotoX'), y: formData.get('fotoY'), zoom: formData.get('fotoZoom') })
+      return { fotoX: f.x, fotoY: f.y, fotoZoom: f.zoom }
+    })(),
     linkedin: String(formData.get('linkedin') ?? '').trim() || null,
     email: String(formData.get('email') ?? '').trim() || null,
     saiuEm: formData.get('saiuEm') ? new Date(String(formData.get('saiuEm'))) : null,

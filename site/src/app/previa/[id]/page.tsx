@@ -35,7 +35,7 @@ export default async function Previa({ params }: { params: Promise<{ id: string 
     db.midia.findMany({ select: { id: true, url: true, alt: true, largura: true, altura: true }, take: 300 }),
     db.petiano.findMany({
       select: {
-        id: true, nome: true, cargo: true, tutor: true, bio: true, fotoId: true,
+        id: true, nome: true, cargo: true, tutor: true, bio: true, fotoId: true, fotoX: true, fotoY: true, fotoZoom: true,
         linkedin: true, email: true, saiuEm: true, curriculo: { select: { url: true } },
       },
       orderBy: [{ tutor: 'desc' }, { ordem: 'asc' }],

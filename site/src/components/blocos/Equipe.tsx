@@ -14,6 +14,9 @@ export type PetianoResolvido = {
   tutor: boolean
   bio: string | null
   fotoId: string | null
+  fotoX: number
+  fotoY: number
+  fotoZoom: number
   linkedin: string | null
   email: string | null
   /** data de saída preenchida no cadastro — não vem pro navegador, só o resultado */
@@ -75,7 +78,7 @@ export function Equipe({
           className="tutor-card"
           style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 34, alignItems: 'center', background: '#fff', border: '3px solid var(--escuro)', marginBottom: 46, overflow: 'hidden' }}
         >
-          <Foto midiaId={tutor.fotoId} legenda="foto do tutor" midias={midias} proporcao="4/5" sizes="(max-width: 900px) 100vw, 300px" />
+          <Foto midiaId={tutor.fotoId} legenda="foto do tutor" midias={midias} proporcao="4/5" sizes="(max-width: 900px) 100vw, 300px" foco={{ x: tutor.fotoX, y: tutor.fotoY, zoom: tutor.fotoZoom }} />
           <div style={{ padding: '32px 34px 34px 0' }}>
             <span style={{ display: 'inline-block', background: 'var(--amarelo)', color: 'var(--escuro)', padding: '6px 12px', font: '900 11px/1 var(--condensada)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
               {tutor.cargo}
@@ -121,7 +124,7 @@ export function Equipe({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 14 }}>
         {membros.map((p) => (
           <figure key={p.id} style={{ position: 'relative', margin: 0, border: '2px solid var(--escuro)', overflow: 'hidden' }}>
-            <Foto midiaId={p.fotoId} legenda={p.nome} midias={midias} proporcao="4/5" sizes="(max-width: 900px) 45vw, 220px" />
+            <Foto midiaId={p.fotoId} legenda={p.nome} midias={midias} proporcao="4/5" sizes="(max-width: 900px) 45vw, 220px" foco={{ x: p.fotoX, y: p.fotoY, zoom: p.fotoZoom }} />
             <figcaption
               style={{
                 position: 'absolute',

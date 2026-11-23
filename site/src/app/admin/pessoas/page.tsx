@@ -10,7 +10,7 @@ export default async function PessoasPage() {
       orderBy: [{ saiuEm: 'asc' }, { tutor: 'desc' }, { ordem: 'asc' }],
       include: { curriculo: { select: { url: true, nome: true } } },
     }),
-    db.midia.findMany({ select: { id: true, url: true, alt: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
+    db.midia.findMany({ select: { id: true, url: true, alt: true, largura: true, altura: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
   ])
 
   return (
@@ -22,7 +22,7 @@ export default async function PessoasPage() {
       <Pessoas
         petianos={petianos.map((p) => ({
           id: p.id, nome: p.nome, cargo: p.cargo, tutor: p.tutor, bio: p.bio,
-          fotoId: p.fotoId, ordem: p.ordem, destino: p.destino, linkedin: p.linkedin, email: p.email,
+          fotoId: p.fotoId, fotoX: p.fotoX, fotoY: p.fotoY, fotoZoom: p.fotoZoom, ordem: p.ordem, destino: p.destino, linkedin: p.linkedin, email: p.email,
           curriculo: p.curriculo,
           saiuEm: p.saiuEm ? p.saiuEm.toISOString().slice(0, 10) : null,
         }))}

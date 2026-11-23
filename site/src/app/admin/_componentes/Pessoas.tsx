@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { salvarPetiano, apagarPetiano, enviarCurriculo, removerCurriculo } from '../acoes'
 import type { OpcaoMidia } from './EscolhaFoto'
+import { EnquadrarFoto } from './EnquadrarFoto'
 
 /** Mesma razão de existir do equivalente em Biblioteca.tsx: contornar o teto de 4,5 MB de Server Action da Vercel. */
 const USA_BLOB = process.env.NEXT_PUBLIC_STORAGE === 'blob'
 
 type P = {
   id: string; nome: string; cargo: string; tutor: boolean; bio: string | null
-  fotoId: string | null; ordem: number; saiuEm: string | null; destino: string | null
+  fotoId: string | null; fotoX: number; fotoY: number; fotoZoom: number; ordem: number; saiuEm: string | null; destino: string | null
   linkedin: string | null; email: string | null; curriculo: { url: string; nome: string } | null
 }
 
@@ -118,15 +119,11 @@ function Ficha({ p, midias, aoFechar }: { p: P | null; midias: OpcaoMidia[]; aoF
           <input type="text" name="cargo" required defaultValue={p?.cargo ?? ''} placeholder="Ex: Coord. de Pesquisa" />
         </label>
 
-        <label className="campo">
-          <span>Foto</span>
-          <select name="fotoId" defaultValue={p?.fotoId ?? ''}>
-            <option value="">— sem foto —</option>
-            {midias.map((m) => (
-              <option key={m.id} value={m.id}>{m.alt}</option>
-            ))}
-          </select>
-        </label>
+        <EnquadrarFoto
+          midias={midias}
+          fotoIdInicial={p?.fotoId ?? ''}
+          focoInicial={{ x: p?.fotoX ?? 50, y: p?.fotoY ?? 50, zoom: p?.fotoZoom ?? 100 }}
+        />
 
         <label className="campo">
           <span>Descrição (opcional)</span>
@@ -227,7 +224,7 @@ export function Pessoas({ petianos, midias }: { petianos: P[]; midias: OpcaoMidi
       {editando === null ? (
         <button className="btn" style={{ marginBottom: 20 }} onClick={() => setEditando('nova')}>+ Nova pessoa</button>
       ) : (
-        <Ficha p={editando === 'nova' ? null : editando} midias={midias} aoFechar={() => setEditando(null)} />
+        <Ficha key={editando === 'nova' ? 'nova' : editando.id} p={editando === 'nova' ? null : editando} midias={midias} aoFechar={() => setEditando(null)} />
       )}
 
       <table className="tabela">
