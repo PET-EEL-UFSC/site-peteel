@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { corSchema } from './cores'
-import { elementoSchema } from './elementos'
+import { elementoSchema, fotoRefSchema } from './elementos'
 
 /**
  * Uma página é uma lista ordenada de blocos.
@@ -119,10 +119,7 @@ export const heroSchema = z.object({
     href: z.string().min(1),
     variante: z.enum(['solido', 'contorno']).default('solido'),
   })).max(2),
-  fotos: z.array(z.object({
-    midiaId: z.string().cuid().nullable(),
-    legenda: z.string().max(120).optional(),
-  })).max(3),
+  fotos: z.array(fotoRefSchema).max(3),
 })
 
 /** Cabeçalho das páginas internas — a tarja com migalha e título. */

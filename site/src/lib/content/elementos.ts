@@ -10,10 +10,21 @@ import { corSchema } from './cores'
 export const PROPORCOES = ['1/1', '4/3', '3/2', '16/10', '4/5'] as const
 export const proporcaoSchema = z.enum(PROPORCOES)
 
-/** Referência a uma linha de Midia. Null = slot vazio (foto ainda não subiu). */
+/** Enquadramento escolhido no painel: ponto de foco (%) e zoom (%). Ver lib/enquadramento. */
+export const focoSchema = z.object({
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  zoom: z.number().int().min(100).max(300),
+})
+
+/**
+ * Referência a uma linha de Midia. Null = slot vazio (foto ainda não subiu).
+ * `foco` é opcional: foto sem ele fica centralizada, como sempre foi.
+ */
 export const fotoRefSchema = z.object({
   midiaId: z.string().cuid().nullable(),
   legenda: z.string().max(120).optional(),
+  foco: focoSchema.optional(),
 })
 
 export const chipSchema = z.object({

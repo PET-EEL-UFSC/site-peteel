@@ -2,11 +2,19 @@
 
 import Image from 'next/image'
 import type { FotoRef } from '@/lib/content/elementos'
+import { FOCO_PADRAO } from '@/lib/enquadramento'
+import { QuadroFoto } from './QuadroFoto'
 
 export type OpcaoMidia = { id: string; url: string; alt: string; largura?: number; altura?: number }
 
-export function EscolhaFoto({ rotulo, valor, midias, onChange }: { rotulo: string; valor: FotoRef; midias: OpcaoMidia[]; onChange: (v: FotoRef) => void }) {
+/**
+ * `proporcao` é o formato do espaço no site ("4/3", "16/10"...). Passando-a, a
+ * foto escolhida ganha o quadro de enquadramento; sem ela (foto que sempre
+ * aparece inteira), só a escolha.
+ */
+export function EscolhaFoto({ rotulo, valor, midias, onChange, proporcao }: { rotulo: string; valor: FotoRef; midias: OpcaoMidia[]; onChange: (v: FotoRef) => void; proporcao?: string }) {
   const atual = valor.midiaId ? midias.find((m) => m.id === valor.midiaId) : undefined
+  const foco = valor.foco ?? FOCO_PADRAO
 
   return (
     <div className="campo">
@@ -19,7 +27,8 @@ export function EscolhaFoto({ rotulo, valor, midias, onChange }: { rotulo: strin
         <div style={{ flex: 1, minWidth: 0 }}>
           <select
             value={valor.midiaId ?? ''}
-            onChange={(e) => onChange({ ...valor, midiaId: e.target.value || null })}
+            // o enquadramento de uma foto não serve em outra: volta ao centro
+            onChange={(e) => onChange({ ...valor, midiaId: e.target.value || null, foco: undefined })}
             style={{ width: '100%', border: '2px solid var(--escuro)', padding: '8px 10px', font: '400 13.5px var(--corpo)' }}
           >
             <option value="">— sem foto ainda —</option>
@@ -37,6 +46,22 @@ export function EscolhaFoto({ rotulo, valor, midias, onChange }: { rotulo: strin
           />
         </div>
       </div>
+      {atual && proporcao && (
+        <details style={{ marginTop: 8 }} open={!!valor.foco}>
+          <summary style={{ cursor: 'pointer', font: '700 12px var(--condensada)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Enquadrar foto{valor.foco ? ' · ajustada' : ''}
+          </summary>
+          <QuadroFoto
+            url={atual.url}
+            largura={atual.largura}
+            altura={atual.altura}
+            foco={foco}
+            // no padrão (centro, sem zoom) não guarda nada: o JSON da página continua enxuto
+            onChange={(f) => onChange({ ...valor, foco: f.x === 50 && f.y === 50 && f.zoom === 100 ? undefined : f })}
+            proporcao={proporcao.replace('/', ' / ')}
+          />
+        </details>
+      )}
       {midias.length === 0 && <p className="dica">Nenhuma imagem enviada ainda. Vá em Imagens para subir as primeiras.</p>}
     </div>
   )

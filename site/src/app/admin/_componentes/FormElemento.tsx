@@ -137,7 +137,7 @@ export function FormElemento({ el, onChange, midias }: Props) {
     case 'foto':
       return (
         <>
-          <EscolhaFoto rotulo="Imagem" valor={el.foto} midias={midias} onChange={(foto) => onChange({ ...el, foto })} />
+          <EscolhaFoto rotulo="Imagem" valor={el.foto} midias={midias} proporcao={el.proporcao} onChange={(foto) => onChange({ ...el, foto })} />
           <Selecao rotulo="Formato" valor={el.proporcao} opcoes={[['4/3', 'Paisagem 4:3'], ['16/10', 'Paisagem larga'], ['3/2', 'Paisagem 3:2'], ['1/1', 'Quadrada'], ['4/5', 'Retrato']]} onChange={(proporcao) => onChange({ ...el, proporcao })} />
         </>
       )
@@ -153,7 +153,8 @@ export function FormElemento({ el, onChange, midias }: Props) {
               itens={el.itens}
               novo={() => ({ ...FOTO_VAZIA })}
               onChange={(itens) => onChange({ ...el, itens })}
-              render={(f, set) => <EscolhaFoto rotulo="Imagem" valor={f} midias={midias} onChange={set} />}
+              // a foto em destaque mostra a imagem inteira (formato próprio): não há o que enquadrar
+              render={(f, set) => <EscolhaFoto rotulo="Imagem" valor={f} midias={midias} proporcao={el.destaque && f === el.itens[0] ? undefined : el.proporcao} onChange={set} />}
             />
           </Secao>
         </>
@@ -175,7 +176,7 @@ export function FormElemento({ el, onChange, midias }: Props) {
                   <Texto rotulo="Etiqueta" valor={c.tag ?? ''} onChange={(tag) => set({ ...c, tag: tag || undefined })} dica="Opcional. Ex: Concluído, Em curso." />
                   <EscolhaCor rotulo="Cor da etiqueta" valor={c.corTag as Cor | undefined} permitirNenhuma onChange={(corTag) => set({ ...c, corTag })} />
                   <Texto rotulo="Link" valor={c.href ?? ''} onChange={(href) => set({ ...c, href: href || undefined })} dica="Opcional." />
-                  <EscolhaFoto rotulo="Foto" valor={c.foto ?? { ...FOTO_VAZIA }} midias={midias} onChange={(foto) => set({ ...c, foto })} />
+                  <EscolhaFoto rotulo="Foto" valor={c.foto ?? { ...FOTO_VAZIA }} midias={midias} proporcao="4/3" onChange={(foto) => set({ ...c, foto })} />
                 </>
               )}
             />
@@ -213,7 +214,7 @@ export function FormElemento({ el, onChange, midias }: Props) {
                   <Texto rotulo="Título" valor={it.titulo} onChange={(titulo) => set({ ...it, titulo })} />
                   <Area rotulo="Descrição" valor={it.texto ?? ''} onChange={(texto) => set({ ...it, texto })} />
                   <Texto rotulo="Link" valor={it.href ?? ''} onChange={(href) => set({ ...it, href: href || undefined })} dica="Opcional." />
-                  {el.comFoto && <EscolhaFoto rotulo="Miniatura" valor={it.foto ?? { ...FOTO_VAZIA }} midias={midias} onChange={(foto) => set({ ...it, foto })} />}
+                  {el.comFoto && <EscolhaFoto rotulo="Miniatura" valor={it.foto ?? { ...FOTO_VAZIA }} midias={midias} proporcao="4/3" onChange={(foto) => set({ ...it, foto })} />}
                 </>
               )}
             />

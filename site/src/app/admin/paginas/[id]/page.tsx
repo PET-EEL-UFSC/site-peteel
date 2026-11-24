@@ -12,7 +12,7 @@ export default async function EditarPagina({ params }: { params: Promise<{ id: s
 
   const [pagina, midias, revisoes, raizes, minicursos] = await Promise.all([
     db.pagina.findUnique({ where: { id }, include: { _count: { select: { filhos: true } } } }),
-    db.midia.findMany({ select: { id: true, url: true, alt: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
+    db.midia.findMany({ select: { id: true, url: true, alt: true, largura: true, altura: true }, orderBy: { criadoEm: 'desc' }, take: 200 }),
     db.paginaRevisao.findMany({
       where: { paginaId: id },
       select: { id: true, criadoEm: true, resumo: true, autor: { select: { nome: true, email: true } } },

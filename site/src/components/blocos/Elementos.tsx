@@ -125,6 +125,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
           legenda={el.foto.legenda}
           midias={ctx.midias}
           proporcao={el.proporcao}
+          foco={el.foto.foco}
           style={{ border: `3px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
         />
       )
@@ -162,6 +163,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 legenda={f.legenda}
                 midias={ctx.midias}
                 proporcao={el.proporcao}
+                foco={f.foco}
                 style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
                 sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`}
               />
@@ -195,7 +197,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                 }}
               >
                 {c.foto && (
-                  <Foto midiaId={c.foto.midiaId} legenda={c.foto.legenda} midias={ctx.midias} proporcao="4/3" style={{ borderBottom: '2px solid #2C2B22' }} sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`} />
+                  <Foto midiaId={c.foto.midiaId} legenda={c.foto.legenda} midias={ctx.midias} proporcao="4/3" foco={c.foto.foco} style={{ borderBottom: '2px solid #2C2B22' }} sizes={`(max-width: 900px) 50vw, ${Math.round(1280 / el.colunas)}px`} />
                 )}
                 <div style={{ padding: '20px 20px 22px' }}>
                   {c.tag && (
@@ -250,6 +252,7 @@ export function RenderElemento({ el, ctx }: { el: Elemento; ctx: Ctx }) {
                     legenda={it.foto?.legenda}
                     midias={ctx.midias}
                     proporcao="4/3"
+                    foco={it.foto?.foco}
                     style={{ border: `2px solid ${ctx.escuro ? '#F9F9F9' : '#2C2B22'}` }}
                     sizes={`(max-width: 900px) 96px, ${LARGURAS_FOTO[el.tamanhoFoto]}px`}
                   />

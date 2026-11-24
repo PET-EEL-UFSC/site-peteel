@@ -133,6 +133,8 @@ export function FormBloco({ bloco, onChange, midias }: { bloco: Bloco; onChange:
               rotulo={i === 0 ? 'Foto principal' : `Foto secundária ${i}`}
               valor={bloco.fotos[i] ?? { midiaId: null, legenda: '' }}
               midias={midias}
+              // proporção aproximada da célula no hero (a grade tem 1,5 fr de altura em cima e 1 fr embaixo)
+              proporcao={i === 0 ? '19/10' : '7/5'}
               onChange={(f) => {
                 const fotos = [...bloco.fotos]
                 while (fotos.length < 3) fotos.push({ midiaId: null, legenda: '' })
